@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="description" content="Auto Market Assistant — used-car price estimation and grounded owner-review RAG by Gayathri Namboodiri." />
+<title>Auto Market Assistant | Gayathri Namboodiri</title>
+<style>
+:root{--bg:#07111f;--panel:#0d1b2a;--panel2:#10243a;--text:#eef6ff;--muted:#9db0c8;--line:#213b56;--accent:#63e6be;--accent2:#7aa2ff;--warn:#ffd166;--good:#7ee787;--shadow:0 18px 60px rgba(0,0,0,.28)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% 0%,#102845 0,#07111f 38%,#050b14 100%);color:var(--text);line-height:1.55}
+a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justify-content:space-between;align-items:center;padding:22px 0}.brand{font-weight:800;letter-spacing:.02em}.home{color:var(--muted);text-decoration:none;font-size:.95rem}.hero{padding:72px 0 42px}.eyebrow{color:var(--accent);font-weight:800;text-transform:uppercase;letter-spacing:.14em;font-size:.78rem}.hero h1{font-size:clamp(2.7rem,7vw,6rem);line-height:.96;letter-spacing:-.055em;margin:.35em 0 .3em;max-width:950px}.lead{font-size:clamp(1.05rem,2vw,1.35rem);color:var(--muted);max-width:800px}.hero-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:24px;margin-top:42px}.card{background:linear-gradient(180deg,rgba(16,36,58,.9),rgba(8,22,36,.96));border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}.story{padding:28px}.story h3{margin:0 0 18px}.twoq{display:grid;grid-template-columns:1fr 1fr;gap:14px}.q{padding:18px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.025)}.q b{display:block;font-size:1.1rem;margin-bottom:6px}.q span{color:var(--muted)}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:18px}.metric{padding:18px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid var(--line)}.metric strong{display:block;font-size:1.7rem;letter-spacing:-.03em}.metric span{color:var(--muted);font-size:.9rem}.section{padding:66px 0}.section h2{font-size:clamp(2rem,4vw,3.5rem);letter-spacing:-.04em;margin:0 0 12px}.section-intro{color:var(--muted);max-width:760px;margin-bottom:30px}.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.step{padding:18px 16px;text-align:center;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.025);position:relative}.step small{display:block;color:var(--accent);font-weight:800;margin-bottom:8px}.step b{font-size:.95rem}.step:not(:last-child):after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--accent2);font-weight:900;z-index:4}.demo{padding:28px}.demo-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.tag{font-size:.8rem;padding:6px 10px;border-radius:99px;background:rgba(99,230,190,.1);border:1px solid rgba(99,230,190,.35);color:var(--accent);white-space:nowrap}.controls{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0 14px}.control{padding:13px 14px;border-radius:14px;border:1px solid var(--line);background:#081522}.control label{display:block;color:var(--muted);font-size:.75rem;margin-bottom:3px}.control strong{font-size:.97rem}.prompt{display:flex;gap:12px;margin-top:12px}.prompt-box{flex:1;padding:15px 16px;border:1px solid var(--line);border-radius:14px;background:#081522;color:#d9e8f6}.btn{border:0;border-radius:14px;background:linear-gradient(135deg,var(--accent),#43c7ff);color:#04101a;font-weight:900;padding:0 22px;cursor:pointer;min-height:52px}.btn:hover{filter:brightness(1.04)}.progress{height:4px;background:#10243a;border-radius:99px;overflow:hidden;margin:18px 0 0}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 1.5s ease}.results{display:none;margin-top:24px}.results.show{display:block;animation:rise .45s ease}@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}.result-grid{display:grid;grid-template-columns:.82fr 1.18fr;gap:16px}.price-card,.review-card{padding:22px;border:1px solid var(--line);border-radius:20px;background:#081522}.big-price{font-size:3rem;line-height:1;font-weight:900;letter-spacing:-.055em;margin:12px 0 8px}.sub{color:var(--muted)}.gauge{position:relative;height:12px;border-radius:99px;background:linear-gradient(90deg,#3d71ff,#63e6be,#ffd166);margin:28px 5px 8px}.pin{position:absolute;top:-8px;left:27%;height:28px;width:3px;background:#fff;border-radius:3px}.pin:after{content:"$10.7k";position:absolute;top:30px;left:50%;transform:translateX(-50%);font-size:.73rem;white-space:nowrap;color:#fff}.range{display:flex;justify-content:space-between;color:var(--muted);font-size:.78rem}.review-card h3{margin-top:0}.answer{font-size:1.02rem}.sources{display:grid;gap:9px;margin-top:16px}.source{padding:12px;border-radius:13px;background:rgba(255,255,255,.03);border:1px solid var(--line);font-size:.88rem}.source b{color:var(--accent)}.verified{display:inline-flex;align-items:center;gap:7px;color:var(--good);font-weight:800;font-size:.84rem;margin-top:14px}.tabs{display:flex;gap:8px;margin-top:22px;flex-wrap:wrap}.tab{background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:8px 13px;cursor:pointer}.tab.active{color:#04101a;background:var(--accent);border-color:var(--accent)}.tabpane{display:none;margin-top:14px;padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}.tabpane.active{display:block}.mini-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.node{padding:9px 11px;border-radius:11px;background:#0d1b2a;border:1px solid var(--line);font-size:.84rem}.arrow{color:var(--accent2)}.metric-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.metric-strip .metric{text-align:center}.metric-strip strong{font-size:1.55rem}.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.phase{padding:20px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.025)}.phase .n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#04101a;font-weight:900;margin-bottom:12px}.phase p{color:var(--muted);font-size:.91rem;margin-bottom:0}.note{padding:18px 20px;border-left:3px solid var(--warn);background:rgba(255,209,102,.06);border-radius:12px;color:#d8e4f0}.footer{padding:45px 0 60px;color:var(--muted);border-top:1px solid var(--line);margin-top:40px}.footer strong{color:var(--text)}
+@media(max-width:900px){.hero-grid,.result-grid{grid-template-columns:1fr}.flow{grid-template-columns:1fr 1fr}.step:not(:last-child):after{display:none}.metric-strip{grid-template-columns:repeat(3,1fr)}.timeline{grid-template-columns:1fr 1fr}.controls{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.hero{padding-top:42px}.twoq,.flow,.controls,.metric-strip,.timeline{grid-template-columns:1fr}.prompt{flex-direction:column}.btn{min-height:50px}.demo-head{flex-direction:column}.metrics{grid-template-columns:1fr 1fr}.hero h1{font-size:3.3rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="nav"><div class="brand">Gayathri Namboodiri</div><a class="home" href="/">← Portfolio home</a></nav>
+
+  <header class="hero">
+    <div class="eyebrow">End-to-end ML + RAG case study</div>
+    <h1>Auto Market<br/>Assistant</h1>
+    <p class="lead">A used-car assistant that separates two problems that are often mixed together: <strong>market value</strong> from structured listings and <strong>owner experience</strong> from retrieved review evidence.</p>
+    <div class="hero-grid">
+      <div class="card story">
+        <h3>One purchase. Two different questions.</h3>
+        <div class="twoq">
+          <div class="q"><b>How much is this car worth?</b><span>CatBoost learns asking-price patterns from Craigslist listings.</span></div>
+          <div class="q"><b>What do owners actually say?</b><span>MiniLM + FAISS retrieves relevant Edmunds reviews before generation.</span></div>
+        </div>
+      </div>
+      <div class="card metrics">
+        <div class="metric"><strong>239K</strong><span>price-model listings</span></div>
+        <div class="metric"><strong>70K+</strong><span>matched reviews</span></div>
+        <div class="metric"><strong>0.883</strong><span>test R²</span></div>
+        <div class="metric"><strong>18 ms</strong><span>median retrieval</span></div>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="eyebrow">System design</div>
+    <h2>Numbers from code. Opinions from evidence.</h2>
+    <p class="section-intro">The language model never invents a market price. Price estimation and owner-review generation stay separate until the final response.</p>
+    <div class="flow">
+      <div class="step"><small>01</small><b>Vehicle inputs</b></div>
+      <div class="step"><small>02</small><b>CatBoost price model</b></div>
+      <div class="step"><small>03</small><b>Review retrieval</b></div>
+      <div class="step"><small>04</small><b>Grounded Qwen summary</b></div>
+      <div class="step"><small>05</small><b>Citation check</b></div>
+    </div>
+  </section>
+
+  <section class="section" id="demo">
+    <div class="eyebrow">Interactive portfolio demo</div>
+    <h2>Try one real pipeline example.</h2>
+    <p class="section-intro">This GitHub Pages demo uses a <strong>precomputed output from the trained pipeline</strong>. It reproduces the product experience without pretending the full CatBoost + FAISS + Qwen stack is running inside your browser.</p>
+    <div class="card demo">
+      <div class="demo-head"><div><h3 style="margin:0">2004 Ford F-150</h3><div class="sub">Real example from the completed notebook run</div></div><span class="tag">PRECOMPUTED • VERIFIED</span></div>
+      <div class="controls">
+        <div class="control"><label>Make</label><strong>Ford</strong></div>
+        <div class="control"><label>Model</label><strong>F-150</strong></div>
+        <div class="control"><label>Year</label><strong>2004</strong></div>
+        <div class="control"><label>Mileage</label><strong>65,000 mi</strong></div>
+      </div>
+      <div class="prompt"><div class="prompt-box">What do owners mention about reliability and common problems?</div><button class="btn" id="runDemo">Analyze vehicle</button></div>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+
+      <div class="results" id="results">
+        <div class="result-grid">
+          <div class="price-card">
+            <div class="eyebrow">Market context</div>
+            <div class="big-price">$10,739</div>
+            <div class="sub">model estimate</div>
+            <div class="gauge"><span class="pin"></span></div>
+            <div class="range"><span>$9,500 Q1</span><span>$14,125 Q3</span></div>
+            <p style="margin-top:42px"><strong>$11,995</strong> comparable median<br/><span class="sub">60 similar listings • 2021 market context</span></p>
+          </div>
+          <div class="review-card">
+            <div class="eyebrow">Owner-review evidence</div>
+            <h3>Reliability experiences were mixed.</h3>
+            <p class="answer">Retrieved reviews included owners describing costly reliability problems as well as owners reporting long-term dependability. The system keeps the answer tied to the specific retrieved evidence instead of presenting one anecdote as universal.</p>
+            <div class="sources">
+              <div class="source"><b>[edm_95c73ef84557]</b> • 2005 • “let the buyer beware.....”</div>
+              <div class="source"><b>[edm_9e0350ab472a]</b> • 2004 • “Ron's Review”</div>
+              <div class="source"><b>[edm_08f6175402a2]</b> • 2003 • “New F-150, problems already”</div>
+            </div>
+            <div class="verified">✓ Final response source IDs validated</div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" data-tab="pipeline">How it worked</button>
+          <button class="tab" data-tab="safety">Grounding safety</button>
+          <button class="tab" data-tab="metrics">Measured performance</button>
+        </div>
+        <div class="tabpane active" id="pipeline"><div class="mini-flow"><span class="node">vehicle fields</span><span class="arrow">→</span><span class="node">20 price features</span><span class="arrow">→</span><span class="node">CatBoost</span><span class="arrow">+</span><span class="node">70,665 reviews</span><span class="arrow">→</span><span class="node">MiniLM + FAISS</span><span class="arrow">→</span><span class="node">Qwen</span></div></div>
+        <div class="tabpane" id="safety"><strong>The generator is not trusted automatically.</strong><p class="sub">Generated source IDs are checked against the reviews that were actually retrieved. In the measured demo, Qwen did not satisfy the citation rule, so the pipeline activated a deterministic evidence fallback. The final response remained source-valid.</p></div>
+        <div class="tabpane" id="metrics"><div class="mini-flow"><span class="node">Hit@5 81.7%</span><span class="node">MRR@10 0.626</span><span class="node">nDCG@10 0.688</span><span class="node">18.32 ms median retrieval</span><span class="node">~3.49 s end-to-end demo</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="eyebrow">Measured results</div>
+    <h2>Performance at a glance.</h2>
+    <div class="metric-strip">
+      <div class="metric"><strong>$2,866</strong><span>test MAE</span></div>
+      <div class="metric"><strong>0.883</strong><span>test R²</span></div>
+      <div class="metric"><strong>84.9%</strong><span>within $5K</span></div>
+      <div class="metric"><strong>81.7%</strong><span>Hit@5</span></div>
+      <div class="metric"><strong>0.626</strong><span>MRR@10</span></div>
+      <div class="metric"><strong>18 ms</strong><span>median retrieval</span></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="eyebrow">Experiment story</div>
+    <h2>What changed as the system matured?</h2>
+    <div class="timeline">
+      <div class="phase"><span class="n">1</span><strong>Start simple</strong><p>A hierarchical median baseline established whether ML was actually adding value.</p></div>
+      <div class="phase"><span class="n">2</span><strong>Fix representation</strong><p>Model-family normalization produced a much larger gain than simply adding more numeric features.</p></div>
+      <div class="phase"><span class="n">3</span><strong>Evaluate retrieval</strong><p>Hit@k, MRR and nDCG were added so ranking quality was not hidden behind one demo.</p></div>
+      <div class="phase"><span class="n">4</span><strong>Design for failure</strong><p>When the generator missed the citation instruction, the final architecture added validation and a safe fallback.</p></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="eyebrow">Data & evaluation</div>
+    <h2>Why the numbers are not presented as “accuracy”.</h2>
+    <p class="section-intro">Price prediction is regression. Review search is information retrieval. They need different evaluation language.</p>
+    <div class="twoq">
+      <div class="q"><b>Price model</b><span>Chronological holdout • MAE • RMSE • MAPE • R² • tolerance bands. Asking price is the target, not final sale price.</span></div>
+      <div class="q"><b>Review retrieval</b><span>Hit@1/3/5 • MRR@10 • nDCG@10 • latency. Identity retrieval is treated as a sanity metric, not universal semantic relevance.</span></div>
+    </div>
+    <div class="note" style="margin-top:18px"><strong>External-comparison rule:</strong> public Craigslist and RAG projects are used to motivate experiments and evaluation design, not to claim a misleading leaderboard win across different splits, features or relevance labels.</div>
+  </section>
+
+  <footer class="footer"><strong>Auto Market Assistant</strong> — portfolio case study by Gayathri Namboodiri.<br/>CatBoost • Sentence Transformers • FAISS • CrossEncoder • Qwen • Python</footer>
+</div>
+<script>
+const btn=document.getElementById('runDemo'),bar=document.getElementById('bar'),results=document.getElementById('results');
+btn.addEventListener('click',()=>{btn.textContent='Analyzing…';btn.disabled=true;bar.style.width='100%';setTimeout(()=>{results.classList.add('show');btn.textContent='Analysis complete ✓';results.scrollIntoView({behavior:'smooth',block:'nearest'});},1450)});
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tabpane').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.getElementById(t.dataset.tab).classList.add('active')}));
+</script>
+</body>
+</html>
