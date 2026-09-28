@@ -1,0 +1,20 @@
+{
+  "raw_review_rows": 137660,
+  "clean_review_rows": 102546,
+  "clean_matched_review_rows": 70665,
+  "price_scope_match_rate_percent": 68.91,
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "embedding_dimensions": 384,
+  "retrieval_eval_queries": 60,
+  "vehicle_hit_at_5_percent": 81.67,
+  "identity_hit_at_1_percent": 50.0,
+  "identity_hit_at_3_percent": 73.33,
+  "identity_mrr_at_10": 0.6256,
+  "identity_ndcg_at_10": 0.6883,
+  "retrieval_latency_median_ms": 21.15,
+  "retrieval_latency_p95_ms": 26.14,
+  "generator_model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "generator_device": "cuda",
+  "demo_citation_validity_percent": 100.0,
+  "demo_fallback_used": true
+}
