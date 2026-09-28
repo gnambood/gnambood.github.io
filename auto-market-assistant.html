@@ -33,7 +33,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
         <div class="metric"><strong>239K</strong><span>price-model listings</span></div>
         <div class="metric"><strong>70K+</strong><span>matched reviews</span></div>
         <div class="metric"><strong>0.883</strong><span>test R²</span></div>
-        <div class="metric"><strong>18 ms</strong><span>median retrieval</span></div>
+        <div class="metric"><strong>21 ms</strong><span>median retrieval</span></div>
       </div>
     </div>
   </header>
@@ -99,7 +99,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
         </div>
         <div class="tabpane active" id="pipeline"><div class="mini-flow"><span class="node">vehicle fields</span><span class="arrow">→</span><span class="node">20 price features</span><span class="arrow">→</span><span class="node">CatBoost</span><span class="arrow">+</span><span class="node">70,665 reviews</span><span class="arrow">→</span><span class="node">MiniLM + FAISS</span><span class="arrow">→</span><span class="node">Qwen</span></div></div>
         <div class="tabpane" id="safety"><strong>The generator is not trusted automatically.</strong><p class="sub">Generated source IDs are checked against the reviews that were actually retrieved. In the measured demo, Qwen did not satisfy the citation rule, so the pipeline activated a deterministic evidence fallback. The final response remained source-valid.</p></div>
-        <div class="tabpane" id="metrics"><div class="mini-flow"><span class="node">Hit@5 81.7%</span><span class="node">MRR@10 0.626</span><span class="node">nDCG@10 0.688</span><span class="node">18.32 ms median retrieval</span><span class="node">~3.49 s end-to-end demo</span></div></div>
+        <div class="tabpane" id="metrics"><div class="mini-flow"><span class="node">Hit@5 81.7%</span><span class="node">MRR@10 0.626</span><span class="node">p95 retrieval 26.14 ms</span><span class="node">21.15 ms median retrieval</span><span class="node">~3.49 s end-to-end demo</span></div></div>
       </div>
     </div>
   </section>
@@ -113,7 +113,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
       <div class="metric"><strong>84.9%</strong><span>within $5K</span></div>
       <div class="metric"><strong>81.7%</strong><span>Hit@5</span></div>
       <div class="metric"><strong>0.626</strong><span>MRR@10</span></div>
-      <div class="metric"><strong>18 ms</strong><span>median retrieval</span></div>
+      <div class="metric"><strong>21 ms</strong><span>median retrieval</span></div>
     </div>
   </section>
 
