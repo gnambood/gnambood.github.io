@@ -1,0 +1,94 @@
+name: Patch Auto Market Assistant into homepage
+
+on:
+  push:
+    branches:
+      - feature/auto-market-home-integration
+
+permissions:
+  contents: write
+
+jobs:
+  patch-homepage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/auto-market-home-integration
+          fetch-depth: 0
+
+      - name: Append Auto Market Assistant section
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("index.html")
+          html = path.read_text(encoding="utf-8")
+
+          marker = "<!-- AUTO_MARKET_ASSISTANT_HOME -->"
+          if marker in html:
+              print("Auto Market Assistant section already present.")
+              raise SystemExit(0)
+
+          section = r'''
+          <!-- AUTO_MARKET_ASSISTANT_HOME -->
+          <section id="auto-market-assistant" style="background:#07111f;color:#eef6ff;padding:84px 20px 76px;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+            <div style="width:min(1120px,94vw);margin:0 auto;">
+              <div style="color:#63e6be;font-size:.78rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px;">Featured ML + RAG Project</div>
+              <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr);gap:24px;align-items:end;margin-bottom:28px;">
+                <div>
+                  <h2 style="font-size:clamp(2.2rem,5vw,4.2rem);line-height:1;letter-spacing:-.05em;margin:0 0 16px;">Auto Market Assistant</h2>
+                  <p style="color:#9db0c8;font-size:1.08rem;max-width:760px;margin:0;">A used-car intelligence system combining a CatBoost price model with grounded owner-review retrieval. Try the interactive demo directly below.</p>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                  <div style="background:#0d1b2a;border:1px solid #213b56;border-radius:16px;padding:15px;"><strong style="display:block;font-size:1.5rem;">$2,866</strong><span style="color:#9db0c8;font-size:.86rem;">test MAE</span></div>
+                  <div style="background:#0d1b2a;border:1px solid #213b56;border-radius:16px;padding:15px;"><strong style="display:block;font-size:1.5rem;">0.883</strong><span style="color:#9db0c8;font-size:.86rem;">test R²</span></div>
+                  <div style="background:#0d1b2a;border:1px solid #213b56;border-radius:16px;padding:15px;"><strong style="display:block;font-size:1.5rem;">81.7%</strong><span style="color:#9db0c8;font-size:.86rem;">Hit@5</span></div>
+                  <div style="background:#0d1b2a;border:1px solid #213b56;border-radius:16px;padding:15px;"><strong style="display:block;font-size:1.5rem;">18 ms</strong><span style="color:#9db0c8;font-size:.86rem;">retrieval</span></div>
+                </div>
+              </div>
+
+              <div style="border:1px solid #213b56;border-radius:24px;overflow:hidden;background:#07111f;box-shadow:0 18px 60px rgba(0,0,0,.24);">
+                <iframe id="ama-home-frame" src="/auto-market-assistant.html?embed=1" title="Auto Market Assistant interactive demo" style="display:block;width:100%;height:760px;border:0;background:#07111f;" loading="lazy"></iframe>
+              </div>
+
+              <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:18px;">
+                <a href="/auto-market-assistant.html" style="display:inline-block;background:#63e6be;color:#04101a;text-decoration:none;font-weight:800;padding:12px 18px;border-radius:12px;">Open full case study →</a>
+                <span style="color:#9db0c8;font-size:.9rem;">Demo outputs shown here are verified outputs from the trained pipeline.</span>
+              </div>
+            </div>
+          </section>
+          <script>
+          (function(){
+            window.addEventListener('message', function(event){
+              if(event.origin !== window.location.origin) return;
+              if(!event.data || event.data.type !== 'auto-market-height') return;
+              var f = document.getElementById('ama-home-frame');
+              if(f && Number(event.data.height)) f.style.height = Math.max(650, Number(event.data.height) + 10) + 'px';
+            });
+          })();
+          </script>
+          '''
+
+          closing = html.lower().rfind("</body>")
+          if closing == -1:
+              raise RuntimeError("Could not find </body> in index.html")
+
+          html = html[:closing] + section + "\n" + html[closing:]
+          path.write_text(html, encoding="utf-8")
+          print("Homepage patched.")
+          PY
+
+      - name: Commit patched homepage
+        shell: bash
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "No homepage changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Embed Auto Market Assistant on portfolio homepage"
+          git push origin HEAD:feature/auto-market-home-integration
