@@ -1,0 +1,46 @@
+name: Auto Market Assistant Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'projects/auto-market-assistant/api/**'
+      - 'projects/auto-market-assistant/Dockerfile'
+      - '.github/workflows/auto-market-deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    if: ${{ vars.AWS_ROLE_ARN != '' && vars.ECR_REPOSITORY != '' && vars.APP_RUNNER_SERVICE_ARN != '' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/auto-market-assistant
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+        run: |
+          docker build -t "$REGISTRY/$REPOSITORY:${GITHUB_SHA}" -t "$REGISTRY/$REPOSITORY:latest" .
+          docker push "$REGISTRY/$REPOSITORY:${GITHUB_SHA}"
+          docker push "$REGISTRY/$REPOSITORY:latest"
+
+      - name: Trigger App Runner deployment
+        run: |
+          aws apprunner start-deployment --service-arn "${{ vars.APP_RUNNER_SERVICE_ARN }}"

@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Auto Market Assistant S3 data lake and raw-upload validation.
+
+Resources:
+  DataBucket:
+    Type: AWS::S3::Bucket
+
+  RawUploadValidator:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.11
+      Handler: validate_upload.handler
+      CodeUri: ../lambda/
+      Timeout: 60
+      MemorySize: 512
+      Environment:
+        Variables:
+          MAX_VALIDATION_ROWS: '5000'
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref DataBucket
+        - S3WritePolicy:
+            BucketName: !Ref DataBucket
+      Events:
+        RawUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref DataBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: raw/
+
+Outputs:
+  DataBucketName:
+    Value: !Ref DataBucket
