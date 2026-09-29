@@ -19,6 +19,8 @@ jobs:
     defaults:
       run:
         working-directory: projects/auto-market-assistant
+    env:
+      PYTHONPATH: .
 
     steps:
       - uses: actions/checkout@v4
@@ -36,4 +38,4 @@ jobs:
         run: ruff check api tests
 
       - name: Test
-        run: pytest -q
+        run: python -m pytest -q
