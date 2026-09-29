@@ -1,49 +1,98 @@
 # Auto Market Assistant
 
-End-to-end used-car intelligence project combining a CatBoost price model with grounded owner-review retrieval.
+End-to-end used-car intelligence system combining a CatBoost price model with grounded owner-review retrieval, a FastAPI inference layer, and an AWS deployment path.
 
-## How the portfolio demo stays exact
+## What it does
 
-GitHub Pages does **not** run CatBoost, FAISS, or Qwen in the browser. The trained pipeline exports a compact `auto-market-demo-data.json` containing real, precomputed outputs. The website reads that JSON directly.
+The system separates two questions that should not be mixed:
 
-```text
-trained CatBoost + cleaned listings
-              |
-MiniLM + FAISS + Qwen + citation validation
-              |
-              v
-   auto-market-demo-data.json
-              |
-              v
-   GitHub Pages interactive demo
-```
+- How much is this vehicle worth in the historical listing market?
+- What do owners actually report about the vehicle?
+
+Price estimates come from a structured CatBoost model. Owner-experience answers come from retrieved Edmunds reviews with citation validation and a safe evidence fallback.
 
 ## Final measured results
 
-**Price model**
-- Test MAE: $2,866
-- Test R²: 0.883
-- 84.9% within ±$5,000
-- Chronological holdout evaluation
+### Price model
+- 238,959 modeling rows
+- chronological holdout
+- test MAE: $2,866
+- test R²: 0.883
+- 84.9% of held-out predictions within ±$5,000
 
-**Owner-review retrieval**
-- 70,665 matched review documents
-- Vehicle Hit@5: 81.67%
+### Owner-review retrieval
+- 70,665 matched reviews
+- MiniLM embeddings
+- FAISS retrieval
+- Hit@5: 81.67%
 - MRR@10: 0.6256
-- Median retrieval latency: 21.15 ms
-- Qwen 2.5 1.5B on CUDA
-- Citation validation with evidence-backed fallback
+- median retrieval latency: 21.15 ms
+- Qwen 2.5 1.5B used in the final notebook run
+- citation validation + evidence-backed fallback
 
-## Reproduce the website data
+## Production extension
 
-1. Run or restore the final Part 1 artifacts.
-2. Run the final Part 2 pipeline.
-3. Run `src/export_demo_data.py` in the Part 2 notebook/runtime.
-4. Commit the generated `auto-market-demo-data.json` to the root of the Pages repo.
-5. `auto-market-assistant.html` loads those exact presets automatically.
+The repository now includes:
+
+- FastAPI endpoints:
+  - POST /predict-price
+  - POST /ask
+  - GET /health
+  - GET /metrics
+- Docker container definition
+- S3 artifact loading
+- S3 raw-data validation Lambda
+- AWS SAM template for the data bucket + validator
+- AWS App Runner / ECR deployment template
+- GitHub Actions CI
+- GitHub Actions deployment workflow
+- model card and architecture documentation
+- static verified JSON fallback for GitHub Pages
+
+## S3 layout
+
+raw/
+- craigslist/
+- edmunds/
+
+processed/
+- vehicles_clean.parquet
+- review_documents.parquet
+
+artifacts/
+- price_model.cbm
+- model_improvement_metrics.json
+- review_index.faiss
+- rag_metrics.json
+
+validation/
+- raw-upload validation reports
+
+## Website architecture
+
+The portfolio supports two modes:
+
+1. verified static demo data generated from the trained pipeline;
+2. live API calls after the AWS App Runner service is deployed.
+
+The static fallback prevents the portfolio from breaking if the cloud service is unavailable.
+
+## Reproducing the exact portfolio data
+
+1. Restore the Part 1 artifact bundle.
+2. Restore the Part 2 artifact bundle.
+3. Run src/build_demo_json_from_artifacts.py in Colab or the project runtime.
+4. Commit the generated auto-market-demo-data.json to the Pages root.
+5. The portfolio automatically loads the exact exported presets.
 
 ## Large artifacts
 
-Parquet datasets, FAISS indexes, embeddings, CatBoost binaries, and ZIP bundles are intentionally excluded from the Pages repository. They are build/runtime artifacts and would unnecessarily bloat a static website repository.
+Large Parquet files, FAISS indexes, embeddings, model binaries and ZIP bundles are intentionally excluded from Git. The deployment service loads them from S3.
 
-Price outputs are historical **2021 Craigslist asking-price context**, not current valuations or transaction sale prices.
+## Scope and limitations
+
+- Price outputs represent 2021 Craigslist asking-price context.
+- Asking price is not a completed transaction price.
+- Results should not be interpreted as current vehicle valuations.
+- Retrieval metrics evaluate vehicle-identity retrieval behavior, not universal semantic answer quality.
+- Owner reviews are anecdotal and may disagree.
