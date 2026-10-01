@@ -2,7 +2,7 @@
   const PROJECT_ID = "auto-market-project";
 
   function removeLegacyBlock() {
-    document.querySelectorAll("body > section#auto-market-assistant").forEach((node) => node.remove());
+    document.querySelectorAll("section#auto-market-assistant").forEach((node) => node.remove());
   }
 
   function addNavLink() {
