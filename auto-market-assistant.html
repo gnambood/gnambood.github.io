@@ -33,7 +33,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
         <div class="metric"><strong>239K</strong><span>price-model listings</span></div>
         <div class="metric"><strong>70K+</strong><span>matched reviews</span></div>
         <div class="metric"><strong>0.883</strong><span>test R²</span></div>
-        <div class="metric"><strong>21 ms</strong><span>median retrieval</span></div>
+        <div class="metric"><strong>19.6 ms</strong><span>median retrieval</span></div>
       </div>
     </div>
   </header>
@@ -46,7 +46,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
       <div class="step"><small>01</small><b>Vehicle inputs</b></div>
       <div class="step"><small>02</small><b>CatBoost price model</b></div>
       <div class="step"><small>03</small><b>Review retrieval</b></div>
-      <div class="step"><small>04</small><b>Grounded Qwen summary</b></div>
+      <div class="step"><small>04</small><b>Grounded summary / fallback</b></div>
       <div class="step"><small>05</small><b>Citation check</b></div>
     </div>
   </section>
@@ -54,9 +54,9 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
   <section class="section" id="demo">
     <div class="eyebrow">Interactive portfolio demo</div>
     <h2>Try one real pipeline example.</h2>
-    <p class="section-intro">This GitHub Pages demo uses a <strong>precomputed output from the trained pipeline</strong>. It reproduces the product experience without pretending the full CatBoost + FAISS + Qwen stack is running inside your browser.</p>
+    <p class="section-intro">This demo calls the <strong>live FastAPI service deployed on AWS ECS Express Mode</strong>. If cloud inference is unavailable, the page automatically falls back to a verified precomputed pipeline result.</p>
     <div class="card demo">
-      <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">Choose a verified precomputed vehicle configuration</div></div><span class="tag">PRECOMPUTED • VERIFIED</span></div>
+      <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">Choose a vehicle configuration and query the deployed pipeline</div></div><span class="tag" id="modeTag">CHECKING LIVE API</span></div>
       <div class="controls">
         <div class="control"><label for="makeSelect">Make</label><select id="makeSelect"></select></div>
         <div class="control"><label for="modelSelect">Model</label><select id="modelSelect"></select></div>
@@ -65,7 +65,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
         <div class="control"><label for="conditionSelect">Condition</label><select id="conditionSelect"></select></div>
         <div class="control"><label for="questionSelect">Owner question</label><select id="questionSelect"></select></div>
       </div>
-      <div class="demo-mode" id="dataModeNote">Loading verified demo presets…</div>
+      <div class="demo-mode" id="dataModeNote">Checking the live AWS service…</div>
       <div class="prompt"><div class="prompt-box" id="promptText">What do owners mention about reliability and common problems?</div><button class="btn" id="runDemo">Analyze vehicle</button></div>
       <div class="progress"><div class="bar" id="bar"></div></div>
 
@@ -97,9 +97,9 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
           <button class="tab" data-tab="safety">Grounding safety</button>
           <button class="tab" data-tab="metrics">Measured performance</button>
         </div>
-        <div class="tabpane active" id="pipeline"><div class="mini-flow"><span class="node">vehicle fields</span><span class="arrow">→</span><span class="node">20 price features</span><span class="arrow">→</span><span class="node">CatBoost</span><span class="arrow">+</span><span class="node">70,665 reviews</span><span class="arrow">→</span><span class="node">MiniLM + FAISS</span><span class="arrow">→</span><span class="node">Qwen</span></div></div>
+        <div class="tabpane active" id="pipeline"><div class="mini-flow"><span class="node">vehicle fields</span><span class="arrow">→</span><span class="node">engineered price features</span><span class="arrow">→</span><span class="node">CatBoost</span><span class="arrow">+</span><span class="node">70,665 reviews</span><span class="arrow">→</span><span class="node">MiniLM + FAISS</span><span class="arrow">→</span><span class="node">grounded response</span></div></div>
         <div class="tabpane" id="safety"><strong>The generator is not trusted automatically.</strong><p class="sub">Generated source IDs are checked against the reviews that were actually retrieved. In the measured demo, Qwen did not satisfy the citation rule, so the pipeline activated a deterministic evidence fallback. The final response remained source-valid.</p></div>
-        <div class="tabpane" id="metrics"><div class="mini-flow"><span class="node">Hit@5 81.7%</span><span class="node">MRR@10 0.626</span><span class="node">p95 retrieval 26.14 ms</span><span class="node">21.15 ms median retrieval</span><span class="node">~3.49 s end-to-end demo</span></div></div>
+        <div class="tabpane" id="metrics"><div class="mini-flow"><span class="node">Hit@5 81.7%</span><span class="node">MRR@10 0.626</span><span class="node">p95 retrieval 21.35 ms</span><span class="node">19.59 ms median retrieval</span></div></div>
       </div>
     </div>
   </section>
@@ -113,7 +113,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
       <div class="metric"><strong>84.9%</strong><span>within $5K</span></div>
       <div class="metric"><strong>81.7%</strong><span>Hit@5</span></div>
       <div class="metric"><strong>0.626</strong><span>MRR@10</span></div>
-      <div class="metric"><strong>21 ms</strong><span>median retrieval</span></div>
+      <div class="metric"><strong>19.6 ms</strong><span>median retrieval</span></div>
     </div>
   </section>
 
@@ -123,7 +123,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
     <div class="timeline">
       <div class="phase"><span class="n">1</span><strong>Start simple</strong><p>A hierarchical median baseline established whether ML was actually adding value.</p></div>
       <div class="phase"><span class="n">2</span><strong>Fix representation</strong><p>Model-family normalization produced a much larger gain than simply adding more numeric features.</p></div>
-      <div class="phase"><span class="n">3</span><strong>Evaluate retrieval</strong><p>Hit@k, MRR and nDCG were added so ranking quality was not hidden behind one demo.</p></div>
+      <div class="phase"><span class="n">3</span><strong>Evaluate retrieval</strong><p>Hit@k, MRR and latency were measured so retrieval quality was not hidden behind one demo.</p></div>
       <div class="phase"><span class="n">4</span><strong>Design for failure</strong><p>When the generator missed the citation instruction, the final architecture added validation and a safe fallback.</p></div>
     </div>
   </section>
@@ -134,14 +134,16 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
     <p class="section-intro">Price prediction is regression. Review search is information retrieval. They need different evaluation language.</p>
     <div class="twoq">
       <div class="q"><b>Price model</b><span>Chronological holdout • MAE • RMSE • MAPE • R² • tolerance bands. Asking price is the target, not final sale price.</span></div>
-      <div class="q"><b>Review retrieval</b><span>Hit@1/3/5 • MRR@10 • nDCG@10 • latency. Identity retrieval is treated as a sanity metric, not universal semantic relevance.</span></div>
+      <div class="q"><b>Review retrieval</b><span>Hit@1/3/5 • MRR@10 • latency. Identity retrieval is treated as a sanity metric, not universal semantic relevance.</span></div>
     </div>
     <div class="note" style="margin-top:18px"><strong>External-comparison rule:</strong> public Craigslist and RAG projects are used to motivate experiments and evaluation design, not to claim a misleading leaderboard win across different splits, features or relevance labels.</div>
   </section>
 
-  <footer class="footer"><strong>Auto Market Assistant</strong> — portfolio case study by Gayathri Namboodiri.<br/>CatBoost • Sentence Transformers • FAISS • CrossEncoder • Qwen • Python</footer>
+  <footer class="footer"><strong>Auto Market Assistant</strong> — portfolio case study by Gayathri Namboodiri.<br/>CatBoost • Sentence Transformers • FAISS • Qwen • FastAPI • Docker • AWS ECS • S3 • ECR</footer>
 </div>
 <script>
+const LIVE_API_BASE="https://au-31cea16fe69c481c8dd923a37b6252df.ecs.ca-central-1.on.aws";
+let LIVE_API_AVAILABLE=false;
 const FALLBACK_DATA={
   market_year:2021,
   questions:{
@@ -149,8 +151,9 @@ const FALLBACK_DATA={
   },
   vehicles:{
     "ford-f150":{
-      display_make:"Ford",display_model:"F-150",
+      display_make:"Ford",display_model:"F-150",make:"ford",model:"f-150",
       years:[2004],mileages:[65000],conditions:["good"],
+      defaults:{fuel:"gas",title_status:"clean",transmission:"automatic",drive:"4wd",vehicle_type:"truck",state:"ca"},
       price_grid:{
         "2004|65000|good":{
           predicted_price:10739,comparable_count:60,comparable_median:11995,
@@ -179,7 +182,7 @@ const els={
   make:document.getElementById('makeSelect'),model:document.getElementById('modelSelect'),
   year:document.getElementById('yearSelect'),mileage:document.getElementById('mileageSelect'),
   condition:document.getElementById('conditionSelect'),question:document.getElementById('questionSelect'),
-  title:document.getElementById('vehicleTitle'),note:document.getElementById('dataModeNote'),
+  title:document.getElementById('vehicleTitle'),note:document.getElementById('dataModeNote'),modeTag:document.getElementById('modeTag'),
   prompt:document.getElementById('promptText'),btn:document.getElementById('runDemo'),
   bar:document.getElementById('bar'),results:document.getElementById('results')
 };
@@ -224,7 +227,7 @@ function syncPrompt(){
   els.btn.textContent='Analyze vehicle';
   els.btn.disabled=false;
 }
-function renderResult(){
+function renderStaticResult(){
   const v=currentVehicle();
   const p=v.price_grid[[els.year.value,els.mileage.value,els.condition.value].join('|')];
   const r=v.reviews[[els.year.value,els.question.value].join('|')] || v.reviews[Object.keys(v.reviews)[0]];
@@ -247,6 +250,84 @@ function renderResult(){
   });
   document.getElementById('verification').textContent=r.citation_valid?'✓ Final response source IDs validated':'Evidence shown directly from retrieved reviews';
 }
+
+function questionHeading(key){
+  return {
+    reliability:"Reliability & common problems",
+    comfort:"Comfort & daily driving",
+    fuel_economy:"Fuel-economy owner evidence"
+  }[key]||"Owner review evidence";
+}
+async function fetchJson(url,options={},timeoutMs=120000){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),timeoutMs);
+  try{
+    const res=await fetch(url,{...options,signal:controller.signal});
+    const body=await res.json().catch(()=>({}));
+    if(!res.ok)throw new Error(body.detail||('HTTP '+res.status));
+    return body;
+  }finally{clearTimeout(timer)}
+}
+async function checkLiveApi(){
+  try{
+    const health=await fetchJson(LIVE_API_BASE+'/health',{cache:'no-store'},8000);
+    LIVE_API_AVAILABLE=health.status==='ok';
+  }catch(e){LIVE_API_AVAILABLE=false}
+  if(LIVE_API_AVAILABLE){
+    els.modeTag.textContent='LIVE • AWS ECS';
+    els.note.textContent='Live AWS FastAPI service available. Verified static output remains as an automatic fallback.';
+  }else{
+    els.modeTag.textContent='STATIC FALLBACK • VERIFIED';
+    els.note.textContent='AWS API is unavailable right now; the demo will use verified precomputed pipeline output.';
+  }
+}
+function renderLiveResult(p,r){
+  document.getElementById('predPrice').textContent=money(p.predicted_price);
+  document.getElementById('q1').textContent=money(p.comparable_q25)+' Q1';
+  document.getElementById('q3').textContent=money(p.comparable_q75)+' Q3';
+  document.getElementById('medianPrice').textContent=money(p.comparable_median);
+  document.getElementById('compMeta').textContent=p.comparable_count+' similar listings • '+p.market_year+' market context';
+  const span=Math.max(1,p.comparable_q75-p.comparable_q25);
+  const pct=Math.max(3,Math.min(97,100*(p.predicted_price-p.comparable_q25)/span));
+  const pin=document.getElementById('estimatePin');pin.style.left=pct+'%';pin.dataset.label=compactMoney(p.predicted_price);
+  document.getElementById('reviewHeading').textContent=questionHeading(els.question.value);
+  document.getElementById('reviewAnswer').textContent=r.answer;
+  const src=document.getElementById('reviewSources');src.innerHTML='';
+  (r.sources||[]).slice(0,5).forEach(s=>{
+    const d=document.createElement('div');d.className='source';
+    d.innerHTML='<b>['+s.review_id+']</b> • '+(s.vehicle_year??'year n/a')+' • “'+String(s.review_title||'Owner review').replace(/[<>]/g,'')+'”';
+    src.appendChild(d);
+  });
+  document.getElementById('verification').textContent=r.citation_valid
+    ?'✓ Live retrieved source IDs validated • '+r.generation_mode
+    :'Live evidence returned from retrieved owner reviews';
+}
+async function runLiveAnalysis(){
+  const v=currentVehicle();
+  const d=v.defaults||{};
+  const make=v.make||String(v.display_make||'').toLowerCase();
+  const model=v.model||String(v.display_model||'').toLowerCase();
+  const pricePayload={
+    manufacturer:make,model,
+    year:Number(els.year.value),mileage:Number(els.mileage.value),
+    condition:els.condition.value,
+    fuel:d.fuel??null,title_status:d.title_status??null,
+    transmission:d.transmission??null,drive:d.drive??null,
+    vehicle_type:d.vehicle_type??null,state:d.state??null
+  };
+  const askPayload={
+    manufacturer:make,model,year:Number(els.year.value),
+    question:(DEMO_DATA.questions||{})[els.question.value]||els.prompt.textContent,
+    k:5
+  };
+  const headers={'Content-Type':'application/json'};
+  const [price,review]=await Promise.all([
+    fetchJson(LIVE_API_BASE+'/predict-price',{method:'POST',headers,body:JSON.stringify(pricePayload)}),
+    fetchJson(LIVE_API_BASE+'/ask',{method:'POST',headers,body:JSON.stringify(askPayload)})
+  ]);
+  renderLiveResult(price,review);
+}
+
 async function loadDemoData(){
   try{
     const res=await fetch('/auto-market-demo-data.json',{cache:'no-store'});
@@ -254,19 +335,33 @@ async function loadDemoData(){
     const data=await res.json();
     if(!data.vehicles||!Object.keys(data.vehicles).length)throw new Error('empty');
     DEMO_DATA=data;
-    els.note.textContent=Object.keys(data.vehicles).length+' verified vehicle presets loaded from the trained pipeline.';
+    els.note.textContent=Object.keys(data.vehicles).length+' verified vehicle presets loaded; checking live AWS API…';
   }catch(e){
     DEMO_DATA=FALLBACK_DATA;
-    els.note.textContent='1 verified preset loaded. Multi-vehicle data export can be added without changing this page.';
+    els.note.textContent='Verified fallback preset loaded; checking live AWS API…';
   }
   populateMakes();
+  await checkLiveApi();
 }
 els.make.addEventListener('change',populateModels);
 els.model.addEventListener('change',populateVehicleFields);
 [els.year,els.mileage,els.condition,els.question].forEach(x=>x.addEventListener('change',syncPrompt));
-els.btn.addEventListener('click',()=>{
-  els.btn.textContent='Analyzing…';els.btn.disabled=true;els.bar.style.width='100%';
-  setTimeout(()=>{renderResult();els.results.classList.add('show');els.btn.textContent='Analysis complete ✓';els.btn.disabled=false;els.results.scrollIntoView({behavior:'smooth',block:'nearest'});},850);
+els.btn.addEventListener('click',async()=>{
+  els.btn.textContent='Analyzing live pipeline…';els.btn.disabled=true;els.bar.style.width='70%';
+  try{
+    if(!LIVE_API_AVAILABLE)throw new Error('live API unavailable');
+    await runLiveAnalysis();
+    els.modeTag.textContent='LIVE • AWS ECS';
+    els.note.textContent='Live result from AWS ECS Express Mode: CatBoost price inference + MiniLM/FAISS owner-review retrieval.';
+  }catch(e){
+    renderStaticResult();
+    els.modeTag.textContent='STATIC FALLBACK • VERIFIED';
+    els.note.textContent='Live AWS request was unavailable; showing the verified precomputed pipeline fallback.';
+  }
+  els.bar.style.width='100%';
+  els.results.classList.add('show');
+  els.btn.textContent='Analysis complete ✓';els.btn.disabled=false;
+  els.results.scrollIntoView({behavior:'smooth',block:'nearest'});
 });
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tabpane').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.getElementById(t.dataset.tab).classList.add('active')}));
 if(new URLSearchParams(location.search).get('embed')==='1'){const sendHeight=()=>parent.postMessage({type:'auto-market-height',height:document.documentElement.scrollHeight},location.origin);new ResizeObserver(sendHeight).observe(document.body);window.addEventListener('load',sendHeight);setTimeout(sendHeight,250)}

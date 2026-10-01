@@ -23,7 +23,8 @@ It is a portfolio/research system, not a current appraisal or transaction-price 
 - Index: FAISS IndexFlatIP over normalized embeddings
 - Vehicle Hit@5: 81.67%
 - MRR@10: 0.6256
-- Median retrieval latency: 21.15 ms
+- Median retrieval latency: 19.59 ms
+- p95 retrieval latency: 21.35 ms
 - Generator in the final notebook run: Qwen/Qwen2.5-1.5B-Instruct
 
 Generated source IDs are checked against retrieved reviews. If citation validation fails, the pipeline returns evidence-backed retrieved excerpts.
@@ -34,4 +35,5 @@ Generated source IDs are checked against retrieved reviews. If citation validati
 - Asking price is not the same as final transaction price.
 - Retrieval metrics measure vehicle-identity retrieval behavior, not universal answer quality.
 - Owner reviews are anecdotal and may disagree.
-- The cloud API can run in retrieval-only fallback mode when ENABLE_GENERATION=false.
+- The deployed AWS ECS API currently runs in retrieval-only fallback mode with ENABLE_GENERATION=false.
+- The live service is intended as a portfolio deployment, not a continuously available commercial SLA.

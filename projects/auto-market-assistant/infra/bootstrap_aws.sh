@@ -91,7 +91,8 @@ cat > /tmp/auto-market-policy.json <<EOF
     {
       "Effect": "Allow",
       "Action": [
-        "apprunner:StartDeployment"
+        "ecs:UpdateExpressGatewayService",
+        "ecs:DescribeExpressGatewayService"
       ],
       "Resource": "*"
     }
@@ -114,4 +115,4 @@ echo "ECR_REPOSITORY=${ECR_REPO}"
 echo "ECR_URI=${ECR_URI}"
 echo "AWS_ROLE_ARN=${ROLE_ARN}"
 echo
-echo "Next: upload the project artifacts, build the first container image, then create App Runner."
+echo "Next: upload the project artifacts, build/push the first container image, then create the ECS Express Mode service."

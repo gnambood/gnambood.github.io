@@ -1,27 +1,28 @@
-# AWS deployment — execution checklist
+# AWS deployment — ECS Express Mode
 
-The infrastructure code is already in this repository. These are the remaining account-specific steps.
+The project is deployed as a Dockerized FastAPI service on Amazon ECS Express Mode with artifacts stored in S3 and the image stored in ECR.
 
-## 1. Bootstrap the AWS account
+## Current live service
 
-Open AWS CloudShell and run:
+`https://au-31cea16fe69c481c8dd923a37b6252df.ecs.ca-central-1.on.aws`
+
+Health check:
 
 ```bash
-export AWS_REGION=ca-central-1
-bash projects/auto-market-assistant/infra/bootstrap_aws.sh
+curl https://au-31cea16fe69c481c8dd923a37b6252df.ecs.ca-central-1.on.aws/health
 ```
 
-The script creates:
-- a private versioned S3 artifact bucket;
-- an ECR repository;
-- GitHub's OIDC trust in AWS if it does not already exist;
-- a GitHub Actions deployment role.
+## Required AWS resources
 
-Keep the printed values.
+- private S3 artifact bucket
+- ECR repository
+- `ecsTaskExecutionRole`
+- `ecsInfrastructureRoleForExpressServices`
+- `AutoMarketTaskRole` with `s3:GetObject` on the processed/artifact prefixes
+- ECS and Application Auto Scaling service-linked roles
+- ECS Express Mode service
 
-## 2. Upload artifacts
-
-The API expects:
+## Artifact layout
 
 ```text
 processed/vehicles_clean.parquet
@@ -32,66 +33,68 @@ artifacts/review_index.faiss
 artifacts/rag_metrics.json
 ```
 
-From the directory containing the saved Part 1 and Part 2 artifacts:
+## Build and push
 
 ```bash
-python projects/auto-market-assistant/src/upload_artifacts_to_s3.py \
-  --bucket YOUR_BUCKET
+export AWS_REGION=ca-central-1
+export ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
+export ECR_REPOSITORY=auto-market-assistant
+export ECR_URI="$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY"
+
+aws ecr get-login-password --region "$AWS_REGION" \
+| docker login --username AWS --password-stdin "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+
+docker build -t "$ECR_URI:latest" projects/auto-market-assistant
+docker push "$ECR_URI:latest"
 ```
 
-## 3. Build the first container
+## Runtime configuration
+
+The ECS primary container listens on port 8080 and receives:
+
+```text
+ARTIFACT_BUCKET=<private S3 bucket>
+ARTIFACT_PREFIX=
+ENABLE_GENERATION=false
+ALLOWED_ORIGINS=https://gnambood.github.io
+```
+
+Health path: `/health`
+
+Recommended portfolio deployment size used for the current service:
+- CPU: 1024
+- memory: 4096 MiB
+- architecture: X86_64
+- min tasks: 1
+- max tasks: 1
+
+## Smoke tests
 
 ```bash
-aws ecr get-login-password --region YOUR_REGION \
-| docker login --username AWS --password-stdin YOUR_ACCOUNT.dkr.ecr.YOUR_REGION.amazonaws.com
+curl "$BASE_URL/health"
+curl "$BASE_URL/metrics"
 
-docker build \
-  -t auto-market-assistant:latest \
-  projects/auto-market-assistant
+curl -X POST "$BASE_URL/predict-price" \
+  -H "Content-Type: application/json" \
+  -d '{"manufacturer":"ford","model":"f-150","year":2004,"mileage":65000,"condition":"good","fuel":"gas","title_status":"clean","transmission":"automatic","drive":"4wd","vehicle_type":"truck","state":"ca"}'
 
-docker tag auto-market-assistant:latest \
-  YOUR_ACCOUNT.dkr.ecr.YOUR_REGION.amazonaws.com/auto-market-assistant:latest
-
-docker push \
-  YOUR_ACCOUNT.dkr.ecr.YOUR_REGION.amazonaws.com/auto-market-assistant:latest
+curl -X POST "$BASE_URL/ask" \
+  -H "Content-Type: application/json" \
+  -d '{"manufacturer":"ford","model":"f-150","year":2004,"question":"What do owners mention about reliability and common problems?","k":5}'
 ```
 
-## 4. Create App Runner
+## GitHub Actions variables
 
-Deploy `infra/apprunner-template.yaml` with:
-- ImageIdentifier = the ECR image ending in `:latest`
-- ArtifactBucketName = the S3 bucket from step 1
+For automatic deployments, configure repository variables:
 
-The default cloud deployment uses retrieval-backed answers with deterministic source fallback. The portfolio's precomputed Qwen outputs remain available through the static JSON demo. GPU Qwen serving can be added separately if required.
+- `AWS_REGION`
+- `AWS_ROLE_ARN`
+- `ECR_REPOSITORY`
+- `ECS_EXPRESS_SERVICE_ARN`
+- `ARTIFACT_BUCKET`
 
-## 5. Configure GitHub repository variables
+The deploy workflow uses GitHub OIDC rather than long-lived AWS access keys.
 
-Add these GitHub Actions variables:
-- AWS_REGION
-- AWS_ROLE_ARN
-- ECR_REPOSITORY
-- APP_RUNNER_SERVICE_ARN
+## Portfolio behavior
 
-After those exist, merges to main can build the Docker image and trigger App Runner automatically.
-
-## 6. Verify
-
-```bash
-curl https://YOUR_APP_RUNNER_URL/health
-```
-
-Expected:
-
-```json
-{
-  "status": "ok",
-  "service": "auto-market-assistant",
-  "generation_enabled": false
-}
-```
-
-Then test `POST /predict-price` and `POST /ask`.
-
-## 7. Portfolio connection
-
-Keep `auto-market-demo-data.json` as the reliable static fallback. Once the App Runner URL is stable, the portfolio JavaScript can try the live API first and fall back to the versioned JSON when the API is unavailable.
+The website calls the live API first and falls back to verified static data if the AWS request is unavailable. The static fallback should remain in the repository even while the live service is running.

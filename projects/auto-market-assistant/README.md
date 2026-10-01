@@ -1,6 +1,6 @@
 # Auto Market Assistant
 
-End-to-end used-car intelligence system combining a CatBoost price model with grounded owner-review retrieval, a FastAPI inference layer, and an AWS deployment path.
+End-to-end used-car intelligence system combining a CatBoost price model, grounded owner-review retrieval, a FastAPI inference layer, Docker, and a live AWS deployment.
 
 ## What it does
 
@@ -26,68 +26,68 @@ Price estimates come from a structured CatBoost model. Owner-experience answers 
 - FAISS retrieval
 - Hit@5: 81.67%
 - MRR@10: 0.6256
-- median retrieval latency: 21.15 ms
+- median retrieval latency: 19.59 ms
+- p95 retrieval latency: 21.35 ms
 - Qwen 2.5 1.5B used in the final notebook run
 - citation validation + evidence-backed fallback
 
-## Production extension
+## Live production deployment
 
-The repository now includes:
+The current deployment uses:
 
-- FastAPI endpoints:
-  - POST /predict-price
-  - POST /ask
-  - GET /health
-  - GET /metrics
-- Docker container definition
-- S3 artifact loading
-- S3 raw-data validation Lambda
-- AWS SAM template for the data bucket + validator
-- AWS App Runner / ECR deployment template
-- GitHub Actions CI
-- GitHub Actions deployment workflow
-- model card and architecture documentation
-- static verified JSON fallback for GitHub Pages
+- GitHub Pages for the portfolio UI
+- FastAPI for inference endpoints
+- Docker for the application image
+- Amazon ECR for image storage
+- Amazon ECS Express Mode / Fargate for serving
+- an AWS-managed HTTPS ingress/load-balancing layer
+- Amazon S3 for model, FAISS, metrics and processed-data artifacts
+- IAM task roles for least-privilege S3 access
+
+Live API:
+
+`https://au-31cea16fe69c481c8dd923a37b6252df.ecs.ca-central-1.on.aws`
+
+Endpoints:
+- `POST /predict-price`
+- `POST /ask`
+- `GET /health`
+- `GET /metrics`
+
+The cloud service intentionally runs with `ENABLE_GENERATION=false`, so the live `/ask` endpoint returns deterministic retrieval-backed evidence. The final notebook separately evaluates Qwen generation with citation validation and fallback.
 
 ## S3 layout
 
+```text
 raw/
-- craigslist/
-- edmunds/
-
+  craigslist/
+  edmunds/
 processed/
-- vehicles_clean.parquet
-- review_documents.parquet
-
+  vehicles_clean.parquet
+  review_documents.parquet
 artifacts/
-- price_model.cbm
-- model_improvement_metrics.json
-- review_index.faiss
-- rag_metrics.json
-
+  price_model.cbm
+  model_improvement_metrics.json
+  review_index.faiss
+  rag_metrics.json
 validation/
-- raw-upload validation reports
+```
 
-## Website architecture
+## Website behavior
 
-The portfolio supports two modes:
+The portfolio tries the live AWS API first. If the cloud request is unavailable or times out, it falls back to verified static output, so the demo remains usable even when compute is offline.
 
-1. verified static demo data generated from the trained pipeline;
-2. live API calls after the AWS App Runner service is deployed.
+## Reproducing the portfolio data
 
-The static fallback prevents the portfolio from breaking if the cloud service is unavailable.
-
-## Reproducing the exact portfolio data
-
-1. Restore the Part 1 artifact bundle.
-2. Restore the Part 2 artifact bundle.
-3. Run src/build_demo_json_from_artifacts.py in Colab or the project runtime.
-4. Commit the generated auto-market-demo-data.json to the Pages root.
-5. The portfolio automatically loads the exact exported presets.
+1. Run the final Part 1 notebook and save `part1_artifacts.zip`.
+2. Run the final Part 2 notebook using that fresh Part 1 bundle and save `part2_artifacts.zip`.
+3. Upload the six deployment artifacts to the expected S3 paths.
+4. Use `src/build_demo_json_from_artifacts.py` when a larger precomputed fallback set is needed.
+5. Deploy the Docker API through ECR + ECS Express Mode.
 
 ## Large artifacts
 
-Large Parquet files, FAISS indexes, embeddings, model binaries and ZIP bundles are intentionally excluded from Git. The deployment service loads them from S3.
+Large Parquet files, FAISS indexes, embeddings, model binaries and ZIP bundles are intentionally excluded from Git. The live API loads its artifacts from S3.
 
 ## Scope and limitations
 
