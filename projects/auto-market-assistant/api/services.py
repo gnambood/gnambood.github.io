@@ -305,6 +305,27 @@ def load_vehicle_catalog():
         lambda value: " ".join(normalize_model(value).split()[:2])
     )
 
+    # Fresh Part 1 exports can omit an explicit vehicle_year column.
+    # Reconstruct it for catalog browsing from the persisted feature columns
+    # instead of failing the whole /catalog request.
+    market_year = (
+        int(vehicles["posting_year"].mode().iloc[0])
+        if "posting_year" in vehicles.columns and not vehicles["posting_year"].dropna().empty
+        else 2021
+    )
+    if "vehicle_year" in vehicles.columns:
+        vehicles["vehicle_year"] = pd.to_numeric(vehicles["vehicle_year"], errors="coerce")
+    elif "year" in vehicles.columns:
+        vehicles["vehicle_year"] = pd.to_numeric(vehicles["year"], errors="coerce")
+    elif "vehicle_age" in vehicles.columns:
+        vehicles["vehicle_year"] = market_year - pd.to_numeric(
+            vehicles["vehicle_age"], errors="coerce"
+        )
+    else:
+        raise RuntimeError(
+            "Vehicle artifact is missing vehicle_year/year/vehicle_age; cannot build catalog"
+        )
+
     reviews = reviews.copy()
     reviews["manufacturer"] = reviews["manufacturer"].astype(str).str.lower().str.strip()
     reviews["model_family"] = reviews["model_family"].astype(str).str.lower().str.strip()
@@ -422,7 +443,7 @@ def load_vehicle_catalog():
             })
 
     return {
-        "market_year": int(vehicles["posting_year"].mode().iloc[0]) if "posting_year" in vehicles.columns else 2021,
+        "market_year": market_year,
         "manufacturer_count": len(manufacturers),
         "model_count": sum(len(item["models"]) for item in manufacturers),
         "manufacturers": manufacturers,
