@@ -149,9 +149,12 @@ const QUESTIONS={
   comfort:"What do owners mention about comfort and daily driving?",
   value:"What do owners mention about value, ownership costs, and satisfaction?"
 };
+const FALLBACK_QUESTIONS={
+  reliability:QUESTIONS.reliability
+};
 const FALLBACK_DATA={
   market_year:2021,
-  questions:QUESTIONS,
+  questions:FALLBACK_QUESTIONS,
   vehicles:{
     "ford-f150":{
       display_make:"Ford",display_model:"F-150",make:"ford",model:"f-150",
@@ -296,7 +299,7 @@ async function loadLiveCatalog(){
   try{
     const health=await fetchJson(LIVE_API_BASE+'/health',{cache:'no-store'},8000);
     if(health.status!=='ok')throw new Error('health check failed');
-    const catalog=await fetchJson(LIVE_API_BASE+'/catalog',{cache:'no-store'},30000);
+    const catalog=await fetchJson(LIVE_API_BASE+'/catalog',{cache:'no-store'},60000);
     const data=catalogToDemoData(catalog);
     if(!Object.keys(data.vehicles).length)throw new Error('empty catalog');
     LIVE_API_AVAILABLE=true;
