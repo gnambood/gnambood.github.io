@@ -3,11 +3,10 @@ uvicorn[standard]==0.34.0
 pydantic==2.10.4
 boto3==1.35.90
 pandas==2.2.3
-numpy==2.2.1
+numpy==1.26.4
 pyarrow==18.1.0
 catboost==1.2.7
 faiss-cpu==1.9.0.post1
 sentence-transformers==3.3.1
 transformers==4.47.1
 accelerate==1.2.1
-torch==2.5.1
