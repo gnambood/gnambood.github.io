@@ -369,6 +369,8 @@ def load_vehicle_catalog():
             years_series = pd.to_numeric(segment["vehicle_year"], errors="coerce").dropna()
             years_series = years_series[(years_series >= 1990) & (years_series <= 2030)]
             years = sorted({int(x) for x in years_series.tolist()}, reverse=True)[:12]
+            if not years:
+                continue
 
             mileage_series = pd.to_numeric(segment["odometer"], errors="coerce").dropna()
             mileage_series = mileage_series[(mileage_series >= 0) & (mileage_series <= 300000)]
