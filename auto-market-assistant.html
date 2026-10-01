@@ -54,9 +54,9 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
   <section class="section" id="demo">
     <div class="eyebrow">Interactive portfolio demo</div>
     <h2>Try one real pipeline example.</h2>
-    <p class="section-intro">This demo calls the <strong>live FastAPI service deployed on AWS ECS Express Mode</strong>. If cloud inference is unavailable, the page automatically falls back to a verified precomputed pipeline result.</p>
+    <p class="section-intro">This demo loads selectable vehicle options from the <strong>deployed dataset</strong> and calls the live FastAPI service on AWS ECS Express Mode. If cloud inference is unavailable, the page falls back to one verified precomputed example.</p>
     <div class="card demo">
-      <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">Choose a vehicle configuration and query the deployed pipeline</div></div><span class="tag" id="modeTag">CHECKING LIVE API</span></div>
+      <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">Choose from dataset-backed makes, models, years, mileage bands and conditions</div></div><span class="tag" id="modeTag">CHECKING LIVE API</span></div>
       <div class="controls">
         <div class="control"><label for="makeSelect">Make</label><select id="makeSelect"></select></div>
         <div class="control"><label for="modelSelect">Model</label><select id="modelSelect"></select></div>
@@ -144,11 +144,17 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
 <script>
 const LIVE_API_BASE="https://au-31cea16fe69c481c8dd923a37b6252df.ecs.ca-central-1.on.aws";
 let LIVE_API_AVAILABLE=false;
+const QUESTIONS={
+  reliability:"What do owners mention about reliability and common problems?",
+  comfort:"What do owners mention about comfort and daily driving?",
+  value:"What do owners mention about value, ownership costs, and satisfaction?"
+};
+const FALLBACK_QUESTIONS={
+  reliability:QUESTIONS.reliability
+};
 const FALLBACK_DATA={
   market_year:2021,
-  questions:{
-    reliability:"What do owners mention about reliability and common problems?"
-  },
+  questions:FALLBACK_QUESTIONS,
   vehicles:{
     "ford-f150":{
       display_make:"Ford",display_model:"F-150",make:"ford",model:"f-150",
@@ -255,7 +261,7 @@ function questionHeading(key){
   return {
     reliability:"Reliability & common problems",
     comfort:"Comfort & daily driving",
-    fuel_economy:"Fuel-economy owner evidence"
+    value:"Value & ownership experience"
   }[key]||"Owner review evidence";
 }
 async function fetchJson(url,options={},timeoutMs=120000){
@@ -268,17 +274,43 @@ async function fetchJson(url,options={},timeoutMs=120000){
     return body;
   }finally{clearTimeout(timer)}
 }
-async function checkLiveApi(){
+function catalogToDemoData(catalog){
+  const vehicles={};
+  (catalog.manufacturers||[]).forEach(make=>{
+    (make.models||[]).forEach(model=>{
+      const key=(make.value+'-'+model.value).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+      vehicles[key]={
+        display_make:make.label,
+        display_model:model.label,
+        make:make.value,
+        model:model.value,
+        years:model.years||[],
+        mileages:model.mileages||[],
+        conditions:model.conditions||['good'],
+        defaults:model.defaults||{},
+        listing_count:model.listing_count||0,
+        review_count:model.review_count||0
+      };
+    });
+  });
+  return {market_year:catalog.market_year||2021,questions:QUESTIONS,vehicles};
+}
+async function loadLiveCatalog(){
   try{
     const health=await fetchJson(LIVE_API_BASE+'/health',{cache:'no-store'},8000);
-    LIVE_API_AVAILABLE=health.status==='ok';
-  }catch(e){LIVE_API_AVAILABLE=false}
-  if(LIVE_API_AVAILABLE){
+    if(health.status!=='ok')throw new Error('health check failed');
+    const catalog=await fetchJson(LIVE_API_BASE+'/catalog',{cache:'no-store'},60000);
+    const data=catalogToDemoData(catalog);
+    if(!Object.keys(data.vehicles).length)throw new Error('empty catalog');
+    LIVE_API_AVAILABLE=true;
+    DEMO_DATA=data;
     els.modeTag.textContent='LIVE • AWS ECS';
-    els.note.textContent='Live AWS FastAPI service available. Verified static output remains as an automatic fallback.';
-  }else{
-    els.modeTag.textContent='STATIC FALLBACK • VERIFIED';
-    els.note.textContent='AWS API is unavailable right now; the demo will use verified precomputed pipeline output.';
+    els.note.textContent=(catalog.manufacturer_count||0)+' makes • '+(catalog.model_count||0)+' models loaded from the deployed dataset.';
+    populateMakes();
+    return true;
+  }catch(e){
+    LIVE_API_AVAILABLE=false;
+    return false;
   }
 }
 function renderLiveResult(p,r){
@@ -329,19 +361,13 @@ async function runLiveAnalysis(){
 }
 
 async function loadDemoData(){
-  try{
-    const res=await fetch('/auto-market-demo-data.json',{cache:'no-store'});
-    if(!res.ok)throw new Error('not found');
-    const data=await res.json();
-    if(!data.vehicles||!Object.keys(data.vehicles).length)throw new Error('empty');
-    DEMO_DATA=data;
-    els.note.textContent=Object.keys(data.vehicles).length+' verified vehicle presets loaded; checking live AWS API…';
-  }catch(e){
-    DEMO_DATA=FALLBACK_DATA;
-    els.note.textContent='Verified fallback preset loaded; checking live AWS API…';
-  }
+  els.note.textContent='Connecting to the live AWS vehicle catalog…';
+  const live=await loadLiveCatalog();
+  if(live)return;
+  DEMO_DATA=FALLBACK_DATA;
   populateMakes();
-  await checkLiveApi();
+  els.modeTag.textContent='STATIC FALLBACK • VERIFIED';
+  els.note.textContent='AWS catalog is unavailable right now; one verified Ford F-150 preset is available as fallback.';
 }
 els.make.addEventListener('change',populateModels);
 els.model.addEventListener('change',populateVehicleFields);
@@ -354,9 +380,12 @@ els.btn.addEventListener('click',async()=>{
     els.modeTag.textContent='LIVE • AWS ECS';
     els.note.textContent='Live result from AWS ECS Express Mode: CatBoost price inference + MiniLM/FAISS owner-review retrieval.';
   }catch(e){
+    LIVE_API_AVAILABLE=false;
+    DEMO_DATA=FALLBACK_DATA;
+    populateMakes();
     renderStaticResult();
     els.modeTag.textContent='STATIC FALLBACK • VERIFIED';
-    els.note.textContent='Live AWS request was unavailable; showing the verified precomputed pipeline fallback.';
+    els.note.textContent='Live AWS request was unavailable; switched to the verified Ford F-150 fallback.';
   }
   els.bar.style.width='100%';
   els.results.classList.add('show');
@@ -364,7 +393,42 @@ els.btn.addEventListener('click',async()=>{
   els.results.scrollIntoView({behavior:'smooth',block:'nearest'});
 });
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tabpane').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.getElementById(t.dataset.tab).classList.add('active')}));
-if(new URLSearchParams(location.search).get('embed')==='1'){const sendHeight=()=>parent.postMessage({type:'auto-market-height',height:document.documentElement.scrollHeight},location.origin);new ResizeObserver(sendHeight).observe(document.body);window.addEventListener('load',sendHeight);setTimeout(sendHeight,250)}
+if(new URLSearchParams(location.search).get('embed')==='1'){
+  const mountInPortfolio=()=>{
+    try{
+      const doc=parent.document;
+      const section=doc.getElementById('auto-market-assistant');
+      const main=doc.querySelector('main');
+      const footer=main&&main.querySelector('footer.footer');
+      if(section&&main&&footer&&section.parentNode!==main)main.insertBefore(section,footer);
+      if(section){
+        section.querySelectorAll('strong').forEach(node=>{
+          if(node.textContent.trim()==='21 ms')node.textContent='19.6 ms';
+        });
+        section.querySelectorAll('span').forEach(node=>{
+          if(node.textContent.trim()==='retrieval')node.textContent='median retrieval';
+          if(node.textContent.trim()==='Demo outputs shown here are verified outputs from the trained pipeline.'){
+            node.textContent='Live AWS inference first, with a verified static fallback if the cloud service is unavailable.';
+          }
+        });
+      }
+      const nav=doc.querySelector('.navLinks');
+      if(nav&&!nav.querySelector('a[href="#auto-market-assistant"]')){
+        const link=doc.createElement('a');
+        link.href='#auto-market-assistant';
+        link.textContent='Auto Market';
+        const experience=nav.querySelector('a[href="#experience"]');
+        nav.insertBefore(link,experience||null);
+      }
+    }catch(e){}
+  };
+  const sendHeight=()=>parent.postMessage({type:'auto-market-height',height:document.documentElement.scrollHeight},location.origin);
+  mountInPortfolio();
+  new ResizeObserver(sendHeight).observe(document.body);
+  window.addEventListener('load',()=>{mountInPortfolio();sendHeight()});
+  setTimeout(()=>{mountInPortfolio();sendHeight()},250);
+  setTimeout(mountInPortfolio,1200);
+}
 loadDemoData();
 </script>
 </body>
