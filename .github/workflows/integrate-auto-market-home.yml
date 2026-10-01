@@ -1,0 +1,73 @@
+name: Integrate Auto Market on Homepage
+
+on:
+  push:
+    branches:
+      - fix/auto-market-home-options
+
+permissions:
+  contents: write
+
+jobs:
+  integrate-homepage:
+    if: ${{ !contains(github.event.head_commit.message, '[homepage-fix]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/auto-market-home-options
+
+      - name: Move Auto Market project into the main portfolio flow
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("index.html")
+          text = path.read_text()
+
+          marker = "<!-- AUTO_MARKET_ASSISTANT_HOME -->"
+          start = text.find(marker)
+          if start < 0:
+              raise SystemExit("Auto Market homepage block not found")
+
+          body_close = text.rfind("</body>")
+          if body_close < start:
+              raise SystemExit("Could not locate closing body tag")
+
+          block = text[start:body_close]
+          text = text[:start] + text[body_close:]
+
+          block = block.replace(
+              '21 ms</strong><span style="color:#9db0c8;font-size:.86rem;">retrieval',
+              '19.6 ms</strong><span style="color:#9db0c8;font-size:.86rem;">retrieval',
+          )
+          block = block.replace(
+              "Demo outputs shown here are verified outputs from the trained pipeline.",
+              "Live AWS inference is used when available, with a verified offline fallback.",
+          )
+          block = block.replace("height:760px", "height:900px")
+
+          experience = '<section class="experienceSection" id="experience">'
+          if experience not in text:
+              raise SystemExit("Experience section marker not found")
+          text = text.replace(experience, block + experience, 1)
+
+          old_nav = '<div class="navLinks"><a href="#work">Work</a><a href="#experience">Experience</a>'
+          new_nav = '<div class="navLinks"><a href="#work">Work</a><a href="#auto-market-assistant">Auto Market</a><a href="#experience">Experience</a>'
+          if old_nav in text:
+              text = text.replace(old_nav, new_nav, 1)
+
+          path.write_text(text)
+          PY
+
+      - name: Commit homepage integration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No homepage changes needed."
+            exit 0
+          fi
+          git commit -m "Place Auto Market Assistant inside homepage [homepage-fix]"
+          git push origin HEAD:fix/auto-market-home-options
