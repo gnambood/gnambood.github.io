@@ -343,26 +343,36 @@ async function runLiveAnalysis(){
   renderLiveResult(price,review);
 }
 async function loadDemoData(){
-  els.note.textContent='Loading supported vehicles from the live AWS service…';
+  // Never leave the controls blank while the cloud catalog is warming up.
+  // Populate the verified fallback immediately, then replace it with the
+  // dataset-backed catalog as soon as AWS responds.
+  DEMO_DATA=FALLBACK_DATA;
+  LIVE_API_AVAILABLE=false;
+  USING_LIVE_CATALOG=false;
+  populateMakes();
+  els.modeTag.textContent='LOADING LIVE CATALOG';
+  els.note.textContent='Verified Ford F-150 fallback is ready while supported vehicles load from AWS…';
+
   try{
     const health=await fetchJson(LIVE_API_BASE+'/health',{cache:'no-store'},8000);
     if(health.status!=='ok')throw new Error('health check failed');
     const catalog=await fetchJson(LIVE_API_BASE+'/catalog',{cache:'no-store'},120000);
     const converted=catalogToDemoData(catalog);
     if(!Object.keys(converted.vehicles).length)throw new Error('catalog empty');
+
     DEMO_DATA=converted;
     LIVE_API_AVAILABLE=true;
     USING_LIVE_CATALOG=true;
+    populateMakes();
     els.modeTag.textContent='LIVE • AWS ECS';
     els.note.textContent=(catalog.model_count||Object.keys(converted.vehicles).length)+' supported model families across '+(catalog.manufacturer_count||'multiple')+' makes loaded from the production dataset.';
   }catch(e){
-    DEMO_DATA=FALLBACK_DATA;
+    // Keep the already-populated verified fallback controls.
     LIVE_API_AVAILABLE=false;
     USING_LIVE_CATALOG=false;
     els.modeTag.textContent='STATIC FALLBACK • VERIFIED';
-    els.note.textContent='Live vehicle catalog is unavailable right now; showing the verified Ford F-150 fallback preset.';
+    els.note.textContent='Live vehicle catalog is unavailable right now; the verified Ford F-150 fallback remains available.';
   }
-  populateMakes();
 }
 
 els.make.addEventListener('change',populateModels);
@@ -398,6 +408,7 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
 }));
 
 if(new URLSearchParams(location.search).get('embed')==='1'){
+  document.documentElement.classList.add('embed-mode');
   const sendHeight=()=>parent.postMessage({type:'auto-market-height',height:document.documentElement.scrollHeight},location.origin);
   new ResizeObserver(sendHeight).observe(document.body);
   window.addEventListener('load',sendHeight);
