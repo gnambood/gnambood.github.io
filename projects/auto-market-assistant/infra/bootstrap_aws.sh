@@ -4,6 +4,8 @@ set -euo pipefail
 REGION="${AWS_REGION:-ca-central-1}"
 PROJECT="auto-market-assistant"
 REPO="gnambood/gnambood.github.io"
+REPO_OWNER_ID="230923225"
+REPO_ID="1378971855"
 
 ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
 BUCKET="${ARTIFACT_BUCKET:-${PROJECT}-${ACCOUNT_ID}-${REGION}}"
@@ -51,7 +53,7 @@ cat > /tmp/auto-market-trust.json <<EOF
       "StringLike": {
         "token.actions.githubusercontent.com:sub": [
           "repo:${REPO}:ref:refs/heads/main",
-          "repo:${REPO}:pull_request"
+          "repo:gnambood@${REPO_OWNER_ID}/gnambood.github.io@${REPO_ID}:ref:refs/heads/main"
         ]
       }
     }
