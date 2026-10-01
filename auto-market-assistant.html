@@ -390,7 +390,31 @@ els.btn.addEventListener('click',async()=>{
   els.results.scrollIntoView({behavior:'smooth',block:'nearest'});
 });
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tabpane').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.getElementById(t.dataset.tab).classList.add('active')}));
-if(new URLSearchParams(location.search).get('embed')==='1'){const sendHeight=()=>parent.postMessage({type:'auto-market-height',height:document.documentElement.scrollHeight},location.origin);new ResizeObserver(sendHeight).observe(document.body);window.addEventListener('load',sendHeight);setTimeout(sendHeight,250)}
+if(new URLSearchParams(location.search).get('embed')==='1'){
+  const mountInPortfolio=()=>{
+    try{
+      const doc=parent.document;
+      const section=doc.getElementById('auto-market-assistant');
+      const main=doc.querySelector('main');
+      const footer=main&&main.querySelector('footer.footer');
+      if(section&&main&&footer&&section.parentNode!==main)main.insertBefore(section,footer);
+      const nav=doc.querySelector('.navLinks');
+      if(nav&&!nav.querySelector('a[href="#auto-market-assistant"]')){
+        const link=doc.createElement('a');
+        link.href='#auto-market-assistant';
+        link.textContent='Auto Market';
+        const experience=nav.querySelector('a[href="#experience"]');
+        nav.insertBefore(link,experience||null);
+      }
+    }catch(e){}
+  };
+  const sendHeight=()=>parent.postMessage({type:'auto-market-height',height:document.documentElement.scrollHeight},location.origin);
+  mountInPortfolio();
+  new ResizeObserver(sendHeight).observe(document.body);
+  window.addEventListener('load',()=>{mountInPortfolio();sendHeight()});
+  setTimeout(()=>{mountInPortfolio();sendHeight()},250);
+  setTimeout(mountInPortfolio,1200);
+}
 loadDemoData();
 </script>
 </body>
