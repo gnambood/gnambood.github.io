@@ -1,0 +1,79 @@
+name: Auto Market Assistant Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'projects/auto-market-assistant/api/**'
+      - 'projects/auto-market-assistant/Dockerfile'
+      - '.github/workflows/auto-market-deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    if: ${{ vars.AWS_ROLE_ARN != '' && vars.ECR_REPOSITORY != '' && vars.ECS_EXPRESS_SERVICE_ARN != '' && vars.ARTIFACT_BUCKET != '' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/auto-market-assistant
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+        run: |
+          IMAGE_URI="$REGISTRY/$REPOSITORY:${GITHUB_SHA}"
+          docker build -t "$IMAGE_URI" -t "$REGISTRY/$REPOSITORY:latest" .
+          docker push "$IMAGE_URI"
+          docker push "$REGISTRY/$REPOSITORY:latest"
+          echo "IMAGE_URI=$IMAGE_URI" >> "$GITHUB_ENV"
+
+      - name: Deploy ECS Express Mode revision
+        env:
+          SERVICE_ARN: ${{ vars.ECS_EXPRESS_SERVICE_ARN }}
+          ARTIFACT_BUCKET: ${{ vars.ARTIFACT_BUCKET }}
+        run: |
+          cat > /tmp/primary-container.json <<JSON
+          {
+            "image": "$IMAGE_URI",
+            "containerPort": 8080,
+            "environment": [
+              {"name":"ARTIFACT_BUCKET","value":"$ARTIFACT_BUCKET"},
+              {"name":"ARTIFACT_PREFIX","value":""},
+              {"name":"ENABLE_GENERATION","value":"false"},
+              {"name":"ALLOWED_ORIGINS","value":"https://gnambood.github.io"}
+            ]
+          }
+          JSON
+
+          aws ecs update-express-gateway-service \
+            --service-arn "$SERVICE_ARN" \
+            --primary-container file:///tmp/primary-container.json \
+            --region "${{ vars.AWS_REGION }}" \
+            --no-cli-pager
+
+      - name: Show deployment status
+        env:
+          SERVICE_ARN: ${{ vars.ECS_EXPRESS_SERVICE_ARN }}
+        run: |
+          aws ecs describe-express-gateway-service \
+            --service-arn "$SERVICE_ARN" \
+            --region "${{ vars.AWS_REGION }}" \
+            --query 'service.{Status:status.statusCode,Endpoint:activeConfigurations[0].ingressPaths[0].endpoint,Image:activeConfigurations[0].primaryContainer.image}' \
+            --output table \
+            --no-cli-pager
