@@ -53,6 +53,15 @@ class PriceEngine:
         self.pd = pd
         paths = ensure_artifacts()
         self.vehicles = pd.read_parquet(paths["vehicles_clean.parquet"])
+
+        # The Part 1 export stores the cleaned modeling table before the
+        # V2 model_family experiment column is added. Reconstruct that
+        # deterministic feature at serving time so market-comparable lookup
+        # uses the same two-token family convention as the trained model.
+        self.vehicles["model_family"] = self.vehicles["model"].map(
+            lambda value: " ".join(normalize_model(value).split()[:2])
+        )
+
         with open(paths["model_improvement_metrics.json"]) as f:
             self.metrics = json.load(f)
         self.model = CatBoostRegressor()
