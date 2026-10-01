@@ -53,10 +53,10 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
 
   <section class="section" id="demo">
     <div class="eyebrow">Interactive portfolio demo</div>
-    <h2>Try one real pipeline example.</h2>
+    <h2>Try the live pipeline with real dataset-backed choices.</h2>
     <p class="section-intro">This demo calls the <strong>live FastAPI service deployed on AWS ECS Express Mode</strong>. If cloud inference is unavailable, the page automatically falls back to a verified precomputed pipeline result.</p>
     <div class="card demo">
-      <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">Choose a vehicle configuration and query the deployed pipeline</div></div><span class="tag" id="modeTag">CHECKING LIVE API</span></div>
+      <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">Choose from vehicle families discovered directly from the deployed datasets</div></div><span class="tag" id="modeTag">CHECKING LIVE API</span></div>
       <div class="controls">
         <div class="control"><label for="makeSelect">Make</label><select id="makeSelect"></select></div>
         <div class="control"><label for="modelSelect">Model</label><select id="modelSelect"></select></div>
@@ -147,7 +147,10 @@ let LIVE_API_AVAILABLE=false;
 const FALLBACK_DATA={
   market_year:2021,
   questions:{
-    reliability:"What do owners mention about reliability and common problems?"
+    reliability:"What do owners mention about reliability and common problems?",
+    comfort:"What do owners say about comfort and everyday driving?",
+    maintenance:"What maintenance issues or recurring repairs do owners mention?",
+    pros_cons:"What do owners like and dislike most about this vehicle?"
   },
   vehicles:{
     "ford-f150":{
@@ -228,10 +231,11 @@ function syncPrompt(){
   els.btn.disabled=false;
 }
 function renderStaticResult(){
-  const v=currentVehicle();
+  const v=FALLBACK_DATA.vehicles[els.model.value];
+  if(!v)return false;
   const p=v.price_grid[[els.year.value,els.mileage.value,els.condition.value].join('|')];
   const r=v.reviews[[els.year.value,els.question.value].join('|')] || v.reviews[Object.keys(v.reviews)[0]];
-  if(!p||!r){alert('This verified preset is not available. Choose another combination.');return}
+  if(!p||!r)return false
   document.getElementById('predPrice').textContent=money(p.predicted_price);
   document.getElementById('q1').textContent=money(p.comparable_q25)+' Q1';
   document.getElementById('q3').textContent=money(p.comparable_q75)+' Q3';
@@ -249,13 +253,15 @@ function renderStaticResult(){
     src.appendChild(d);
   });
   document.getElementById('verification').textContent=r.citation_valid?'✓ Final response source IDs validated':'Evidence shown directly from retrieved reviews';
+  return true;
 }
 
 function questionHeading(key){
   return {
     reliability:"Reliability & common problems",
     comfort:"Comfort & daily driving",
-    fuel_economy:"Fuel-economy owner evidence"
+    maintenance:"Maintenance & recurring repairs",
+    pros_cons:"Owner-reported strengths & weaknesses"
   }[key]||"Owner review evidence";
 }
 async function fetchJson(url,options={},timeoutMs=120000){
@@ -329,19 +335,27 @@ async function runLiveAnalysis(){
 }
 
 async function loadDemoData(){
-  try{
-    const res=await fetch('/auto-market-demo-data.json',{cache:'no-store'});
-    if(!res.ok)throw new Error('not found');
-    const data=await res.json();
-    if(!data.vehicles||!Object.keys(data.vehicles).length)throw new Error('empty');
-    DEMO_DATA=data;
-    els.note.textContent=Object.keys(data.vehicles).length+' verified vehicle presets loaded; checking live AWS API…';
-  }catch(e){
-    DEMO_DATA=FALLBACK_DATA;
-    els.note.textContent='Verified fallback preset loaded; checking live AWS API…';
-  }
+  DEMO_DATA=FALLBACK_DATA;
   populateMakes();
   await checkLiveApi();
+
+  if(!LIVE_API_AVAILABLE)return;
+
+  try{
+    const catalog=await fetchJson(LIVE_API_BASE+'/options',{cache:'no-store'},30000);
+    if(!catalog.vehicles||!Object.keys(catalog.vehicles).length)throw new Error('empty catalog');
+    DEMO_DATA={
+      market_year:catalog.market_year||2021,
+      questions:FALLBACK_DATA.questions,
+      vehicles:catalog.vehicles
+    };
+    populateMakes();
+    els.note.textContent=catalog.vehicle_count+' live vehicle families loaded from the deployed datasets.';
+  }catch(e){
+    DEMO_DATA=FALLBACK_DATA;
+    populateMakes();
+    els.note.textContent='Live API is healthy, but vehicle options could not be loaded. Showing the verified Ford F-150 fallback.';
+  }
 }
 els.make.addEventListener('change',populateModels);
 els.model.addEventListener('change',populateVehicleFields);
@@ -354,9 +368,17 @@ els.btn.addEventListener('click',async()=>{
     els.modeTag.textContent='LIVE • AWS ECS';
     els.note.textContent='Live result from AWS ECS Express Mode: CatBoost price inference + MiniLM/FAISS owner-review retrieval.';
   }catch(e){
-    renderStaticResult();
-    els.modeTag.textContent='STATIC FALLBACK • VERIFIED';
-    els.note.textContent='Live AWS request was unavailable; showing the verified precomputed pipeline fallback.';
+    const rendered=renderStaticResult();
+    els.modeTag.textContent=rendered?'STATIC FALLBACK • VERIFIED':'LIVE REQUEST FAILED';
+    els.note.textContent=rendered
+      ?'Live AWS request was unavailable; showing the verified Ford F-150 pipeline fallback.'
+      :'The live request failed for this selection. Choose Ford F-150 for the verified offline fallback or retry the live service.';
+    if(!rendered){
+      document.getElementById('reviewHeading').textContent='Live service temporarily unavailable';
+      document.getElementById('reviewAnswer').textContent='This selection is served live from AWS and does not have a fabricated offline result.';
+      document.getElementById('reviewSources').innerHTML='';
+      document.getElementById('verification').textContent='No synthetic fallback was generated';
+    }
   }
   els.bar.style.width='100%';
   els.results.classList.add('show');

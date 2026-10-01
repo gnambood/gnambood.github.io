@@ -290,6 +290,123 @@ class RagEngine:
             "sources": sources,
         }
 
+
+@lru_cache(maxsize=1)
+def load_vehicle_options(limit=12):
+    import pandas as pd
+
+    paths = ensure_artifacts()
+    vehicle_columns = [
+        "manufacturer", "model", "vehicle_year", "odometer", "condition",
+        "fuel", "title_status", "transmission", "drive", "type", "state",
+    ]
+    vehicles = pd.read_parquet(paths["vehicles_clean.parquet"], columns=vehicle_columns)
+    reviews = pd.read_parquet(
+        paths["review_documents.parquet"],
+        columns=["manufacturer", "model_family"],
+    )
+
+    vehicles = vehicles.copy()
+    vehicles["manufacturer"] = vehicles["manufacturer"].astype(str).str.lower().str.strip()
+    vehicles["model_family"] = vehicles["model"].map(
+        lambda value: " ".join(normalize_model(value).split()[:2])
+    )
+    reviews = reviews.copy()
+    reviews["manufacturer"] = reviews["manufacturer"].astype(str).str.lower().str.strip()
+    reviews["model_family"] = reviews["model_family"].map(normalize_model)
+
+    listing_counts = (
+        vehicles.groupby(["manufacturer", "model_family"])
+        .size().rename("listing_count").reset_index()
+    )
+    review_counts = (
+        reviews.groupby(["manufacturer", "model_family"])
+        .size().rename("review_count").reset_index()
+    )
+    candidates = listing_counts.merge(
+        review_counts, on=["manufacturer", "model_family"], how="inner"
+    )
+    candidates = candidates[
+        (candidates["listing_count"] >= 100)
+        & (candidates["review_count"] >= 5)
+        & candidates["manufacturer"].ne("nan")
+        & candidates["model_family"].ne("")
+    ].sort_values(["listing_count", "review_count"], ascending=False)
+
+    selected = []
+    make_counts = {}
+    for row in candidates.itertuples(index=False):
+        make = str(row.manufacturer)
+        if make_counts.get(make, 0) >= 2:
+            continue
+        selected.append((make, str(row.model_family)))
+        make_counts[make] = make_counts.get(make, 0) + 1
+        if len(selected) >= limit:
+            break
+
+    def mode_text(frame, column, fallback=None):
+        values = frame[column].dropna().astype(str).str.lower().str.strip()
+        values = values[~values.isin(["", "nan", "none", "unknown"])]
+        return fallback if values.empty else str(values.mode().iloc[0])
+
+    make_labels = {"bmw": "BMW", "gmc": "GMC", "ram": "RAM"}
+    output = {}
+
+    for make, family in selected:
+        subset = vehicles[
+            vehicles["manufacturer"].eq(make)
+            & vehicles["model_family"].eq(family)
+        ].copy()
+        if subset.empty:
+            continue
+
+        models = subset["model"].dropna().astype(str).str.strip()
+        display_model = models.value_counts().index[0].title() if not models.empty else family.title()
+        display_make = make_labels.get(make, make.title())
+
+        year_values = pd.to_numeric(subset["vehicle_year"], errors="coerce").dropna().astype(int)
+        year_values = year_values[(year_values >= 1990) & (year_values <= 2021)]
+        years = sorted(set(year_values.value_counts().head(6).index.astype(int).tolist()), reverse=True)
+        if not years:
+            continue
+
+        mileage_values = pd.to_numeric(subset["odometer"], errors="coerce").dropna()
+        mileage_values = mileage_values[(mileage_values >= 0) & (mileage_values <= 300000)]
+        mileages = []
+        if not mileage_values.empty:
+            for quantile in (0.25, 0.5, 0.75):
+                value = int(round(float(mileage_values.quantile(quantile)) / 5000.0) * 5000)
+                value = max(5000, min(250000, value))
+                if value not in mileages:
+                    mileages.append(value)
+        if not mileages:
+            mileages = [50000, 100000, 150000]
+
+        conditions = subset["condition"].dropna().astype(str).str.lower().str.strip()
+        conditions = conditions[~conditions.isin(["", "nan", "none", "unknown"])]
+        conditions = conditions.value_counts().head(4).index.tolist() or ["good"]
+
+        key = re.sub(r"[^a-z0-9]+", "-", f"{make}-{family}").strip("-")
+        output[key] = {
+            "display_make": display_make,
+            "display_model": display_model,
+            "make": make,
+            "model": family,
+            "years": years,
+            "mileages": mileages,
+            "conditions": conditions,
+            "defaults": {
+                "fuel": mode_text(subset, "fuel"),
+                "title_status": mode_text(subset, "title_status"),
+                "transmission": mode_text(subset, "transmission"),
+                "drive": mode_text(subset, "drive"),
+                "vehicle_type": mode_text(subset, "type"),
+                "state": mode_text(subset, "state"),
+            },
+        }
+
+    return {"market_year": 2021, "vehicle_count": len(output), "vehicles": output}
+
 @lru_cache(maxsize=1)
 def get_price_engine():
     return PriceEngine()

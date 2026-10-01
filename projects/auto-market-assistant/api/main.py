@@ -2,7 +2,13 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from .schemas import AskRequest, AskResponse, PriceRequest, PriceResponse
-from .services import ENABLE_GENERATION, get_price_engine, get_rag_engine, load_public_metrics
+from .services import (
+    ENABLE_GENERATION,
+    get_price_engine,
+    get_rag_engine,
+    load_public_metrics,
+    load_vehicle_options,
+)
 
 app = FastAPI(
     title="Auto Market Assistant API",
@@ -39,6 +45,13 @@ def health():
 def metrics():
     try:
         return load_public_metrics()
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+@app.get("/options")
+def options():
+    try:
+        return load_vehicle_options()
     except Exception as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 

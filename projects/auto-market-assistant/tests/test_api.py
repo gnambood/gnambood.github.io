@@ -23,3 +23,26 @@ def test_ask_input_validation():
         json={"manufacturer": "ford", "model": "f-150", "year": 2004, "question": "bad"},
     )
     assert response.status_code == 422
+
+
+def test_vehicle_options_route(monkeypatch):
+    payload = {
+        "market_year": 2021,
+        "vehicle_count": 1,
+        "vehicles": {
+            "ford-f-150": {
+                "display_make": "Ford",
+                "display_model": "F-150",
+                "make": "ford",
+                "model": "f 150",
+                "years": [2004],
+                "mileages": [65000],
+                "conditions": ["good"],
+                "defaults": {},
+            }
+        },
+    }
+    monkeypatch.setattr("api.main.load_vehicle_options", lambda: payload)
+    response = client.get("/options")
+    assert response.status_code == 200
+    assert response.json()["vehicle_count"] == 1
