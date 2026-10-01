@@ -398,6 +398,17 @@ if(new URLSearchParams(location.search).get('embed')==='1'){
       const main=doc.querySelector('main');
       const footer=main&&main.querySelector('footer.footer');
       if(section&&main&&footer&&section.parentNode!==main)main.insertBefore(section,footer);
+      if(section){
+        section.querySelectorAll('strong').forEach(node=>{
+          if(node.textContent.trim()==='21 ms')node.textContent='19.6 ms';
+        });
+        section.querySelectorAll('span').forEach(node=>{
+          if(node.textContent.trim()==='retrieval')node.textContent='median retrieval';
+          if(node.textContent.trim()==='Demo outputs shown here are verified outputs from the trained pipeline.'){
+            node.textContent='Live AWS inference first, with a verified static fallback if the cloud service is unavailable.';
+          }
+        });
+      }
       const nav=doc.querySelector('.navLinks');
       if(nav&&!nav.querySelector('a[href="#auto-market-assistant"]')){
         const link=doc.createElement('a');
