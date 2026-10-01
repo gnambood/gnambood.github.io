@@ -94,9 +94,29 @@ cat > /tmp/auto-market-policy.json <<EOF
       "Effect": "Allow",
       "Action": [
         "ecs:UpdateExpressGatewayService",
-        "ecs:DescribeExpressGatewayService"
+        "ecs:DescribeExpressGatewayService",
+        "ecs:RegisterTaskDefinition"
       ],
       "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::${ACCOUNT_ID}:role/ecsTaskExecutionRole",
+        "arn:aws:iam::${ACCOUNT_ID}:role/AutoMarketTaskRole",
+        "arn:aws:iam::${ACCOUNT_ID}:role/ecsInfrastructureRoleForExpressServices"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": [
+            "ecs-tasks.amazonaws.com",
+            "ecs.amazonaws.com"
+          ]
+        }
+      }
     }
   ]
 }
