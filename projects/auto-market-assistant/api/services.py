@@ -8,6 +8,7 @@ ARTIFACT_DIR = Path(os.getenv("ARTIFACT_DIR", "/app/artifacts"))
 ARTIFACT_BUCKET = os.getenv("ARTIFACT_BUCKET", "")
 ARTIFACT_PREFIX = os.getenv("ARTIFACT_PREFIX", "").strip("/")
 ENABLE_GENERATION = os.getenv("ENABLE_GENERATION", "false").lower() == "true"
+RAG_MIN_SIMILARITY = float(os.getenv("RAG_MIN_SIMILARITY", "0.45"))
 
 ARTIFACTS = {
     "vehicles_clean.parquet": "processed/vehicles_clean.parquet",
@@ -189,14 +190,62 @@ class RagEngine:
         return cited, bool(cited) and cited.issubset(valid_ids)
 
     @staticmethod
+    def _scope_guard(question):
+        """Reject questions that require evidence this corpus does not contain."""
+        q = re.sub(r"\s+", " ", str(question).lower()).strip()
+
+        specific_vehicle = re.search(r"\b(this|the|my)\s+(vehicle|car|truck|suv)\b", q)
+        inspection_terms = re.search(
+            r"\b(dent|dented|scratch|scratched|damage|damaged|accident|collision|"
+            r"windshield|tire tread|flat tire|paint chip|paint damage|body damage|"
+            r"rust spot|current condition|inspection)\b",
+            q,
+        )
+        record_terms = re.search(
+            r"\b(vin|carfax|accident history|service history|maintenance history|"
+            r"previous owner|number of owners|odometer rollback|registration|"
+            r"license plate|where is this|current location)\b",
+            q,
+        )
+
+        if record_terms:
+            return {
+                "reason": (
+                    "This question needs a vehicle-specific record such as a VIN, "
+                    "history report, inspection, or listing record. The available "
+                    "corpus only contains model-level owner reviews."
+                ),
+                "suggested_question": (
+                    "What problems do owners commonly report for this model and year?"
+                ),
+            }
+
+        if specific_vehicle and inspection_terms:
+            return {
+                "reason": (
+                    "I cannot inspect this specific vehicle from owner-review data. "
+                    "Dents, scratches, accident damage, and current physical condition "
+                    "require photos, an inspection, or listing-specific evidence."
+                ),
+                "suggested_question": (
+                    "Do owners report body-panel, paint, door, or corrosion problems "
+                    "with this model?"
+                ),
+            }
+
+        return None
+
+    @staticmethod
     def _fallback(retrieved):
         if retrieved.empty:
             return "Not enough review evidence for this vehicle."
-        lines = ["Here are the strongest retrieved owner-review excerpts:"]
-        for _, row in retrieved.head(3).iterrows():
-            excerpt = re.sub(r"\s+", " ", str(row["review_text"])).strip()[:280]
-            lines.append(f"- [{row['review_id']}] {excerpt}")
-        return "\n".join(lines)
+        ids = [f"[{review_id}]" for review_id in retrieved["review_id"].head(3)]
+        cited = ", ".join(ids[:-1]) + (" and " + ids[-1] if len(ids) > 1 else ids[0])
+        return (
+            f"Relevant owner-review evidence was found in {cited}. "
+            "Live generation is disabled, so the strongest matching excerpts are "
+            "shown below instead of being synthesized into a new claim."
+        )
 
     def _load_generator(self):
         if self.generator is not None:
@@ -258,15 +307,54 @@ class RagEngine:
         return answer, valid, fallback_used, self.generator_name or "qwen"
 
     def ask(self, payload):
+        guard = self._scope_guard(payload.question)
+        if guard:
+            return {
+                "answer": guard["reason"],
+                "scope": "outside available owner-review evidence",
+                "citation_valid": False,
+                "fallback_used": False,
+                "generation_mode": "abstained-out-of-scope",
+                "sources": [],
+                "answerable": False,
+                "reason": guard["reason"],
+                "suggested_question": guard["suggested_question"],
+                "max_similarity": None,
+            }
+
         retrieved, scope = self._retrieve(payload)
         if retrieved.empty:
+            reason = "No owner-review evidence was available for this vehicle selection."
             return {
-                "answer": "Not enough review evidence for this vehicle.",
+                "answer": reason,
                 "scope": scope,
                 "citation_valid": False,
                 "fallback_used": False,
                 "generation_mode": "no-evidence",
                 "sources": [],
+                "answerable": False,
+                "reason": reason,
+                "suggested_question": "What do owners mention about reliability and common problems?",
+                "max_similarity": None,
+            }
+
+        max_similarity = float(retrieved["similarity"].max())
+        if max_similarity < RAG_MIN_SIMILARITY:
+            reason = (
+                "The retrieved owner reviews were not similar enough to this question "
+                "to support a grounded answer."
+            )
+            return {
+                "answer": reason,
+                "scope": scope,
+                "citation_valid": False,
+                "fallback_used": False,
+                "generation_mode": "abstained-low-relevance",
+                "sources": [],
+                "answerable": False,
+                "reason": reason,
+                "suggested_question": "Try asking about reliability, maintenance, comfort, fuel economy, or common problems.",
+                "max_similarity": max_similarity,
             }
 
         answer, valid, fallback_used, mode = self._generate(payload.question, retrieved)
@@ -288,6 +376,10 @@ class RagEngine:
             "fallback_used": bool(fallback_used),
             "generation_mode": mode,
             "sources": sources,
+            "answerable": True,
+            "reason": None,
+            "suggested_question": None,
+            "max_similarity": max_similarity,
         }
 
 
