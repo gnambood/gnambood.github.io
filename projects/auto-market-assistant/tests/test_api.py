@@ -111,3 +111,23 @@ def test_catalog_reconstructs_vehicle_year_from_vehicle_age(monkeypatch, tmp_pat
     assert catalog["market_year"] == 2021
     assert catalog["manufacturer_count"] == 1
     assert catalog["manufacturers"][0]["models"][0]["years"] == [2004]
+
+
+def test_scope_guard_rejects_specific_vehicle_inspection():
+    from api.services import RagEngine
+
+    result = RagEngine._scope_guard("Does this vehicle have a dent?")
+
+    assert result is not None
+    assert "specific vehicle" in result["reason"].lower()
+    assert "body-panel" in result["suggested_question"].lower()
+
+
+def test_scope_guard_allows_model_level_owner_question():
+    from api.services import RagEngine
+
+    result = RagEngine._scope_guard(
+        "Do owners report body-panel or paint problems with this model?"
+    )
+
+    assert result is None
