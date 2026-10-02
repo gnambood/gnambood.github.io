@@ -45,3 +45,7 @@ class AskResponse(BaseModel):
     fallback_used: bool
     generation_mode: str
     sources: list[ReviewSource]
+    answerable: bool = True
+    reason: Optional[str] = None
+    suggested_question: Optional[str] = None
+    max_similarity: Optional[float] = None
