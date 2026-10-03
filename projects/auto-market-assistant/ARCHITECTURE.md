@@ -76,3 +76,28 @@ The deployed retrieval gate uses the validated operating point:
 The scope guard handles exact-vehicle condition/history, current transactional data and authoritative specifications before retrieval relevance is considered.
 
 The policy came from a held-out weakly supervised benchmark across unseen vehicle families. It is not described as universal RAG accuracy.
+
+
+## Production vs reference infrastructure
+
+### Active production path
+
+The currently deployed serving path is:
+
+- GitHub Pages frontend
+- AWS-managed HTTPS ingress
+- ECS Express Mode / Fargate
+- Dockerized FastAPI
+- Amazon ECR
+- private Amazon S3 artifacts
+- IAM runtime roles
+- GitHub Actions OIDC deployment
+- live health/policy smoke testing
+
+### Repository reference infrastructure
+
+The repository also includes an S3-triggered Lambda validation stack in `infra/data-pipeline-template.yaml` and `lambda/`.
+
+That serverless validator is part of the reproducible architecture design, but it should not be interpreted as an active production component unless the SAM/CloudFormation stack is explicitly deployed.
+
+See `DEPLOY_AWS.md` for the full resource inventory, IAM/OIDC security model, runtime configuration and deployment procedure.
