@@ -90,7 +90,13 @@ jobs:
             echo "Attempt $attempt: status=$STATUS image=$ACTIVE_IMAGE endpoint=$ENDPOINT"
 
             if [[ "$ACTIVE_IMAGE" == *"$GITHUB_SHA"* && -n "$ENDPOINT" ]]; then
-              if curl -fsS --max-time 20 "${ENDPOINT%/}/health" | tee /tmp/health.json; then
+              if [[ "$ENDPOINT" == http://* || "$ENDPOINT" == https://* ]]; then
+                ENDPOINT_URL="${ENDPOINT%/}"
+              else
+                ENDPOINT_URL="https://${ENDPOINT%/}"
+              fi
+
+              if curl -fsS --max-time 20 "$ENDPOINT_URL/health" | tee /tmp/health.json; then
                 READY=1
                 break
               fi
