@@ -11,7 +11,12 @@ AWS ECS Express Mode
     |
     +--> FastAPI /predict-price --> CatBoost
     |
-    +--> FastAPI /ask --> MiniLM --> FAISS --> citation-safe retrieval fallback
+    +--> FastAPI /ask
+              --> capability/scope guard
+              --> vehicle-family/year candidate filter
+              --> question-only MiniLM retrieval
+              --> calibrated multi-signal evidence gate
+              --> citation-safe retrieval response
     |
     +--> FastAPI /health
     |
@@ -59,4 +64,15 @@ The browser calls the live AWS API first. If the API is unavailable, the GitHub 
 
 ## Generation policy
 
-The production service currently sets `ENABLE_GENERATION=false` to keep the cloud deployment CPU-friendly and predictable. The final notebook evaluates Qwen 2.5 generation separately and validates cited review IDs before accepting generated text.
+The production service currently sets `ENABLE_GENERATION=false` to keep the cloud deployment CPU-friendly and predictable. The final notebook separately validates Qwen 2.5 generation using short source aliases that are mapped back to real `edm_*` IDs before final citation validation.
+
+## Answerability policy
+
+The deployed retrieval gate uses the validated operating point:
+
+- max similarity ≥ 0.38
+- mean top-3 similarity ≥ 0.36 **or** at least 2 sources with similarity ≥ 0.34
+
+The scope guard handles exact-vehicle condition/history, current transactional data and authoritative specifications before retrieval relevance is considered.
+
+The policy came from a held-out weakly supervised benchmark across unseen vehicle families. It is not described as universal RAG accuracy.

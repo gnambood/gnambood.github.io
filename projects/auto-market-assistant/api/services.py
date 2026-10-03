@@ -8,7 +8,37 @@ ARTIFACT_DIR = Path(os.getenv("ARTIFACT_DIR", "/app/artifacts"))
 ARTIFACT_BUCKET = os.getenv("ARTIFACT_BUCKET", "")
 ARTIFACT_PREFIX = os.getenv("ARTIFACT_PREFIX", "").strip("/")
 ENABLE_GENERATION = os.getenv("ENABLE_GENERATION", "false").lower() == "true"
-RAG_MIN_SIMILARITY = float(os.getenv("RAG_MIN_SIMILARITY", "0.45"))
+ANSWERABILITY_POLICY_PATH = Path(
+    os.getenv(
+        "ANSWERABILITY_POLICY_PATH",
+        str(Path(__file__).with_name("answerability_policy.json")),
+    )
+)
+DEFAULT_ANSWERABILITY_POLICY = {
+    "max_threshold": 0.38,
+    "mean_top3_threshold": 0.36,
+    "support_threshold": 0.34,
+    "min_support_sources": 2,
+}
+
+
+@lru_cache(maxsize=1)
+def load_answerability_policy():
+    policy = dict(DEFAULT_ANSWERABILITY_POLICY)
+
+    if ANSWERABILITY_POLICY_PATH.exists():
+        with open(ANSWERABILITY_POLICY_PATH) as f:
+            raw = json.load(f)
+        candidate = raw.get("selected_policy", raw)
+        for key in policy:
+            if key in candidate:
+                policy[key] = candidate[key]
+
+    policy["max_threshold"] = float(policy["max_threshold"])
+    policy["mean_top3_threshold"] = float(policy["mean_top3_threshold"])
+    policy["support_threshold"] = float(policy["support_threshold"])
+    policy["min_support_sources"] = int(policy["min_support_sources"])
+    return policy
 
 ARTIFACTS = {
     "vehicles_clean.parquet": "processed/vehicles_clean.parquet",
@@ -144,14 +174,25 @@ class RagEngine:
         import numpy as np
         import pandas as pd
         from sentence_transformers import SentenceTransformer
+
         self.faiss, self.np, self.pd = faiss, np, pd
         paths = ensure_artifacts()
         self.docs = pd.read_parquet(paths["review_documents.parquet"])
         self.index = faiss.read_index(str(paths["review_index.faiss"]))
+
         if self.index.ntotal != len(self.docs):
-            raise RuntimeError(f"FAISS/doc mismatch: {self.index.ntotal} != {len(self.docs)}")
-        self.embeddings = np.asarray(self.index.reconstruct_n(0, self.index.ntotal), dtype="float32")
-        self.embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+            raise RuntimeError(
+                f"FAISS/doc mismatch: {self.index.ntotal} != {len(self.docs)}"
+            )
+
+        self.embeddings = np.asarray(
+            self.index.reconstruct_n(0, self.index.ntotal),
+            dtype="float32",
+        )
+        self.embedder = SentenceTransformer(
+            "sentence-transformers/all-MiniLM-L6-v2"
+        )
+        self.policy = load_answerability_policy()
         self.tokenizer = None
         self.generator = None
         self.generator_name = None
@@ -159,9 +200,19 @@ class RagEngine:
     def _retrieve(self, payload):
         make = payload.manufacturer.lower().strip()
         family = " ".join(normalize_model(payload.model).split()[:2])
+
         make_mask = self.docs["manufacturer"].eq(make)
         family_mask = make_mask & self.docs["model_family"].eq(family)
-        near_year = family_mask if payload.year is None else family_mask & self.docs["vehicle_year"].between(payload.year - 1, payload.year + 1)
+
+        near_year = (
+            family_mask
+            if payload.year is None
+            else family_mask
+            & self.docs["vehicle_year"].between(
+                payload.year - 1,
+                payload.year + 1,
+            )
+        )
 
         if payload.year is not None and int(near_year.sum()) >= payload.k:
             mask, scope = near_year, "same model family, year ±1"
@@ -171,76 +222,372 @@ class RagEngine:
             mask, scope = make_mask, "same manufacturer"
 
         candidate_idx = self.np.flatnonzero(mask.to_numpy())
+
         if not len(candidate_idx):
             return self.docs.iloc[0:0].copy(), scope
 
-        query = f"{payload.year or ''} {make} {family}. {payload.question}".strip()
-        q = self.embedder.encode([query], normalize_embeddings=True, convert_to_numpy=True).astype("float32")
+        # Vehicle identity is already enforced by the candidate mask. Encoding
+        # only the question keeps the cosine score about question↔review
+        # relevance rather than inflating it with repeated make/model tokens.
+        q = self.embedder.encode(
+            [payload.question],
+            normalize_embeddings=True,
+            convert_to_numpy=True,
+        ).astype("float32")
+
         local = self.faiss.IndexFlatIP(self.embeddings.shape[1])
         local.add(self.embeddings[candidate_idx])
+
         n = min(payload.k, len(candidate_idx))
         scores, ids = local.search(q, n)
+
         result = self.docs.iloc[candidate_idx[ids[0]]].copy()
         result["similarity"] = scores[0]
         return result.reset_index(drop=True), scope
 
     @staticmethod
     def _extract_citations(text, valid_ids):
-        cited = set(re.findall(r"\[(edm_[a-f0-9]+)\]", text))
+        cited = set(
+            re.findall(
+                r"\[(edm_[a-f0-9]+)\]",
+                str(text),
+            )
+        )
         return cited, bool(cited) and cited.issubset(valid_ids)
 
     @staticmethod
     def _scope_guard(question):
-        """Reject questions that require evidence this corpus does not contain."""
+        """Block question types that model-level owner reviews cannot establish."""
         q = re.sub(r"\s+", " ", str(question).lower()).strip()
 
-        specific_vehicle = re.search(r"\b(this|the|my)\s+(vehicle|car|truck|suv)\b", q)
-        inspection_terms = re.search(
-            r"\b(dent|dented|scratch|scratched|damage|damaged|accident|collision|"
-            r"windshield|tire tread|flat tire|paint chip|paint damage|body damage|"
-            r"rust spot|current condition|inspection)\b",
-            q,
-        )
-        record_terms = re.search(
-            r"\b(vin|carfax|accident history|service history|maintenance history|"
-            r"previous owner|number of owners|odometer rollback|registration|"
-            r"license plate|where is this|current location)\b",
-            q,
+        specific_vehicle = bool(
+            re.search(
+                r"\b(?:this|that|my|the)\s+"
+                r"(?:(?:specific|exact|particular|individual)\s+)?"
+                r"(?:vehicle|car|truck|suv|van|listing)\b",
+                q,
+            )
         )
 
-        if record_terms:
+        specific_instance_fact = bool(
+            re.search(
+                r"\b("
+                r"dent(?:ed)?|scratch(?:ed)?|crack(?:ed)?|damage(?:d)?|"
+                r"accident|collision|paint chip|body damage|rust spot|"
+                r"windshield|tire tread|flat tire|vin|carfax|"
+                r"vehicle history|accident history|service history|"
+                r"maintenance history|ownership history|previous owners?|"
+                r"number of owners?|owner count|odometer rollback|"
+                r"registration|license plate|current mileage|exact mileage|"
+                r"current location|where is it|where is this|still for sale|"
+                r"clean title|salvage title|exact trim|exact options|"
+                r"paint color|exterior color|interior color"
+                r")\b",
+                q,
+            )
+        )
+
+        exact_history_request = bool(
+            re.search(
+                r"\b("
+                r"what(?:'s| is) the vin|vin number|carfax|"
+                r"how many previous owners?|number of previous owners?|"
+                r"ownership history|accident history|"
+                r"service history for (?:this|that|the)|"
+                r"maintenance history for (?:this|that|the)"
+                r")\b",
+                q,
+            )
+        )
+
+        if (
+            specific_vehicle
+            and specific_instance_fact
+        ) or exact_history_request:
             return {
+                "reason_code": "specific_vehicle_fact",
                 "reason": (
-                    "This question needs a vehicle-specific record such as a VIN, "
-                    "history report, inspection, or listing record. The available "
-                    "corpus only contains model-level owner reviews."
+                    "This question asks for a fact about one specific vehicle. "
+                    "The available evidence contains model-level owner reviews, "
+                    "not listing-, inspection-, VIN-, or history-report data."
                 ),
                 "suggested_question": (
                     "What problems do owners commonly report for this model and year?"
                 ),
             }
 
-        if specific_vehicle and inspection_terms:
+        insurance_or_finance = bool(
+            re.search(
+                r"\b("
+                r"insurance|insurance premium|insurance quote|"
+                r"finance|financing|loan|interest rate|apr|down payment"
+                r")\b",
+                q,
+            )
+        )
+
+        dealer_inventory = bool(
+            re.search(
+                r"\b("
+                r"in stock|dealer inventory|dealership inventory|"
+                r"where can i buy|available near me|for sale near me|"
+                r"which dealer|which dealership"
+                r")\b",
+                q,
+            )
+        )
+
+        registration_or_tax = bool(
+            re.search(
+                r"\b("
+                r"registration fee|registration cost|license fee|"
+                r"sales tax|tax deductible|tax deduction|"
+                r"how much tax|vehicle tax"
+                r")\b",
+                q,
+            )
+        )
+
+        weather_request = bool(
+            re.search(
+                r"\b(weather|rain|snow|forecast|temperature)\b",
+                q,
+            )
+            and re.search(
+                r"\b(today|tomorrow|tonight|this week|next week|trip)\b",
+                q,
+            )
+        )
+
+        future_fuel_price = bool(
+            re.search(
+                r"\b(?:gas|gasoline|fuel)\s+prices?\b|"
+                r"\bprice of (?:gas|gasoline|fuel)\b",
+                q,
+            )
+            and re.search(
+                r"\b(next|future|tomorrow|week|month|year|will|forecast|predict)\b",
+                q,
+            )
+        )
+
+        future_market_value = bool(
+            re.search(
+                r"\b("
+                r"collectible value|future value|future resale value|"
+                r"worth in (?:five|ten|\d+) years?|"
+                r"value in (?:five|ten|\d+) years?"
+                r")\b",
+                q,
+            )
+        )
+
+        if (
+            insurance_or_finance
+            or dealer_inventory
+            or registration_or_tax
+            or weather_request
+            or future_fuel_price
+            or future_market_value
+        ):
             return {
+                "reason_code": "requires_external_data",
                 "reason": (
-                    "I cannot inspect this specific vehicle from owner-review data. "
-                    "Dents, scratches, accident damage, and current physical condition "
-                    "require photos, an inspection, or listing-specific evidence."
+                    "This question requires current, transactional, regulatory, "
+                    "or future-looking information that model-level owner reviews "
+                    "do not provide."
                 ),
                 "suggested_question": (
-                    "Do owners report body-panel, paint, door, or corrosion problems "
-                    "with this model?"
+                    "What do owners report about reliability, maintenance, comfort, "
+                    "fuel economy, or common problems?"
+                ),
+            }
+
+        strong_spec_phrase = bool(
+            re.search(
+                r"\b("
+                r"lug nut torque|torque spec|oil capacity|fluid capacity|"
+                r"factory paint code|oem part number|part number|curb weight|"
+                r"wheelbase|tire pressure|official crash(?:-|\s)?test|"
+                r"original msrp|factory msrp|official horsepower|"
+                r"official towing capacity|epa rating|epa combined mpg"
+                r")\b",
+                q,
+            )
+        )
+
+        authoritative_modifier = bool(
+            re.search(
+                r"\b("
+                r"official|factory|oem|manufacturer[- ]specified|"
+                r"exact specification"
+                r")\b",
+                q,
+            )
+        )
+
+        specification_term = bool(
+            re.search(
+                r"\b("
+                r"horsepower|torque|curb weight|wheelbase|oil capacity|"
+                r"tire pressure|msrp|crash(?:-|\s)?test score|"
+                r"part number|towing capacity|epa rating"
+                r")\b",
+                q,
+            )
+        )
+
+        if (
+            strong_spec_phrase
+            or (
+                authoritative_modifier
+                and specification_term
+            )
+        ):
+            return {
+                "reason_code": "authoritative_specification",
+                "reason": (
+                    "This question asks for an authoritative vehicle specification. "
+                    "The available evidence is owner-review text rather than "
+                    "manufacturer or regulatory specification data."
+                ),
+                "suggested_question": (
+                    "What do owners say about real-world performance, towing, "
+                    "fuel economy, or everyday driving?"
                 ),
             }
 
         return None
 
     @staticmethod
+    def _retrieval_features(retrieved, support_threshold):
+        if retrieved.empty:
+            return {
+                "max_similarity": None,
+                "mean_top3_similarity": None,
+                "support_source_count": 0,
+            }
+
+        scores = (
+            retrieved["similarity"]
+            .astype(float)
+            .sort_values(ascending=False)
+            .to_numpy()
+        )
+
+        return {
+            "max_similarity": float(scores[0]),
+            "mean_top3_similarity": float(
+                scores[: min(3, len(scores))].mean()
+            ),
+            "support_source_count": int(
+                (scores >= float(support_threshold)).sum()
+            ),
+        }
+
+    @classmethod
+    def _assess_retrieval(cls, retrieved, policy):
+        support_threshold = float(
+            policy["support_threshold"]
+        )
+
+        features = cls._retrieval_features(
+            retrieved,
+            support_threshold,
+        )
+
+        if (
+            features["max_similarity"] is None
+            or features["mean_top3_similarity"] is None
+        ):
+            return {
+                "answerable": False,
+                "reason_code": "no_review_evidence",
+                "reason": (
+                    "No owner-review evidence was retrieved for this vehicle selection."
+                ),
+                **features,
+                "relevant_source_count": 0,
+                "relevant_reviews": retrieved.iloc[0:0].copy(),
+            }
+
+        max_ok = (
+            features["max_similarity"]
+            >= float(policy["max_threshold"])
+        )
+        mean_ok = (
+            features["mean_top3_similarity"]
+            >= float(policy["mean_top3_threshold"])
+        )
+        support_ok = (
+            features["support_source_count"]
+            >= int(policy["min_support_sources"])
+        )
+
+        answerable = bool(
+            max_ok
+            and (
+                mean_ok
+                or support_ok
+            )
+        )
+
+        if not answerable:
+            return {
+                "answerable": False,
+                "reason_code": "low_retrieval_relevance",
+                "reason": (
+                    "The retrieved owner reviews do not provide enough "
+                    "semantically relevant evidence to support a grounded answer."
+                ),
+                **features,
+                "relevant_source_count": 0,
+                "relevant_reviews": retrieved.iloc[0:0].copy(),
+            }
+
+        scores = retrieved["similarity"].astype(float)
+        relevant = (
+            retrieved.loc[scores >= support_threshold]
+            .copy()
+            .reset_index(drop=True)
+        )
+
+        if relevant.empty:
+            relevant = (
+                retrieved.head(1)
+                .copy()
+                .reset_index(drop=True)
+            )
+
+        return {
+            "answerable": True,
+            "reason_code": None,
+            "reason": None,
+            **features,
+            "relevant_source_count": int(len(relevant)),
+            "relevant_reviews": relevant,
+        }
+
+    @staticmethod
     def _fallback(retrieved):
         if retrieved.empty:
             return "Not enough review evidence for this vehicle."
-        ids = [f"[{review_id}]" for review_id in retrieved["review_id"].head(3)]
-        cited = ", ".join(ids[:-1]) + (" and " + ids[-1] if len(ids) > 1 else ids[0])
+
+        ids = [
+            f"[{review_id}]"
+            for review_id
+            in retrieved["review_id"].head(3)
+        ]
+
+        cited = (
+            ", ".join(ids[:-1])
+            + (
+                " and " + ids[-1]
+                if len(ids) > 1
+                else ids[0]
+            )
+        )
+
         return (
             f"Relevant owner-review evidence was found in {cited}. "
             "Live generation is disabled, so the strongest matching excerpts are "
@@ -250,64 +597,147 @@ class RagEngine:
     def _load_generator(self):
         if self.generator is not None:
             return
+
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        name = "Qwen/Qwen2.5-1.5B-Instruct" if device == "cuda" else "Qwen/Qwen2.5-0.5B-Instruct"
+
+        device = (
+            "cuda"
+            if torch.cuda.is_available()
+            else "cpu"
+        )
+        name = (
+            "Qwen/Qwen2.5-1.5B-Instruct"
+            if device == "cuda"
+            else "Qwen/Qwen2.5-0.5B-Instruct"
+        )
+
         self.tokenizer = AutoTokenizer.from_pretrained(name)
         self.generator = AutoModelForCausalLM.from_pretrained(
             name,
-            torch_dtype=torch.float16 if device == "cuda" else torch.float32,
-            device_map="auto" if device == "cuda" else None,
+            torch_dtype=(
+                torch.float16
+                if device == "cuda"
+                else torch.float32
+            ),
+            device_map=(
+                "auto"
+                if device == "cuda"
+                else None
+            ),
         )
+
         if device == "cpu":
             self.generator.to("cpu")
+
         self.generator_name = name
 
     def _generate(self, question, retrieved):
         if not ENABLE_GENERATION:
             answer = self._fallback(retrieved)
-            _, valid = self._extract_citations(answer, set(retrieved["review_id"]))
-            return answer, valid, True, "retrieval-fallback"
+            _, valid = self._extract_citations(
+                answer,
+                set(retrieved["review_id"]),
+            )
+            return (
+                answer,
+                valid,
+                True,
+                "retrieval-fallback",
+            )
 
+        # Production generation remains optional. The portfolio notebook is the
+        # validated Qwen path; ECS currently runs retrieval-only to keep the CPU
+        # service small and predictable.
         self._load_generator()
+
         evidence = []
         for _, row in retrieved.iterrows():
-            excerpt = re.sub(r"\s+", " ", str(row["review_text"])).strip()[:850]
+            excerpt = re.sub(
+                r"\s+",
+                " ",
+                str(row["review_text"]),
+            ).strip()[:850]
+
             evidence.append(
-                f"SOURCE [{row['review_id']}]\nVehicle year: {row['vehicle_year']}\n"
-                f"Rating: {row['rating']}\nTitle: {row['review_title']}\nReview: {excerpt}"
+                f"SOURCE [{row['review_id']}]\n"
+                f"Vehicle year: {row['vehicle_year']}\n"
+                f"Rating: {row['rating']}\n"
+                f"Title: {row['review_title']}\n"
+                f"Review: {excerpt}"
             )
 
         messages = [
             {
                 "role": "system",
                 "content": (
-                    "Use only supplied owner-review sources. Every factual bullet must end with a source ID exactly as written. "
-                    "If reviews disagree, say so. Return 2 to 4 concise bullets."
+                    "Use only supplied owner-review sources. "
+                    "Every factual bullet must end with a source ID exactly "
+                    "as written. If reviews disagree, say so. "
+                    "Return 2 to 4 concise bullets."
                 ),
             },
-            {"role": "user", "content": f"Question: {question}\n\n" + "\n\n".join(evidence)},
+            {
+                "role": "user",
+                "content": (
+                    f"Question: {question}\n\n"
+                    + "\n\n".join(evidence)
+                ),
+            },
         ]
 
-        prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=3500).to(self.generator.device)
-        output = self.generator.generate(**inputs, max_new_tokens=220, do_sample=False, pad_token_id=self.tokenizer.eos_token_id)
-        generated = output[0, inputs["input_ids"].shape[1]:]
-        answer = self.tokenizer.decode(generated, skip_special_tokens=True).strip()
+        prompt = self.tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
+        )
+        inputs = self.tokenizer(
+            prompt,
+            return_tensors="pt",
+            truncation=True,
+            max_length=3500,
+        ).to(self.generator.device)
+
+        output = self.generator.generate(
+            **inputs,
+            max_new_tokens=220,
+            do_sample=False,
+            pad_token_id=self.tokenizer.eos_token_id,
+        )
+        generated = output[
+            0,
+            inputs["input_ids"].shape[1]:,
+        ]
+        answer = self.tokenizer.decode(
+            generated,
+            skip_special_tokens=True,
+        ).strip()
+
         valid_ids = set(retrieved["review_id"])
-        _, valid = self._extract_citations(answer, valid_ids)
+        _, valid = self._extract_citations(
+            answer,
+            valid_ids,
+        )
         fallback_used = False
 
         if not valid:
             answer = self._fallback(retrieved)
-            _, valid = self._extract_citations(answer, valid_ids)
+            _, valid = self._extract_citations(
+                answer,
+                valid_ids,
+            )
             fallback_used = True
 
-        return answer, valid, fallback_used, self.generator_name or "qwen"
+        return (
+            answer,
+            valid,
+            fallback_used,
+            self.generator_name or "qwen",
+        )
 
     def ask(self, payload):
         guard = self._scope_guard(payload.question)
+
         if guard:
             return {
                 "answer": guard["reason"],
@@ -318,13 +748,20 @@ class RagEngine:
                 "sources": [],
                 "answerable": False,
                 "reason": guard["reason"],
+                "reason_code": guard["reason_code"],
                 "suggested_question": guard["suggested_question"],
                 "max_similarity": None,
+                "mean_top3_similarity": None,
+                "support_source_count": 0,
+                "relevant_source_count": 0,
             }
 
         retrieved, scope = self._retrieve(payload)
+
         if retrieved.empty:
-            reason = "No owner-review evidence was available for this vehicle selection."
+            reason = (
+                "No owner-review evidence was available for this vehicle selection."
+            )
             return {
                 "answer": reason,
                 "scope": scope,
@@ -334,40 +771,73 @@ class RagEngine:
                 "sources": [],
                 "answerable": False,
                 "reason": reason,
-                "suggested_question": "What do owners mention about reliability and common problems?",
+                "reason_code": "no_review_evidence",
+                "suggested_question": (
+                    "What do owners mention about reliability and common problems?"
+                ),
                 "max_similarity": None,
+                "mean_top3_similarity": None,
+                "support_source_count": 0,
+                "relevant_source_count": 0,
             }
 
-        max_similarity = float(retrieved["similarity"].max())
-        if max_similarity < RAG_MIN_SIMILARITY:
-            reason = (
-                "The retrieved owner reviews were not similar enough to this question "
-                "to support a grounded answer."
-            )
+        assessment = self._assess_retrieval(
+            retrieved,
+            self.policy,
+        )
+
+        if not assessment["answerable"]:
             return {
-                "answer": reason,
+                "answer": assessment["reason"],
                 "scope": scope,
                 "citation_valid": False,
                 "fallback_used": False,
                 "generation_mode": "abstained-low-relevance",
                 "sources": [],
                 "answerable": False,
-                "reason": reason,
-                "suggested_question": "Try asking about reliability, maintenance, comfort, fuel economy, or common problems.",
-                "max_similarity": max_similarity,
+                "reason": assessment["reason"],
+                "reason_code": assessment["reason_code"],
+                "suggested_question": (
+                    "Try asking about reliability, maintenance, comfort, "
+                    "fuel economy, or common problems."
+                ),
+                "max_similarity": assessment["max_similarity"],
+                "mean_top3_similarity": assessment["mean_top3_similarity"],
+                "support_source_count": assessment["support_source_count"],
+                "relevant_source_count": 0,
             }
 
-        answer, valid, fallback_used, mode = self._generate(payload.question, retrieved)
+        relevant = assessment["relevant_reviews"]
+
+        answer, valid, fallback_used, mode = self._generate(
+            payload.question,
+            relevant,
+        )
+
         sources = []
-        for _, row in retrieved.iterrows():
-            sources.append({
-                "review_id": str(row["review_id"]),
-                "vehicle_year": int(row["vehicle_year"]) if self.pd.notna(row["vehicle_year"]) else None,
-                "rating": float(row["rating"]) if self.pd.notna(row["rating"]) else None,
-                "review_title": str(row["review_title"]),
-                "excerpt": re.sub(r"\s+", " ", str(row["review_text"])).strip()[:260],
-                "similarity": float(row["similarity"]),
-            })
+        for _, row in relevant.iterrows():
+            sources.append(
+                {
+                    "review_id": str(row["review_id"]),
+                    "vehicle_year": (
+                        int(row["vehicle_year"])
+                        if self.pd.notna(row["vehicle_year"])
+                        else None
+                    ),
+                    "rating": (
+                        float(row["rating"])
+                        if self.pd.notna(row["rating"])
+                        else None
+                    ),
+                    "review_title": str(row["review_title"]),
+                    "excerpt": re.sub(
+                        r"\s+",
+                        " ",
+                        str(row["review_text"]),
+                    ).strip()[:260],
+                    "similarity": float(row["similarity"]),
+                }
+            )
 
         return {
             "answer": answer,
@@ -378,8 +848,12 @@ class RagEngine:
             "sources": sources,
             "answerable": True,
             "reason": None,
+            "reason_code": None,
             "suggested_question": None,
-            "max_similarity": max_similarity,
+            "max_similarity": assessment["max_similarity"],
+            "mean_top3_similarity": assessment["mean_top3_similarity"],
+            "support_source_count": assessment["support_source_count"],
+            "relevant_source_count": assessment["relevant_source_count"],
         }
 
 
@@ -552,9 +1026,20 @@ def get_rag_engine():
 def load_public_metrics():
     paths = ensure_artifacts()
     output = {}
-    for name in ["model_improvement_metrics.json", "rag_metrics.json"]:
+
+    for name in [
+        "model_improvement_metrics.json",
+        "rag_metrics.json",
+    ]:
         path = paths.get(name)
         if path and path.exists():
             with open(path) as f:
                 output[name] = json.load(f)
+
+    output["answerability_runtime"] = {
+        "policy": load_answerability_policy(),
+        "generation_enabled": ENABLE_GENERATION,
+        "scope_guard": "capability + exact-vehicle/current-data/specification",
+        "retrieval_query": "question-only embedding after vehicle-family filtering",
+    }
     return output

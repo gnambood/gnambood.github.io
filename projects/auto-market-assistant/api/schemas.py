@@ -47,5 +47,9 @@ class AskResponse(BaseModel):
     sources: list[ReviewSource]
     answerable: bool = True
     reason: Optional[str] = None
+    reason_code: Optional[str] = None
     suggested_question: Optional[str] = None
     max_similarity: Optional[float] = None
+    mean_top3_similarity: Optional[float] = None
+    support_source_count: int = 0
+    relevant_source_count: int = 0

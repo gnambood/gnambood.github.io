@@ -33,7 +33,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
         <div class="metric"><strong>239K</strong><span>price-model listings</span></div>
         <div class="metric"><strong>70K+</strong><span>matched reviews</span></div>
         <div class="metric"><strong>0.883</strong><span>test R²</span></div>
-        <div class="metric"><strong>19.6 ms</strong><span>median retrieval</span></div>
+        <div class="metric"><strong>17.6 ms</strong><span>median retrieval</span></div>
       </div>
     </div>
   </header>
@@ -100,8 +100,8 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
           <button class="tab" data-tab="metrics">Measured performance</button>
         </div>
         <div class="tabpane active" id="pipeline"><div class="mini-flow"><span class="node">vehicle fields</span><span class="arrow">→</span><span class="node">engineered price features</span><span class="arrow">→</span><span class="node">CatBoost</span><span class="arrow">+</span><span class="node">70,665 reviews</span><span class="arrow">→</span><span class="node">MiniLM + FAISS</span><span class="arrow">→</span><span class="node">grounded response</span></div></div>
-        <div class="tabpane" id="safety"><strong>The system can abstain.</strong><p class="sub">Custom questions first pass an answerability guard. Vehicle-specific inspection/history questions are rejected, weak retrieval is filtered by a similarity threshold, and generated source IDs are still validated against the reviews that were actually retrieved.</p></div>
-        <div class="tabpane" id="metrics"><div class="mini-flow"><span class="node">Hit@5 81.7%</span><span class="node">MRR@10 0.626</span><span class="node">p95 retrieval 21.35 ms</span><span class="node">19.59 ms median retrieval</span></div></div>
+        <div class="tabpane" id="safety"><strong>The system can abstain.</strong><p class="sub">Questions first pass a capability guard that blocks exact-vehicle condition/history, current transactional data and authoritative-specification requests. In-scope questions then pass a calibrated evidence gate using max similarity, mean top-3 similarity and the number of supporting reviews. Generated source IDs are validated against the reviews that were actually retrieved.</p></div>
+        <div class="tabpane" id="metrics"><div class="mini-flow"><span class="node">Hit@5 81.7%</span><span class="node">MRR@10 0.626</span><span class="node">Answerability F1 87.1%</span><span class="node">Precision 90.0%</span><span class="node">Recall 84.4%</span><span class="node">p95 retrieval 21.11 ms</span></div></div>
       </div>
     </div>
   </section>
@@ -126,7 +126,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
       <div class="phase"><span class="n">1</span><strong>Start simple</strong><p>A hierarchical median baseline established whether ML was actually adding value.</p></div>
       <div class="phase"><span class="n">2</span><strong>Fix representation</strong><p>Model-family normalization produced a much larger gain than simply adding more numeric features.</p></div>
       <div class="phase"><span class="n">3</span><strong>Evaluate retrieval</strong><p>Hit@k, MRR and latency were measured so retrieval quality was not hidden behind one demo.</p></div>
-      <div class="phase"><span class="n">4</span><strong>Design for failure</strong><p>When the generator missed the citation instruction, the final architecture added validation and a safe fallback.</p></div>
+      <div class="phase"><span class="n">4</span><strong>Calibrate abstention</strong><p>A held-out weakly supervised benchmark separated source capability from retrieval relevance and selected a multi-signal operating point instead of a magic cosine cutoff.</p></div>
     </div>
   </section>
 
@@ -136,9 +136,22 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
     <p class="section-intro">Price prediction is regression. Review search is information retrieval. They need different evaluation language.</p>
     <div class="twoq">
       <div class="q"><b>Price model</b><span>Chronological holdout • MAE • RMSE • MAPE • R² • tolerance bands. Asking price is the target, not final sale price.</span></div>
-      <div class="q"><b>Review retrieval</b><span>Hit@1/3/5 • MRR@10 • latency. Identity retrieval is treated as a sanity metric, not universal semantic relevance.</span></div>
+      <div class="q"><b>Review retrieval</b><span>Hit@1/3/5 • MRR@10 • latency • held-out answerability precision/recall/F1. Identity retrieval and weak-label answerability are reported separately rather than collapsed into one “RAG accuracy” number.</span></div>
     </div>
     <div class="note" style="margin-top:18px"><strong>External-comparison rule:</strong> public Craigslist and RAG projects are used to motivate experiments and evaluation design, not to claim a misleading leaderboard win across different splits, features or relevance labels.</div>
+  </section>
+
+  <section class="section">
+    <div class="eyebrow">Future work</div>
+    <h2>What I would test next.</h2>
+    <p class="section-intro">The production-oriented pipeline is intentionally frozen at a validated operating point. The next improvements are research extensions, not required fixes.</p>
+    <div class="twoq">
+      <div class="q"><b>Human-labelled relevance set</b><span>Manually grade question-review pairs and use that gold set to compare dense retrieval with cross-encoder reranking.</span></div>
+      <div class="q"><b>Stronger retrieval representations</b><span>Test passage-level chunking and newer embedding families such as BGE or E5 on the exact same held-out labels.</span></div>
+      <div class="q"><b>Faithfulness evaluation</b><span>Add claim-level entailment checks so citation validity is complemented by evidence-to-claim support measurement.</span></div>
+      <div class="q"><b>Production generation</b><span>Evaluate whether a managed or larger generator improves synthesis enough to justify additional latency and infrastructure cost.</span></div>
+    </div>
+    <div class="note" style="margin-top:18px"><strong>Current answerability result:</strong> 80.95% accuracy, 90.0% precision, 84.38% recall and 87.10% F1 on a held-out weakly supervised benchmark across unseen vehicle families. These are not presented as universal RAG accuracy.</div>
   </section>
 
   <footer class="footer"><strong>Auto Market Assistant</strong> — portfolio case study by Gayathri Namboodiri.<br/>CatBoost • Sentence Transformers • FAISS • Qwen • FastAPI • Docker • AWS ECS • S3 • ECR</footer>
@@ -440,7 +453,7 @@ els.btn.addEventListener('click',async()=>{
     if(!LIVE_API_AVAILABLE)throw new Error('live API unavailable');
     await runLiveAnalysis();
     els.modeTag.textContent='LIVE • AWS ECS';
-    els.note.textContent='Live result from AWS ECS Express Mode: CatBoost price inference + guarded MiniLM/FAISS owner-review retrieval.';
+    els.note.textContent='Live result from AWS ECS Express Mode: CatBoost price inference + calibrated guarded MiniLM/FAISS owner-review retrieval.';
     els.results.classList.add('show');
   }catch(e){
     const rendered=renderStaticResult();

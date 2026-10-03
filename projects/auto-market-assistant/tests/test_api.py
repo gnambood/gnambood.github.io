@@ -119,8 +119,45 @@ def test_scope_guard_rejects_specific_vehicle_inspection():
     result = RagEngine._scope_guard("Does this vehicle have a dent?")
 
     assert result is not None
+    assert result["reason_code"] == "specific_vehicle_fact"
     assert "specific vehicle" in result["reason"].lower()
-    assert "body-panel" in result["suggested_question"].lower()
+
+
+def test_scope_guard_rejects_plural_previous_owner_question():
+    from api.services import RagEngine
+
+    result = RagEngine._scope_guard(
+        "How many previous owners did this exact car have?"
+    )
+
+    assert result is not None
+    assert result["reason_code"] == "specific_vehicle_fact"
+
+
+def test_scope_guard_rejects_external_data_questions():
+    from api.services import RagEngine
+
+    questions = [
+        "How much should I expect to pay for insurance on this vehicle?",
+        "Will fuel prices go up next year for this vehicle?",
+        "Which dealership has this model in stock today?",
+    ]
+
+    for question in questions:
+        result = RagEngine._scope_guard(question)
+        assert result is not None
+        assert result["reason_code"] == "requires_external_data"
+
+
+def test_scope_guard_rejects_authoritative_specification():
+    from api.services import RagEngine
+
+    result = RagEngine._scope_guard(
+        "What is the official EPA combined MPG rating?"
+    )
+
+    assert result is not None
+    assert result["reason_code"] == "authoritative_specification"
 
 
 def test_scope_guard_allows_model_level_owner_question():
@@ -131,3 +168,58 @@ def test_scope_guard_allows_model_level_owner_question():
     )
 
     assert result is None
+
+
+
+def test_answerability_policy_matches_validated_operating_point():
+    from api.services import load_answerability_policy
+
+    policy = load_answerability_policy()
+
+    assert policy == {
+        "max_threshold": 0.38,
+        "mean_top3_threshold": 0.36,
+        "support_threshold": 0.34,
+        "min_support_sources": 2,
+    }
+
+
+def test_multi_signal_retrieval_gate_accepts_supported_question():
+    import pandas as pd
+    from api.services import RagEngine, load_answerability_policy
+
+    retrieved = pd.DataFrame(
+        {
+            "similarity": [0.3854, 0.3800, 0.3700, 0.3500, 0.3450],
+            "review_id": ["a", "b", "c", "d", "e"],
+        }
+    )
+
+    result = RagEngine._assess_retrieval(
+        retrieved,
+        load_answerability_policy(),
+    )
+
+    assert result["answerable"] is True
+    assert result["support_source_count"] == 5
+    assert result["relevant_source_count"] == 5
+
+
+def test_multi_signal_retrieval_gate_rejects_weak_question():
+    import pandas as pd
+    from api.services import RagEngine, load_answerability_policy
+
+    retrieved = pd.DataFrame(
+        {
+            "similarity": [0.36, 0.35, 0.34, 0.30, 0.29],
+            "review_id": ["a", "b", "c", "d", "e"],
+        }
+    )
+
+    result = RagEngine._assess_retrieval(
+        retrieved,
+        load_answerability_policy(),
+    )
+
+    assert result["answerable"] is False
+    assert result["reason_code"] == "low_retrieval_relevance"
