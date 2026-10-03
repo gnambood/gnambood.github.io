@@ -42,11 +42,16 @@ The current deployment uses:
 - GitHub Pages for the portfolio UI
 - FastAPI for inference endpoints
 - Docker for the application image
-- Amazon ECR for image storage
+- Amazon ECR for private image storage and scan-on-push
 - Amazon ECS Express Mode / Fargate for serving
 - an AWS-managed HTTPS ingress/load-balancing layer
 - Amazon S3 for model, FAISS, metrics and processed-data artifacts
-- IAM task roles for least-privilege S3 access
+- private/versioned S3 storage with public-access blocking
+- IAM task, execution and infrastructure roles
+- GitHub Actions OIDC federation to AWS instead of long-lived deployment keys
+- deployment smoke tests that verify the active ECS image and calibrated RAG policy
+
+For the full AWS resource inventory, security model, CI/CD flow, runtime configuration and production/reference-infrastructure distinction, see **[DEPLOY_AWS.md](DEPLOY_AWS.md)** and **[ARCHITECTURE.md](ARCHITECTURE.md)**.
 
 Live API:
 
