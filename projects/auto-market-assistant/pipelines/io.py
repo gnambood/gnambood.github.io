@@ -1,9 +1,16 @@
 import json
+import shutil
 from pathlib import Path
 
 
 def write_partitioned_parquet(df, path, partition_cols):
     path = Path(path)
+
+    # Replace the local dataset atomically at directory level so rerunning the
+    # same source snapshot does not append duplicate Parquet parts.
+    if path.exists():
+        shutil.rmtree(path)
+
     path.mkdir(parents=True, exist_ok=True)
     df.to_parquet(path, index=False, partition_cols=partition_cols)
     return path
