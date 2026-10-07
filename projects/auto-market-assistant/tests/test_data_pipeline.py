@@ -1,6 +1,7 @@
 import pandas as pd
 
 from pipelines.quality import evaluate_quality_gates
+from pipelines.run_pipeline import run_pipeline
 from pipelines.transform_reviews import (
     clean_reviews,
     match_reviews_to_vehicle_scope,
@@ -155,3 +156,80 @@ def test_quality_gate_detects_bad_pipeline_run():
     assert result["status"] == "FAIL"
     assert result["checks"]["vehicle_clean_retention"] is True
     assert result["checks"]["review_match_rate"] is False
+
+
+
+def test_end_to_end_pipeline_is_idempotent(tmp_path):
+    vehicle_path = tmp_path / "vehicles.csv"
+    review_dir = tmp_path / "reviews"
+    review_dir.mkdir()
+    output_dir = tmp_path / "output"
+
+    vehicles = []
+    for i in range(20):
+        vehicles.append(
+            {
+                "id": i + 1,
+                "price": 15000 + i * 100,
+                "year": 2018,
+                "manufacturer": "Honda",
+                "model": "Civic Sedan",
+                "odometer": 40000 + i * 1000,
+                "posting_date": "2021-04-01T12:00:00Z",
+                "condition": "good",
+                "fuel": "gas",
+                "title_status": "clean",
+                "transmission": "automatic",
+                "drive": "fwd",
+                "type": "sedan",
+                "region": "austin",
+                "state": "tx",
+            }
+        )
+
+    pd.DataFrame(vehicles).to_csv(vehicle_path, index=False)
+
+    reviews = []
+    for i in range(20):
+        reviews.append(
+            {
+                "Vehicle_Title": "2018 Honda Civic Sedan LX",
+                "Review_Title": "Reliable",
+                "Review": (
+                    "This Civic has been reliable for commuting and normal "
+                    f"maintenance over several years. Review {i}."
+                ),
+                "Rating": 4.5,
+                "Review_Date": "01/02/2020",
+            }
+        )
+
+    pd.DataFrame(reviews).to_csv(
+        review_dir / "Scrapped_Car_Reviews_Honda.csv",
+        index=False,
+    )
+
+    first = run_pipeline(
+        vehicles_csv=vehicle_path,
+        reviews_dir=review_dir,
+        output_dir=output_dir,
+    )
+    first_parts = sorted(
+        p.relative_to(output_dir)
+        for p in output_dir.rglob("*.parquet")
+    )
+
+    second = run_pipeline(
+        vehicles_csv=vehicle_path,
+        reviews_dir=review_dir,
+        output_dir=output_dir,
+    )
+    second_parts = sorted(
+        p.relative_to(output_dir)
+        for p in output_dir.rglob("*.parquet")
+    )
+
+    assert first["manifest"]["run_id"] == second["manifest"]["run_id"]
+    assert first_parts == second_parts
+    assert (output_dir / "manifests" / "latest.json").exists()
+    assert (output_dir / "quality" / "quality_gate.json").exists()
