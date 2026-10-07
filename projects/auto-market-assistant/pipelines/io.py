@@ -2,17 +2,63 @@ import json
 import shutil
 from pathlib import Path
 
+import pandas as pd
+
+
+def _hive_partition_value(value):
+    if pd.isna(value):
+        return "__HIVE_DEFAULT_PARTITION__"
+    return str(value)
+
 
 def write_partitioned_parquet(df, path, partition_cols):
+    """Write deterministic Hive-style Parquet partitions.
+
+    Each partition gets a stable part-00000.parquet filename. Re-running the
+    same snapshot therefore overwrites the same local/S3 object keys instead of
+    accumulating UUID-named Parquet parts.
+    """
     path = Path(path)
 
-    # Replace the local dataset atomically at directory level so rerunning the
-    # same source snapshot does not append duplicate Parquet parts.
     if path.exists():
         shutil.rmtree(path)
 
     path.mkdir(parents=True, exist_ok=True)
-    df.to_parquet(path, index=False, partition_cols=partition_cols)
+
+    if not partition_cols:
+        df.to_parquet(path / "part-00000.parquet", index=False)
+        return path
+
+    group_key = partition_cols[0] if len(partition_cols) == 1 else partition_cols
+
+    grouped = df.groupby(
+        group_key,
+        dropna=False,
+        sort=True,
+        observed=True,
+    )
+
+    for values, group in grouped:
+        if len(partition_cols) == 1:
+            values = (values,)
+
+        partition_path = path
+        for column, value in zip(partition_cols, values):
+            partition_path = (
+                partition_path
+                / f"{column}={_hive_partition_value(value)}"
+            )
+
+        partition_path.mkdir(parents=True, exist_ok=True)
+
+        # Partition columns are encoded in the Hive-style directory path and
+        # are therefore omitted from each Parquet payload.
+        payload = group.drop(columns=partition_cols)
+        payload.to_parquet(
+            partition_path / "part-00000.parquet",
+            index=False,
+        )
+
     return path
 
 
