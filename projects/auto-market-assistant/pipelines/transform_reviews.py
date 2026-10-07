@@ -1,4 +1,6 @@
+import csv
 import re
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -21,6 +23,7 @@ def make_from_filename(path, supported_makes):
 
 def load_review_directory(review_dir, supported_makes):
     """Load supported Edmunds CSVs with the notebook's fallback parser."""
+    csv.field_size_limit(sys.maxsize)
     paths = sorted(Path(review_dir).rglob("*.csv"))
     selected = [
         (path, make_from_filename(path, supported_makes)) for path in paths
