@@ -1,6 +1,6 @@
 # Auto Market Assistant
 
-End-to-end used-car intelligence system combining a CatBoost price model, grounded owner-review retrieval, a FastAPI inference layer, Docker, and a live AWS deployment.
+End-to-end used-car intelligence system combining a reusable batch data pipeline, CatBoost price model, grounded owner-review retrieval, FastAPI inference, Docker, analytics, and a live AWS deployment.
 
 ## What it does
 
@@ -51,7 +51,7 @@ The current deployment uses:
 - GitHub Actions OIDC federation to AWS instead of long-lived deployment keys
 - deployment smoke tests that verify the active ECS image and calibrated RAG policy
 
-For the full AWS resource inventory, security model, CI/CD flow, runtime configuration and production/reference-infrastructure distinction, see **[DEPLOY_AWS.md](DEPLOY_AWS.md)** and **[ARCHITECTURE.md](ARCHITECTURE.md)**.
+For the full AWS resource inventory, security model, CI/CD flow, runtime configuration and production/reference-infrastructure distinction, see **[DEPLOY_AWS.md](DEPLOY_AWS.md)**, **[ARCHITECTURE.md](ARCHITECTURE.md)** and **[DATA_PIPELINE.md](DATA_PIPELINE.md)**.
 
 Live API:
 
@@ -81,21 +81,61 @@ grounded evidence response
 citation validation
 ```
 
+## Data engineering layer
+
+The validated notebook transformations have been refactored into a reusable batch pipeline under `pipelines/`.
+
+It produces manufacturer-partitioned Parquet datasets, row-level cleaning audits, data-quality reports, quality gates and SHA-256 lineage manifests so CatBoost, RAG and analytics can share one curated definition of the data.
+
+```text
+raw CSV snapshots
+      ↓
+Python batch ETL
+      ↓
+schema + quality gates
+      ↓
+curated Parquet in S3
+      ↓
+├── CatBoost
+├── FAISS / RAG
+└── Glue Data Catalog → Athena → Tableau / QA
+```
+
+A deployable Glue/Athena catalog stack is defined in `infra/data-catalog-template.yaml`, with reusable Athena queries in `sql/`. The analytics stack is intentionally not auto-deployed with the ECS application because Athena/Glue usage can incur AWS charges.
+
+See **[DATA_PIPELINE.md](DATA_PIPELINE.md)** for the ETL rules, S3 layout, lineage model, quality thresholds and catalog setup.
+
 ## S3 layout
 
 ```text
 raw/
   craigslist/
   edmunds/
+
+curated/
+  vehicles/manufacturer=.../
+  reviews/manufacturer=.../
+  vehicle_review_matches/manufacturer=.../
+
+quality/
+  vehicle_cleaning_audit.csv
+  vehicle_quality.json
+  review_quality.json
+  quality_gate.json
+
+manifests/
+  pipeline_<source-fingerprint>.json
+  latest.json
+
 processed/
   vehicles_clean.parquet
   review_documents.parquet
+
 artifacts/
   price_model.cbm
   model_improvement_metrics.json
   review_index.faiss
   rag_metrics.json
-validation/
 ```
 
 ## Website behavior
