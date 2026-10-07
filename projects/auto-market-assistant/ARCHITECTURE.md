@@ -28,6 +28,34 @@ AWS ECS Express Mode
 
 The deployed ECS service runs on Fargate behind AWS-managed HTTPS ingress/load-balancing infrastructure.
 
+## Data platform path
+
+```text
+Craigslist + Edmunds raw snapshots
+            |
+            v
+    reusable Python batch ETL
+            |
+    schema + quality gates
+            |
+            v
+ manufacturer-partitioned Parquet
+            |
+            v
+        Amazon S3
+       /    |     \
+      /     |      \
+ CatBoost  FAISS   Glue Data Catalog
+                    |
+                  Athena
+                    |
+               Tableau / QA
+```
+
+The batch pipeline under `pipelines/` reuses the same vehicle-cleaning and review-matching rules that produced the validated notebooks. It also emits row-count audits, quality-gate results and source-hash manifests for lineage.
+
+The Glue/Athena catalog is infrastructure-as-code in `infra/data-catalog-template.yaml`. It is separate from the active ECS serving stack and is not automatically deployed because analytics usage can incur additional AWS charges.
+
 ## Deployment path
 
 ```text
@@ -96,8 +124,8 @@ The currently deployed serving path is:
 
 ### Repository reference infrastructure
 
-The repository also includes an S3-triggered Lambda validation stack in `infra/data-pipeline-template.yaml` and `lambda/`.
+The repository also includes an S3-triggered Lambda validation stack in `infra/data-pipeline-template.yaml` and `lambda/`, plus a Glue/Athena catalog stack in `infra/data-catalog-template.yaml`.
 
-That serverless validator is part of the reproducible architecture design, but it should not be interpreted as an active production component unless the SAM/CloudFormation stack is explicitly deployed.
+Those analytics/validation components are reproducible infrastructure definitions. They should not be interpreted as active production components unless their CloudFormation stacks are explicitly deployed.
 
 See `DEPLOY_AWS.md` for the full resource inventory, IAM/OIDC security model, runtime configuration and deployment procedure.
