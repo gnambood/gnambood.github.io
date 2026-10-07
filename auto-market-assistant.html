@@ -115,7 +115,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
       <div class="metric"><strong>84.9%</strong><span>within $5K</span></div>
       <div class="metric"><strong>81.7%</strong><span>Hit@5</span></div>
       <div class="metric"><strong>0.626</strong><span>MRR@10</span></div>
-      <div class="metric"><strong>19.6 ms</strong><span>median retrieval</span></div>
+      <div class="metric"><strong>17.6 ms</strong><span>median retrieval</span></div>
     </div>
   </section>
 
@@ -128,6 +128,19 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
       <div class="phase"><span class="n">3</span><strong>Evaluate retrieval</strong><p>Hit@k, MRR and latency were measured so retrieval quality was not hidden behind one demo.</p></div>
       <div class="phase"><span class="n">4</span><strong>Calibrate abstention</strong><p>A held-out weakly supervised benchmark separated source capability from retrieval relevance and selected a multi-signal operating point instead of a magic cosine cutoff.</p></div>
     </div>
+  </section>
+
+  <section class="section">
+    <div class="eyebrow">Data platform</div>
+    <h2>One curated data definition for ML, RAG and analytics.</h2>
+    <p class="section-intro">As the project moved beyond notebooks, the Craigslist and Edmunds transformations were extracted into a tested batch pipeline so downstream consumers do not silently drift apart.</p>
+    <div class="twoq">
+      <div class="q"><b>Reusable batch ETL</b><span>Raw CSV snapshots are normalized, deduplicated, validated and transformed into manufacturer-partitioned Parquet datasets using the same cleaning and model-family rules as the final notebooks.</span></div>
+      <div class="q"><b>Data quality gates</b><span>Each run reconciles source/curated row counts and checks vehicle-retention, review-retention and review-match thresholds before publishing outputs.</span></div>
+      <div class="q"><b>Lineage & idempotency</b><span>SHA-256 source fingerprints identify each run, while deterministic Hive-style partition paths and Parquet object names make reruns safe and traceable.</span></div>
+      <div class="q"><b>Analytics-ready AWS layer</b><span>Infrastructure-as-code defines Glue external tables and a cost-controlled Athena workgroup for querying the curated S3 layer; deployment is kept separate from the live ECS serving path.</span></div>
+    </div>
+    <div class="mini-flow" style="margin-top:18px"><span class="node">raw CSV</span><span class="arrow">→</span><span class="node">Python ETL</span><span class="arrow">→</span><span class="node">quality gates</span><span class="arrow">→</span><span class="node">partitioned Parquet</span><span class="arrow">→</span><span class="node">S3</span><span class="arrow">→</span><span class="node">ML / RAG / Athena</span></div>
   </section>
 
   <section class="section">
@@ -154,7 +167,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
     <div class="note" style="margin-top:18px"><strong>Current answerability result:</strong> 80.95% accuracy, 90.0% precision, 84.38% recall and 87.10% F1 on a held-out weakly supervised benchmark across unseen vehicle families. These are not presented as universal RAG accuracy.</div>
   </section>
 
-  <footer class="footer"><strong>Auto Market Assistant</strong> — portfolio case study by Gayathri Namboodiri.<br/>CatBoost • Sentence Transformers • FAISS • Qwen • FastAPI • Docker • AWS ECS • S3 • ECR</footer>
+  <footer class="footer"><strong>Auto Market Assistant</strong> — portfolio case study by Gayathri Namboodiri.<br/>CatBoost • Sentence Transformers • FAISS • Qwen • FastAPI • Docker • Parquet • AWS ECS • S3 • ECR</footer>
 </div>
 <script>
 const LIVE_API_BASE="https://au-31cea16fe69c481c8dd923a37b6252df.ecs.ca-central-1.on.aws";
