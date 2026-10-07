@@ -101,7 +101,7 @@ python -m pipelines.run_pipeline \
   --s3-bucket <artifact-bucket>
 ```
 
-The publisher uploads deterministic keys and does not delete existing S3 prefixes. S3 versioning already preserves prior object versions.
+Each local curated dataset directory is replaced before a rerun, so the same source snapshot does not append duplicate Parquet parts. The publisher then uploads the same logical object keys and does not delete unrelated S3 prefixes. S3 versioning preserves prior object versions.
 
 ## Glue + Athena
 
