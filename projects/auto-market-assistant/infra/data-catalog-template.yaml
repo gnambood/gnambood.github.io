@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Glue/Athena catalog for Auto Market Assistant curated Parquet datasets.
+Description: Auto Market Assistant - curated Glue and Athena (deployed two-table schema)
 
 Parameters:
   ArtifactBucketName:
     Type: String
-    Description: Existing private S3 bucket containing curated data.
+    Description: Existing private S3 bucket with curated Parquet data.
   DatabaseName:
     Type: String
     Default: auto_market_curated
@@ -19,7 +19,6 @@ Resources:
       CatalogId: !Ref AWS::AccountId
       DatabaseInput:
         Name: !Ref DatabaseName
-        Description: Curated Auto Market Assistant datasets for analytics and ML.
 
   VehiclesTable:
     Type: AWS::Glue::Table
@@ -45,25 +44,30 @@ Resources:
           SerdeInfo:
             SerializationLibrary: org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
           Columns:
-            - {Name: id, Type: string}
-            - {Name: price, Type: double}
-            - {Name: year, Type: bigint}
+            - {Name: id, Type: bigint}
+            - {Name: region, Type: string}
+            - {Name: price, Type: bigint}
+            - {Name: year, Type: double}
             - {Name: model, Type: string}
-            - {Name: model_family, Type: string}
-            - {Name: odometer, Type: double}
-            - {Name: posting_date, Type: timestamp}
-            - {Name: posting_year, Type: bigint}
-            - {Name: vehicle_age, Type: bigint}
             - {Name: condition, Type: string}
             - {Name: fuel, Type: string}
+            - {Name: odometer, Type: double}
             - {Name: title_status, Type: string}
             - {Name: transmission, Type: string}
             - {Name: drive, Type: string}
             - {Name: type, Type: string}
-            - {Name: region, Type: string}
             - {Name: state, Type: string}
+            - {Name: posting_date, Type: timestamp}
+            - {Name: posting_year, Type: int}
+            - {Name: vehicle_age, Type: double}
             - {Name: price_extreme_flag, Type: boolean}
             - {Name: odometer_zero_flag, Type: boolean}
+            - {Name: condition_missing, Type: bigint}
+            - {Name: fuel_missing, Type: bigint}
+            - {Name: title_status_missing, Type: bigint}
+            - {Name: transmission_missing, Type: bigint}
+            - {Name: drive_missing, Type: bigint}
+            - {Name: type_missing, Type: bigint}
             - {Name: quality_issue_count, Type: bigint}
             - {Name: quality_band, Type: string}
 
@@ -91,59 +95,20 @@ Resources:
           SerdeInfo:
             SerializationLibrary: org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
           Columns:
-            - {Name: vehicle_title, Type: string}
-            - {Name: review_title, Type: string}
-            - {Name: review_text, Type: string}
-            - {Name: source_file, Type: string}
-            - {Name: rating, Type: double}
-            - {Name: review_date, Type: timestamp}
+            - {Name: review_id, Type: string}
             - {Name: vehicle_year, Type: bigint}
             - {Name: model, Type: string}
             - {Name: model_family, Type: string}
-            - {Name: matched_price_scope, Type: boolean}
-
-  VehicleReviewMatchesTable:
-    Type: AWS::Glue::Table
-    Properties:
-      CatalogId: !Ref AWS::AccountId
-      DatabaseName: !Ref CuratedDatabase
-      TableInput:
-        Name: vehicle_review_matches
-        TableType: EXTERNAL_TABLE
-        Parameters:
-          classification: parquet
-          projection.enabled: 'true'
-          projection.manufacturer.type: enum
-          projection.manufacturer.values: ford,chevrolet,toyota,honda,nissan,jeep,ram,gmc,bmw,dodge
-          storage.location.template: !Sub 's3://${ArtifactBucketName}/curated/vehicle_review_matches/manufacturer=${!manufacturer}/'
-        PartitionKeys:
-          - Name: manufacturer
-            Type: string
-        StorageDescriptor:
-          Location: !Sub 's3://${ArtifactBucketName}/curated/vehicle_review_matches/'
-          InputFormat: org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat
-          OutputFormat: org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
-          SerdeInfo:
-            SerializationLibrary: org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
-          Columns:
-            - {Name: vehicle_title, Type: string}
+            - {Name: rating, Type: double}
             - {Name: review_title, Type: string}
             - {Name: review_text, Type: string}
-            - {Name: source_file, Type: string}
-            - {Name: rating, Type: double}
-            - {Name: review_date, Type: timestamp}
-            - {Name: vehicle_year, Type: bigint}
-            - {Name: model, Type: string}
-            - {Name: model_family, Type: string}
-            - {Name: matched_price_scope, Type: boolean}
+            - {Name: document, Type: string}
 
   AnalyticsWorkGroup:
     Type: AWS::Athena::WorkGroup
     Properties:
       Name: !Ref AthenaWorkGroupName
-      Description: Cost-controlled Athena workgroup for Auto Market Assistant analytics.
       State: ENABLED
-      RecursiveDeleteOption: false
       WorkGroupConfiguration:
         EnforceWorkGroupConfiguration: true
         BytesScannedCutoffPerQuery: 1073741824
@@ -152,7 +117,7 @@ Resources:
           OutputLocation: !Sub 's3://${ArtifactBucketName}/athena-results/'
 
 Outputs:
-  GlueDatabaseName:
+  GlueDatabase:
     Value: !Ref CuratedDatabase
   AthenaWorkGroup:
     Value: !Ref AnalyticsWorkGroup
