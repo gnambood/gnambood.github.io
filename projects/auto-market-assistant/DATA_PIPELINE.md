@@ -127,6 +127,19 @@ The `auto-market-analytics` workgroup executed all six statements in `sql/athena
 
 Validation SQL success is not equivalent to an independently audited raw-to-curated pipeline. Source snapshots and end-to-end run lineage remain pending. Queries involving price, odometer and rating columns also succeeded and scanned Parquet content.
 
+
+## Athena analytics execution evidence (2026-10-08)
+
+All three statements in `sql/athena_analytics.sql` executed successfully in the `auto-market-analytics` workgroup:
+
+| Query | Query execution ID | Reported bytes scanned | Result |
+|---|---|---:|---|
+| Manufacturer aggregates, CTE join and price ranking | `d6d1f373-8949-407d-8fc1-2340721fa56f` | 1,082,468 | SUCCEEDED |
+| Vehicle-age segmentation | `b966e95f-82a8-4718-b6e0-6409bf737a0a` | 560,359 | SUCCEEDED |
+| Manufacturer input-quality band distribution | `31416b05-8349-4eb7-9534-997436a05abd` | 448,413 | SUCCEEDED |
+
+The manufacturer analysis ranks Ram highest by historical mean asking price ($31,526.52) and Honda lowest ($11,953.02). Ford mean asking price by age segment is $40,708 (0–2 years), $30,720.63 (3–5), $20,021.73 (6–10), and $10,313.20 (11+). The quality-band indicators refer to *listing input completeness/quality*, not physical vehicle condition. These are descriptive historical sample patterns and should not be presented as current transaction valuations or causal depreciation estimates.
+
 ## Why this design
 
 - **Pandas, not Spark:** hundreds of thousands of rows do not justify a distributed cluster.
