@@ -101,7 +101,7 @@ curated Parquet in S3
 └── Glue Data Catalog → Athena → Tableau / QA
 ```
 
-A deployable Glue/Athena catalog stack is defined in `infra/data-catalog-template.yaml`, with reusable Athena queries in `sql/`. The analytics stack is intentionally not auto-deployed with the ECS application because Athena/Glue usage can incur AWS charges.
+A deployable Glue/Athena catalog stack is defined in `infra/data-catalog-template.yaml`, with reusable Athena queries in `sql/`. The analytics stack was deployed separately on 2026-10-08 as CloudFormation stack `auto-market-data-platform` in `ca-central-1`. Both tables (`vehicles`, `reviews`) passed Athena row-count and content queries. It is not auto-deployed with ECS because Athena/Glue usage can incur AWS charges. Raw-source ingestion and reproducible end-to-end lineage are still pending.
 
 See **[DATA_PIPELINE.md](DATA_PIPELINE.md)** for the ETL rules, S3 layout, lineage model, quality thresholds and catalog setup.
 
