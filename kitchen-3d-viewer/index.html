@@ -2522,7 +2522,7 @@ body[data-not-sent] > #vis-container ~ #not-sent {
 }
 </style>
 <h2 class="sr-only">Interactive 3D model of the kitchen with a floor-length breakfast counter base, a one-inch-thick teak shelf above the window aligned to the top of the right upper cabinets, with three dim lights beneath it, two pendant lights over the breakfast counter and four vertically aligned vents at the right edge of the second drawer below the stove and four equal drawers on the cabinet to the left of the sink, leaving the other side as a door for the corner. Drag to rotate.</h2>
-<div class="mobile-top"><div>Kitchen 3D <small>Interactive mobile model</small></div><button id="fs" type="button">⛶ Full screen</button></div>
+<div class="mobile-top"><div>Kitchen 3D <small>V23U · aligned pendant beam</small></div><button id="fs" type="button">⛶ Full screen</button></div>
 <canvas id="cv"></canvas>
 <div class="bar">
 <span>View</span>
@@ -2570,8 +2570,8 @@ var floorMat=new THREE.MeshStandardMaterial({map:tex(plankC(),7,7),roughness:0.8
 var wallMat=mk(0xf1ede6,0.95),divMat=mk(0xf7f3eb,0.95);
 var TOP=200;
 B(-40,270,-3,0,-3,270,floorMat,true);
-B(-40,270,0,250,-3,0,wallMat,true);
-B(-3,0,0,250,0,270,wallMat,true);
+B(-40,270,0,304.8,-3,0,wallMat,true);
+B(-3,0,0,304.8,0,270,wallMat,true);
 B(0,165,88.5,140,0,0.4,marble,true);
 B(0,0.4,88.5,140,0,173,marble,true);
 var g=0.25;
@@ -2645,6 +2645,12 @@ B(165,175,92,TOP,0,37,divMat);
 var tb=new THREE.Mesh(new THREE.BoxGeometry(38,89,120),[fl(120/25.6),ply,ply,ply,fl(38/25.6),ply]);
 tb.position.set(184,44.5,60);tb.castShadow=true;tb.receiveShadow=true;scene.add(tb);
 B(164.5,231,89,92,0,121,topMat);
+// V23T: make the breakfast-counter top continue straight down to the floor at the exposed end.
+// Keep the inner breakfast-counter cabinet/body unchanged so chair clearance is preserved.
+// Full-width waterfall slab at the short end, matching the countertop finish.
+B(164.5,231,0,89,0.0,2.54,topMat,true);
+// Slight underside return to visually connect the horizontal top and vertical waterfall panel.
+B(164.5,231,88.6,89.0,0.0,2.54,topMat,true);
 function TI(z0,z1,y0,y1){B(163.2,165,y0+g,y1-g,z0+g,z1-g,baseMat);FN(z0,z1,y0,y1,163.2);}
 TI(54,87,76.5,89);TI(87,120,76.5,89);
 TI(54,87,15,76.5);TI(87,120,15,76.5);
@@ -2692,10 +2698,11 @@ function jar(x,y,z,c){var m=new THREE.Mesh(new THREE.CylinderGeometry(2.6,2.6,7,
 jar(7,110,54,0x2c5f7c);jar(7,147.4,56,0xc46a3c);jar(7,184.8,54,0xefe5d3);
 // V7: shallow ceiling beam over the breakfast counter, with three low-hung
 // dark-ribbed/amber-glass pendants in an evenly spaced straight row.
-B(183,215,237,250,5,116,divMat,true);
+// Beam top aligned with the top of chimney covering at TOP+24 = 224 cm.
+B(183,215,TOP+11,TOP+24,5,116,divMat,true);
 var pend=[],pendLights=[];
 function addAmberPendant(x,z){
-  var ceilingY=237, globeY=177, globeR=8.5;
+  var ceilingY=TOP+11, globeY=177, globeR=8.5;
   var mount=new THREE.Mesh(new THREE.CylinderGeometry(3.4,3.4,1.3,32),black);
   mount.position.set(x,ceilingY-0.8,z);scene.add(mount);
   var cableEnd=globeY+globeR+5;
@@ -2716,6 +2723,79 @@ function addAmberPendant(x,z){
 }
 [38,84].forEach(function(z){addAmberPendant(199,z);});
 var pl3=new THREE.PointLight(0xffc98a,0.1,170,1.5);pl3.position.set(199,177,61);scene.add(pl3);
+// V23H: Whirlpool reference refrigerator; dimensions in centimetres: H 144.8, W 54.2, D 65.5.
+// Single dark navy-blue refrigerator door, slim metallic vertical handle and low kick plinth.
+var fridgeY=144.8, fridgeZ0=175.9, fridgeZ1=230.1, fridgeX0=3.5, fridgeX1=69;
+var fridgeBody=mk(0x242735,0.43,0.26),fridgeDoor=mk(0x102d50,0.32,0.25),fridgeEdge=mk(0x121b2e,0.4,0.27);
+B(fridgeX0,fridgeX1,0,fridgeY,fridgeZ0,fridgeZ1,fridgeBody);
+// One continuous door front (not a split-door refrigerator).
+B(fridgeX1,fridgeX1+1.4,8,fridgeY-2,fridgeZ0+0.7,fridgeZ1-0.7,fridgeDoor);
+B(fridgeX1+1.4,fridgeX1+1.8,8,fridgeY-2,fridgeZ0+0.7,fridgeZ1-0.7,fridgeEdge,true);
+// Simple silver vertical pull; placed toward one outer edge of the single door.
+B(fridgeX1+1.9,fridgeX1+3.1,fridgeY-55,fridgeY-15,fridgeZ0+5,fridgeZ0+7,steel,true);
+B(fridgeX0,fridgeX1+1.5,0,7,fridgeZ0,fridgeZ1,fridgeEdge);
+
+// Leave a 5 cm gap above the fridge, then create one full storage unit with a separator and a front glass door.
+// The top of the unit still aligns to the wood shelf area above the window at y=TOP (200).
+var fridgeTopAligned=TOP, gapAboveFridge=5, unitBottom=fridgeY+gapAboveFridge, dividerY=181.8, cabinetFrontX=fridgeX1+3.4;
+var microwaveMat=mk(0x2d3036,0.58,0.12),microwaveGlass=new THREE.MeshPhysicalMaterial({color:0x1b2128,roughness:0.04,metalness:0.05,transparent:true,opacity:0.42});
+var cabinetGlass=new THREE.MeshPhysicalMaterial({color:0x8c6a4b,roughness:0.12,metalness:0.04,transparent:true,opacity:0.38,side:THREE.DoubleSide,depthWrite:false,clearcoat:0.45});
+// One teak cabinet box above the fridge.
+B(fridgeX0-0.3,cabinetFrontX,unitBottom,unitBottom+1.5,fridgeZ0-1,fridgeZ1+1,teakMat);
+// Match the 1-inch window/sink teak shelf thickness and join their upper surfaces.
+B(fridgeX0-0.3,cabinetFrontX,fridgeTopAligned-2.54,fridgeTopAligned,fridgeZ0-1,fridgeZ1+1,teakMat);
+// Continuous teak bridge connecting the top of the window shelf (z=170)
+// to the top of the microwave cabinet (z=fridgeZ0-1), both at y=TOP.
+B(0,22,TOP-2.54,TOP,170,fridgeZ0-1+0.15,teakMat);
+B(fridgeX0-0.3,fridgeX0+1.5,unitBottom,fridgeTopAligned,fridgeZ0-1,fridgeZ1+1,teakMat);
+// Front is the wide +X face directly above the visible refrigerator door.
+ // Keep the front open behind the hinged brown-glass door, not covered by solid teak.
+ B(cabinetFrontX-1.5,cabinetFrontX,unitBottom,fridgeTopAligned,fridgeZ0-1,fridgeZ0+0.5,teakMat);
+ B(cabinetFrontX-1.5,cabinetFrontX,unitBottom,fridgeTopAligned,fridgeZ1-0.5,fridgeZ1+1,teakMat);
+ // The narrow adjacent +Z side remains solid brown.
+ B(fridgeX0-0.3,cabinetFrontX-1.5,unitBottom,fridgeTopAligned,fridgeZ1-0.7,fridgeZ1+1,teakMat);
+B(fridgeX0+1.3,cabinetFrontX-1.5,unitBottom+1.5,fridgeTopAligned-1.5,fridgeZ0,fridgeZ0+1.1,teakMat);
+// Internal horizontal separator creating two sections in the same cabinet.
+B(fridgeX0+1.3,cabinetFrontX-1.5,dividerY-0.75,dividerY+0.75,fridgeZ0,fridgeZ1,teakMat);
+// Microwave in the lower section; front faces the same direction as the fridge.
+var microD=31.5,microW=41.5,microX1=cabinetFrontX-2.0,microX0=microX1-microD;
+var microY0=unitBottom+2.6,microY1=microY0+24.5;
+var microMidZ=(fridgeZ0+fridgeZ1)/2,microZ0=microMidZ-microW/2,microZ1=microMidZ+microW/2;
+B(microX0,microX1,microY0,microY1,microZ0,microZ1,microwaveMat);
+B(microX1-0.12,microX1+0.1,microY0+3.3,microY1-3.3,microZ0+2,microZ1-8.2,microwaveGlass,true);
+B(microX1+0.1,microX1+0.5,microY0+5.0,microY1-5.0,microZ0+2.8,microZ0+3.8,steel,true);
+B(microX1-0.1,microX1+0.14,microY0+3.2,microY1-3.2,microZ1-7.0,microZ1-1.8,steel,true);
+for(var mp=microY0+6;mp<=microY1-6;mp+=4.6){
+ var btn=new THREE.Mesh(new THREE.CylinderGeometry(0.33,0.33,0.18,14),steel);
+ btn.rotation.z=Math.PI/2;btn.position.set(microX1+0.25,mp,microZ1-4.3);scene.add(btn);
+}
+// Simple storage items in the upper section.
+function cubbyItem(z,y,c){var m=new THREE.MeshStandardMaterial({color:c,roughness:0.24,metalness:0.02});var b=new THREE.Mesh(new THREE.BoxGeometry(5,12,7),m);b.position.set(18,y,z);b.castShadow=true;scene.add(b);} 
+cubbyItem(fridgeZ0+12,190,0xb78963); cubbyItem(fridgeZ0+21,190,0x6d7f8a); cubbyItem(fridgeZ0+31,190,0xd7d2c8);
+// CORRECTED: wide +X face marked red, in line with the refrigerator door,
+// is the front of this cabinet. Narrow +Z face is solid teak.
+var doorH=fridgeTopAligned-unitBottom-2.4;
+var doorW=fridgeZ1-fridgeZ0+0.2;
+// Hinge on left vertical edge of front (+X) face at fridgeZ0.
+// Glass door panel rotates open around its vertical axis.
+var doorPivot=new THREE.Group();
+doorPivot.position.set(cabinetFrontX+1.05,(unitBottom+fridgeTopAligned)/2,fridgeZ0-0.15);
+var door=new THREE.Mesh(new THREE.PlaneGeometry(doorW,doorH),cabinetGlass);
+door.rotation.y=Math.PI/2;
+door.position.set(0,0,doorW/2);
+doorPivot.add(door);
+doorPivot.rotation.y=-0.35;
+scene.add(doorPivot);
+// Teak frame around front glass, without filling in its center.
+B(cabinetFrontX+0.3,cabinetFrontX+1.1,unitBottom,fridgeTopAligned,fridgeZ0-1,fridgeZ0+0.7,teakMat,true);
+B(cabinetFrontX+0.3,cabinetFrontX+1.1,unitBottom,fridgeTopAligned,fridgeZ1-0.7,fridgeZ1+1,teakMat,true);
+B(cabinetFrontX+0.3,cabinetFrontX+1.1,unitBottom,unitBottom+1.1,fridgeZ0-1,fridgeZ1+1,teakMat,true);
+B(cabinetFrontX+0.3,cabinetFrontX+1.1,fridgeTopAligned-1.1,fridgeTopAligned,fridgeZ0-1,fridgeZ1+1,teakMat,true);
+// Handle attached to the swinging glass door near its free edge.
+var dHandle=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,11,14),steel);
+dHandle.position.set(0,0,doorW-5.5);
+doorPivot.add(dHandle);
+
 scene.add(new THREE.HemisphereLight(0xffffff,0xc2b6a2,0.75));
 var dl=new THREE.DirectionalLight(0xffffff,0.75);dl.position.set(240,380,320);dl.target.position.set(110,40,60);scene.add(dl.target);
 dl.castShadow=true;dl.shadow.mapSize.set(mobile?1024:2048,mobile?1024:2048);var sc=dl.shadow.camera;sc.left=-290;sc.right=290;sc.top=290;sc.bottom=-290;sc.near=10;sc.far=900;dl.shadow.bias=-0.0006;scene.add(dl);
