@@ -2612,6 +2612,34 @@ var strips=[];
 for(var i=0;i<3;i++){var x0=i*35;B(x0+0.2,x0+34.8,140,TOP,0,30,carcass);B(x0+0.45,x0+34.55,140.25,TOP-0.25,30,31.7,upperMat);FZ(x0+0.45,x0+34.55,140.25,TOP-0.25,31.7);}
 strips.push(B(0,105,139.6,140,4,26,new THREE.MeshBasicMaterial({color:0xfff1d6}),true));
 B(105,165,140,TOP,0,30,carcass);B(105.45,164.55,140.25,TOP-0.25,30,31.7,upperMat);FZ(105.45,164.55,140.25,TOP-0.25,31.7);
+
+// PREVIEW ONLY (not merged into main): Wonderchef chimney with all ductwork
+// and the tapered canopy concealed by the lower continuation of the cabinet.
+// The black control fascia and vent/filter underside remain visible.
+var hoodLowerY=140;
+// Cabinet-coloured duct/hood cover: lower edge now aligns with adjacent cabinets at y=140,
+// directly above the appliance's thin black front fascia.
+// Original upper cabinet already ends at y=140; no extra extension below it.
+// Cover and adjacent cabinets now share precisely the same bottom level.
+// The flat exposed front fascia (full 60 cm hood width).
+var hoodFinish=mk(0x131318,0.32,0.36);
+B(105,165,135.7,139.8,0,48,hoodFinish);
+B(105.3,164.7,135.5,135.9,1,47,steel);
+// Stainless filter slots, visible from below when the model is tilted.
+for(var hs=0;hs<11;hs++){
+  B(109+hs*4.7,110.7+hs*4.7,135.26,135.55,7,38,black,true);
+}
+// Front control buttons: face toward the kitchen, as in reference photograph.
+for(var hb=0;hb<5;hb++){
+ var btn=new THREE.Mesh(new THREE.CylinderGeometry(0.95,0.95,0.24,20),steel);
+ btn.rotation.x=Math.PI/2;
+ btn.position.set(145+hb*3.65,137.9,48.22);
+ scene.add(btn);
+ var dot=new THREE.Mesh(new THREE.CircleGeometry(0.34,16),black);
+ dot.position.set(145+hb*3.65,137.9,48.37);scene.add(dot);
+}
+// Concealed sloping body and exhaust path behind enclosure; no exposed pyramid.
+
 B(0,165,TOP,TOP+24,0,31.7,upperMat);B(0,31.7,TOP,TOP+24,0,64,upperMat);
 B(165,175,92,TOP,0,37,divMat);
 var tb=new THREE.Mesh(new THREE.BoxGeometry(38,89,120),[fl(120/25.6),ply,ply,ply,fl(38/25.6),ply]);
@@ -2729,4 +2757,4 @@ document.addEventListener('fullscreenchange',function(){fs.textContent=document.
 if(window.ResizeObserver)new ResizeObserver(size).observe(cv);
 size();
 })();
-</script></div><script>window.addEventListener('error',function(e){if(e&&e.message){var b=document.getElementById('viewer-error');if(b){b.style.display='block';b.textContent='Could not load 3D kitchen: '+e.message;}}});</script><div id="viewer-error" role="alert" style="display:none;position:fixed;z-index:10000;left:12px;right:12px;top:12px;padding:15px;background:#fff4e6;color:#6a2b00;font:14px system-ui;border:1px solid #d8a76c;border-radius:10px"></div></body></html>
+</script></div></body></html>
