@@ -159,12 +159,16 @@ def clean_reviews(reviews_raw):
     reviews = reviews.dropna(subset=["vehicle_title", "review_text"]).copy()
     reviews["review_text"] = (
         reviews["review_text"]
+        .str.replace("\u0085", " ", regex=False)
+        .str.replace("\u00a0", " ", regex=False)
         .str.replace(r"\s+", " ", regex=True)
         .str.strip()
     )
     reviews["review_title"] = (
         reviews["review_title"]
         .fillna("")
+        .str.replace("\u0085", " ", regex=False)
+        .str.replace("\u00a0", " ", regex=False)
         .str.replace(r"\s+", " ", regex=True)
         .str.strip()
     )
