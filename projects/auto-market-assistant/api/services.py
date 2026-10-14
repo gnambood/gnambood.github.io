@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from .vehicle_context import vehicle_context_conflict
 from functools import lru_cache
 from pathlib import Path
 
@@ -178,6 +179,7 @@ class RagEngine:
         self.faiss, self.np, self.pd = faiss, np, pd
         paths = ensure_artifacts()
         self.docs = pd.read_parquet(paths["review_documents.parquet"])
+        self.known_vehicle_pairs = set(zip(self.docs["manufacturer"], self.docs["model_family"]))
         self.index = faiss.read_index(str(paths["review_index.faiss"]))
 
         if self.index.ntotal != len(self.docs):
@@ -736,6 +738,34 @@ class RagEngine:
         )
 
     def ask(self, payload):
+        mismatch = vehicle_context_conflict(
+            payload.question,
+            payload.manufacturer,
+            payload.model,
+            payload.year,
+            self.known_vehicle_pairs,
+        )
+        if mismatch:
+            return {
+                "answer": mismatch,
+                "scope": "vehicle selection conflicts with question",
+                "citation_valid": False,
+                "fallback_used": False,
+                "generation_mode": "abstained-vehicle-mismatch",
+                "sources": [],
+                "answerable": False,
+                "reason": mismatch,
+                "reason_code": "vehicle_context_mismatch",
+                "suggested_question": (
+                    "What reliability and maintenance issues do owners report "
+                    "for my selected vehicle?"
+                ),
+                "max_similarity": None,
+                "mean_top3_similarity": None,
+                "support_source_count": 0,
+                "relevant_source_count": 0,
+            }
+
         guard = self._scope_guard(payload.question)
 
         if guard:
