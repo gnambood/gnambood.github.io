@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "market_year": 2021,
+  "source_note": "Preserved portfolio snapshot for a 2004 Ford F-150. Results were recorded before the AWS serving pause; no browser inference or additional vehicle predictions are performed.",
+  "source_limitations": "Original trained model, source review text, and per-snapshot artifact hash are not included in the public site. Source IDs and titles are recorded evidence metadata, not newly retrieved reviews.",
+  "questions": {
+    "reliability": "What do owners mention about reliability and common problems?",
+    "maintenance": "What maintenance issues and repair costs do owners mention?",
+    "comfort": "What do owners say about comfort and everyday driving?",
+    "fuel_economy": "What do owners mention about fuel economy and efficiency?"
+  },
+  "vehicles": {
+    "ford-f150": {
+      "display_make": "Ford",
+      "display_model": "F-150",
+      "make": "ford",
+      "model": "f-150",
+      "years": [
+        2004
+      ],
+      "mileages": [
+        65000
+      ],
+      "conditions": [
+        "good"
+      ],
+      "defaults": {
+        "fuel": "gas",
+        "title_status": "clean",
+        "transmission": "automatic",
+        "drive": "4wd",
+        "vehicle_type": "truck",
+        "state": "ca"
+      },
+      "price_grid": {
+        "2004|65000|good": {
+          "predicted_price": 10739,
+          "comparable_count": 60,
+          "comparable_median": 11995,
+          "comparable_q25": 9500,
+          "comparable_q75": 14125,
+          "comparable_scope": "same model family + similar age/mileage",
+          "market_year": 2021
+        }
+      },
+      "reviews": {
+        "2004|reliability": {
+          "heading": "Reliability experiences were mixed.",
+          "answer": "Retrieved reviews included owners describing costly reliability problems as well as owners reporting long-term dependability. The system keeps the answer tied to the specific retrieved evidence instead of presenting one anecdote as universal.",
+          "citation_valid": true,
+          "fallback_used": true,
+          "sources": [
+            {
+              "review_id": "edm_95c73ef84557",
+              "vehicle_year": 2005,
+              "review_title": "let the buyer beware....."
+            },
+            {
+              "review_id": "edm_9e0350ab472a",
+              "vehicle_year": 2004,
+              "review_title": "Ron's Review"
+            },
+            {
+              "review_id": "edm_08f6175402a2",
+              "vehicle_year": 2003,
+              "review_title": "New F-150, problems already"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "evaluation": {
+    "context": "Saved project-level evaluation, not a score measured on this one Ford F-150 example.",
+    "price_test": {
+      "sample_rows": 238959,
+      "mae_v0": 3195.966824649035,
+      "mae_final": 2866.3434732167643,
+      "r2": 0.8832208759984115,
+      "within_5000_percent": 84.85660082580068
+    },
+    "retrieval": {
+      "matched_reviews": 70665,
+      "hit_at_5_percent": 81.67,
+      "mrr_at_10": 0.6256,
+      "median_ms": 19.59,
+      "p95_ms": 21.35
+    },
+    "answerability": {
+      "precision_percent": 90,
+      "recall_percent": 84.38,
+      "f1_percent": 87.1,
+      "benchmark": "Held-out weakly supervised benchmark across unseen vehicle families"
+    }
+  }
+}
