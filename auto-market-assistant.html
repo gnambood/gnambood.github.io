@@ -20,20 +20,21 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
   <header class="hero">
     <div class="eyebrow">End-to-end ML + RAG case study</div>
     <h1>Auto Market<br/>Assistant</h1>
-    <p class="lead">A used-car assistant that separates two problems that are often mixed together: <strong>market value</strong> from structured listings and <strong>owner experience</strong> from retrieved review evidence.</p>
+    <p class="lead">An end-to-end ML application for historical vehicle asking prices and evidence-backed owner reviews. CatBoost handles numerical estimates; MiniLM and FAISS find relevant owner experiences. <strong>Data, inference, and the browser demo are separate, testable parts.</strong></p>
+    <p class="sub"><a href="https://github.com/gnambood/auto-market-assistant" target="_blank" rel="noopener noreferrer">Explore the Python project and tests on GitHub ↗</a></p>
     <div class="hero-grid">
       <div class="card story">
         <h3>One purchase. Two different questions.</h3>
         <div class="twoq">
-          <div class="q"><b>How much is this car worth?</b><span>CatBoost learns asking-price patterns from Craigslist listings.</span></div>
-          <div class="q"><b>What do owners actually say?</b><span>MiniLM + FAISS retrieves relevant Edmunds reviews before generation.</span></div>
+          <div class="q"><b>What was a similar listing asking?</b><span>CatBoost estimates historical asking prices using structured Craigslist listings, not current sale prices.</span></div>
+          <div class="q"><b>What do owners actually say?</b><span>MiniLM + FAISS retrieves matched Edmunds reviews, with source IDs and an evidence-based abstention policy.</span></div>
         </div>
       </div>
       <div class="card metrics">
         <div class="metric"><strong>239K</strong><span>price-model listings</span></div>
         <div class="metric"><strong>70K+</strong><span>matched reviews</span></div>
         <div class="metric"><strong>0.883</strong><span>test R²</span></div>
-        <div class="metric"><strong>17.6 ms</strong><span>median retrieval</span></div>
+        <div class="metric"><strong>19.59 ms</strong><span>recorded median retrieval</span></div>
       </div>
     </div>
   </header>
@@ -41,12 +42,12 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
   <section class="section">
     <div class="eyebrow">System design</div>
     <h2>Numbers from code. Opinions from evidence.</h2>
-    <p class="section-intro">The language model never invents a market price. Price estimation and owner-review generation stay separate until the final response.</p>
+    <p class="section-intro">Prices come from structured data and CatBoost; review evidence comes from model-scoped retrieval. The deployed CPU API uses retrieval-backed responses and does not require a running text generator.</p>
     <div class="flow">
       <div class="step"><small>01</small><b>Vehicle inputs</b></div>
       <div class="step"><small>02</small><b>CatBoost price model</b></div>
       <div class="step"><small>03</small><b>Review retrieval</b></div>
-      <div class="step"><small>04</small><b>Grounded summary / fallback</b></div>
+      <div class="step"><small>04</small><b>Review evidence / abstention</b></div>
       <div class="step"><small>05</small><b>Citation check</b></div>
     </div>
   </section>
@@ -56,18 +57,18 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
     <h2>Try one real pipeline example.</h2>
     <p class="section-intro">AWS live inference is paused to reduce hosting costs. This offline portfolio demonstration shows one verified, precomputed 2004 Ford F-150 example based on historical 2021 Craigslist asking prices and Edmunds owner reviews.</p>
     <div class="card demo">
-      <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">Choose from dataset-backed makes, models, years, mileage bands and conditions</div></div><span class="tag" id="modeTag">OFFLINE EXAMPLE</span></div>
+      <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">Saved, verified example. Full vehicle selection is available when the FastAPI service is running locally or in AWS.</div></div><span class="tag" id="modeTag">OFFLINE EXAMPLE</span></div>
       <div class="controls">
         <div class="control"><label for="makeSelect">Make</label><select id="makeSelect"></select></div>
         <div class="control"><label for="modelSelect">Model</label><select id="modelSelect"></select></div>
         <div class="control"><label for="yearSelect">Year</label><select id="yearSelect"></select></div>
         <div class="control"><label for="mileageSelect">Mileage</label><select id="mileageSelect"></select></div>
         <div class="control"><label for="conditionSelect">Condition</label><select id="conditionSelect"></select></div>
-        <div class="control"><label for="questionSelect">Owner question</label><select id="questionSelect"></select></div>
+        <div class="control"><label for="questionSelect">Available owner question</label><select id="questionSelect"></select></div>
         <div class="control custom-question" id="customQuestionWrap"><label for="customQuestion">Ask your own question</label><input id="customQuestion" type="text" minlength="5" maxlength="500" placeholder="e.g. Do owners mention transmission problems?" autocomplete="off"></div>
       </div>
       <div class="demo-mode" id="dataModeNote">Loading the saved historical example…</div>
-      <div class="prompt"><div class="prompt-box" id="promptText">What do owners mention about reliability and common problems?</div><button class="btn" id="runDemo">Analyze vehicle</button></div>
+      <div class="prompt"><div class="prompt-box" id="promptText">What do owners mention about reliability and common problems?</div><button class="btn" id="runDemo">View saved example</button></div>
       <div class="progress"><div class="bar" id="bar"></div></div>
 
       <div class="results" id="results">
@@ -101,7 +102,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
         </div>
         <div class="tabpane active" id="pipeline"><div class="mini-flow"><span class="node">vehicle fields</span><span class="arrow">→</span><span class="node">engineered price features</span><span class="arrow">→</span><span class="node">CatBoost</span><span class="arrow">+</span><span class="node">70,665 reviews</span><span class="arrow">→</span><span class="node">MiniLM + FAISS</span><span class="arrow">→</span><span class="node">grounded response</span></div></div>
         <div class="tabpane" id="safety"><strong>The system can abstain.</strong><p class="sub">Questions first pass a capability guard that blocks exact-vehicle condition/history, current transactional data and authoritative-specification requests. In-scope questions then pass a calibrated evidence gate using max similarity, mean top-3 similarity and the number of supporting reviews. Generated source IDs are validated against the reviews that were actually retrieved.</p></div>
-        <div class="tabpane" id="metrics"><div class="mini-flow"><span class="node">Hit@5 81.7%</span><span class="node">MRR@10 0.626</span><span class="node">Answerability F1 87.1%</span><span class="node">Precision 90.0%</span><span class="node">Recall 84.4%</span><span class="node">p95 retrieval 21.11 ms</span></div></div>
+        <div class="tabpane" id="metrics"><div class="mini-flow"><span class="node">Hit@5 81.7%</span><span class="node">MRR@10 0.626</span><span class="node">Answerability F1 87.1%</span><span class="node">Precision 90.0%</span><span class="node">Recall 84.4%</span><span class="node">recorded p95 retrieval 21.35 ms</span></div></div>
       </div>
     </div>
   </section>
@@ -151,23 +152,23 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
       <div class="q"><b>Price model</b><span>Chronological holdout • MAE • RMSE • MAPE • R² • tolerance bands. Asking price is the target, not final sale price.</span></div>
       <div class="q"><b>Review retrieval</b><span>Hit@1/3/5 • MRR@10 • latency • held-out answerability precision/recall/F1. Identity retrieval and weak-label answerability are reported separately rather than collapsed into one “RAG accuracy” number.</span></div>
     </div>
-    <div class="note" style="margin-top:18px"><strong>External-comparison rule:</strong> public Craigslist and RAG projects are used to motivate experiments and evaluation design, not to claim a misleading leaderboard win across different splits, features or relevance labels.</div>
+    <div class="note" style="margin-top:18px"><strong>Evaluation boundary:</strong> these results come from historical test data. The offline example is not a new prediction, and no current-price or live-inventory capability is implied.</div>
   </section>
 
   <section class="section">
-    <div class="eyebrow">Future work</div>
-    <h2>What I would test next.</h2>
-    <p class="section-intro">The production-oriented pipeline is intentionally frozen at a validated operating point. The next improvements are research extensions, not required fixes.</p>
+    <div class="eyebrow">Project delivery</div>
+    <h2>From datasets to a usable application.</h2>
+    <p class="section-intro">Each layer has an explicit role and can be tested without continuously running cloud compute.</p>
     <div class="twoq">
-      <div class="q"><b>Human-labelled relevance set</b><span>Manually grade question-review pairs and use that gold set to compare dense retrieval with cross-encoder reranking.</span></div>
-      <div class="q"><b>Stronger retrieval representations</b><span>Test passage-level chunking and newer embedding families such as BGE or E5 on the exact same held-out labels.</span></div>
-      <div class="q"><b>Faithfulness evaluation</b><span>Add claim-level entailment checks so citation validity is complemented by evidence-to-claim support measurement.</span></div>
-      <div class="q"><b>Production generation</b><span>Evaluate whether a managed or larger generator improves synthesis enough to justify additional latency and infrastructure cost.</span></div>
+      <div class="q"><b>Data</b><span>CSV ingestion, cleaning, duplicate checks, quality gates, partitioned Parquet, and lineage manifests.</span></div>
+      <div class="q"><b>Models</b><span>Saved CatBoost inference, model-family review retrieval, and relevance-based abstention.</span></div>
+      <div class="q"><b>Serving</b><span>Documented FastAPI endpoints, Pydantic validation, Docker, regression tests, and optional ECS hosting.</span></div>
+      <div class="q"><b>Delivery</b><span>Interactive portfolio example, recorded evaluation metrics, source code, and a low-cost offline mode.</span></div>
     </div>
     <div class="note" style="margin-top:18px"><strong>Current answerability result:</strong> 80.95% accuracy, 90.0% precision, 84.38% recall and 87.10% F1 on a held-out weakly supervised benchmark across unseen vehicle families. These are not presented as universal RAG accuracy.</div>
   </section>
 
-  <footer class="footer"><strong>Auto Market Assistant</strong> — portfolio case study by Gayathri Namboodiri.<br/>CatBoost • Sentence Transformers • FAISS • Qwen • FastAPI • Docker • Parquet • AWS ECS • S3 • ECR</footer>
+  <footer class="footer"><strong>Auto Market Assistant</strong> — end-to-end ML application by Gayathri Namboodiri.<br/>CatBoost • MiniLM • FAISS • FastAPI • Docker • Parquet • AWS (compute paused) · <a href="https://github.com/gnambood/auto-market-assistant" target="_blank" rel="noopener noreferrer">Source code</a></footer>
 </div>
 <script>
 const LIVE_API_BASE="https://au-31cea16fe69c481c8dd923a37b6252df.ecs.ca-central-1.on.aws";
@@ -479,7 +480,7 @@ els.btn.addEventListener('click',async()=>{
     if(rendered)els.results.classList.add('show');
   }
   els.bar.style.width='100%';
-  els.btn.textContent='Analysis complete ✓';els.btn.disabled=false;
+  els.btn.textContent=LIVE_API_AVAILABLE?'Analysis complete ✓':'View saved example ✓';els.btn.disabled=false;
   if(els.results.classList.contains('show'))els.results.scrollIntoView({behavior:'smooth',block:'nearest'});
 });
 
