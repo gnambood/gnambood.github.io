@@ -43,10 +43,10 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
 
   <section class="section" id="demo">
     <div class="eyebrow">Interactive portfolio demo</div>
-    <h2>Explore an actual saved ML result.</h2>
-    <p class="section-intro">This is a browser-only explorer of previously recorded 2021 model output and owner-review evidence. There is no AWS connection, no paid inference, and no fabricated predictions for unsupported vehicles. More verified snapshots can be added using the canonical export script.</p>
+    <h2>Explore the system through a real, saved result.</h2>
+    <p class="section-intro"><strong>Interactive portfolio preview, not live inference.</strong> Explore a previously recorded result from the full Auto Market Assistant pipeline, including the historical CatBoost asking-price estimate, comparable listings and cited owner-review evidence. Everything runs locally in your browser using saved data: this page does not generate new predictions or contact AWS. The complete implementation and evaluation are available in the <a href="https://github.com/gnambood/auto-market-assistant">project repository</a>.</p>
     <div class="card demo">
-      <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">Saved CatBoost prediction and cited retrieval output. Selections grow only when additional verified snapshots are published.</div></div><span class="tag" id="modeTag">STATIC · NO AWS</span></div>
+      <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">A recorded model estimate and cited review evidence, presented as an interactive example rather than a live prediction.</div></div><span class="tag" id="modeTag">SAVED-RESULT DEMO</span></div>
       <div class="controls">
         <div class="control"><label for="makeSelect">Make</label><select id="makeSelect"></select></div>
         <div class="control"><label for="modelSelect">Model</label><select id="modelSelect"></select></div>
@@ -104,7 +104,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
     <div class="card story">
       <p><a href="https://github.com/gnambood/auto-market-assistant"><strong>Open canonical source repository</strong></a></p>
       <p><a href="https://github.com/gnambood/auto-market-assistant/blob/main/MODEL_CARD.md">Model card and metric definitions</a> · <a href="https://github.com/gnambood/auto-market-assistant/blob/main/ARCHITECTURE.md">Architecture</a> · <a href="https://github.com/gnambood/auto-market-assistant/blob/main/MARKET_INTELLIGENCE.md">Historical market trends</a> · <a href="https://github.com/gnambood/auto-market-assistant/blob/main/DEPLOY_AWS.md">Deployment details</a></p>
-      <p class="sub">Data: historical 2021 Craigslist asking prices. Live AWS may be off to control cost; a labelled static fallback is available. Qwen 2.5 is optional and is not enabled in the deployed retrieval-only service.</p>
+      <p class="sub">This showcase uses saved 2021 Craigslist asking-price results and recorded review evidence, not real-time predictions. The actual FastAPI service has been deployed on AWS ECS, but cloud inference is currently paused to control costs. Optional Qwen 2.5 generation was evaluated separately; the deployed service runs in retrieval-only mode when active.</p>
     </div>
   </section>
   <footer class="footer"><strong>Auto Market Assistant</strong> — end-to-end ML application by Gayathri Namboodiri.<br/>CatBoost • MiniLM • FAISS • FastAPI • Docker • Parquet • AWS (compute paused) · <a href="https://github.com/gnambood/auto-market-assistant" target="_blank" rel="noopener noreferrer">Source code</a></footer>
