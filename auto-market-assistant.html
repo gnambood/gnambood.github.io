@@ -54,9 +54,9 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
   <section class="section" id="demo">
     <div class="eyebrow">Interactive portfolio demo</div>
     <h2>Try one real pipeline example.</h2>
-    <p class="section-intro">This demo loads selectable vehicle options from the <strong>deployed dataset</strong> and calls the live FastAPI service on AWS ECS Express Mode. If cloud inference is unavailable, the page falls back to one verified precomputed example.</p>
+    <p class="section-intro">AWS live inference is paused to reduce hosting costs. This offline portfolio demonstration shows one verified, precomputed 2004 Ford F-150 example based on historical 2021 Craigslist asking prices and Edmunds owner reviews.</p>
     <div class="card demo">
-      <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">Choose from dataset-backed makes, models, years, mileage bands and conditions</div></div><span class="tag" id="modeTag">CHECKING LIVE API</span></div>
+      <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">Choose from dataset-backed makes, models, years, mileage bands and conditions</div></div><span class="tag" id="modeTag">OFFLINE EXAMPLE</span></div>
       <div class="controls">
         <div class="control"><label for="makeSelect">Make</label><select id="makeSelect"></select></div>
         <div class="control"><label for="modelSelect">Model</label><select id="modelSelect"></select></div>
@@ -66,7 +66,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
         <div class="control"><label for="questionSelect">Owner question</label><select id="questionSelect"></select></div>
         <div class="control custom-question" id="customQuestionWrap"><label for="customQuestion">Ask your own question</label><input id="customQuestion" type="text" minlength="5" maxlength="500" placeholder="e.g. Do owners mention transmission problems?" autocomplete="off"></div>
       </div>
-      <div class="demo-mode" id="dataModeNote">Checking the live AWS service…</div>
+      <div class="demo-mode" id="dataModeNote">Loading the saved historical example…</div>
       <div class="prompt"><div class="prompt-box" id="promptText">What do owners mention about reliability and common problems?</div><button class="btn" id="runDemo">Analyze vehicle</button></div>
       <div class="progress"><div class="bar" id="bar"></div></div>
 
@@ -171,6 +171,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
 </div>
 <script>
 const LIVE_API_BASE="https://au-31cea16fe69c481c8dd923a37b6252df.ecs.ca-central-1.on.aws";
+const ENABLE_CLOUD_DEMO=false; // Turn on only after ECS service is restored and tested.
 const QUESTIONS={
   reliability:"What do owners mention about reliability and common problems?",
   maintenance:"What maintenance issues and repair costs do owners mention?",
@@ -278,8 +279,8 @@ function populateVehicleFields(){
   fillSelect(els.mileage,v.mileages,x=>Number(x).toLocaleString('en-US')+' mi');
   fillSelect(els.condition,v.conditions,x=>String(x).replace(/\b\w/g,c=>c.toUpperCase()));
   els.question.innerHTML='';
-  Object.entries(QUESTIONS).forEach(([key,text])=>els.question.appendChild(option(key,text)));
-  els.question.appendChild(option('custom','Ask your own question…'));
+  Object.entries(QUESTIONS).filter(([key])=>LIVE_API_AVAILABLE || (v.reviews && v.reviews[els.year.value+'|'+key])).forEach(([key,text])=>els.question.appendChild(option(key,text)));
+  if(LIVE_API_AVAILABLE)els.question.appendChild(option('custom','Ask your own question…'));
   syncPrompt();
 }
 function syncPrompt(){
@@ -291,14 +292,14 @@ function syncPrompt(){
   els.prompt.textContent=question||(isCustom?'Type your owner question above.':QUESTIONS.reliability);
   els.results.classList.remove('show');
   els.bar.style.width='0';
-  els.btn.textContent='Analyze vehicle';
+  els.btn.textContent=LIVE_API_AVAILABLE?'Analyze vehicle':'View saved example';
   els.btn.disabled=isCustom && question.length<5;
 }
 function renderStaticResult(){
   if(els.question.value==='custom')return false;
   const v=currentVehicle();
   const p=v&&v.price_grid?v.price_grid[[els.year.value,els.mileage.value,els.condition.value].join('|')]:null;
-  const r=v&&v.reviews?(v.reviews[[els.year.value,els.question.value].join('|')]||v.reviews[Object.keys(v.reviews)[0]]):null;
+  const r=v&&v.reviews?(v.reviews[[els.year.value,els.question.value].join('|')]):null;
   if(!p||!r)return false;
   renderPrice(p);
   document.getElementById('reviewHeading').textContent=r.heading||'Owner review evidence';
@@ -426,8 +427,9 @@ async function loadDemoData(){
   LIVE_API_AVAILABLE=false;
   USING_LIVE_CATALOG=false;
   populateMakes();
-  els.modeTag.textContent='LOADING LIVE CATALOG';
-  els.note.textContent='Verified Ford F-150 fallback is ready while supported vehicles load from AWS…';
+  els.modeTag.textContent='OFFLINE • SAVED 2021 EXAMPLE';
+  els.note.textContent='Cloud inference is paused. This 2004 Ford F-150 example is precomputed; only supported questions are shown.';
+  if(!ENABLE_CLOUD_DEMO)return;
 
   try{
     const health=await fetchJson(LIVE_API_BASE+'/health',{cache:'no-store'},8000);
@@ -461,7 +463,7 @@ els.btn.addEventListener('click',async()=>{
     els.note.textContent='Please enter an owner question with at least 5 characters.';
     return;
   }
-  els.btn.textContent='Analyzing live pipeline…';els.btn.disabled=true;els.bar.style.width='70%';
+  els.btn.textContent=LIVE_API_AVAILABLE?'Analyzing live pipeline…':'Loading saved example…';els.btn.disabled=true;els.bar.style.width='70%';
   try{
     if(!LIVE_API_AVAILABLE)throw new Error('live API unavailable');
     await runLiveAnalysis();
@@ -472,8 +474,8 @@ els.btn.addEventListener('click',async()=>{
     const rendered=renderStaticResult();
     els.modeTag.textContent='STATIC FALLBACK • VERIFIED';
     els.note.textContent=rendered
-      ?'Live AWS request was unavailable; showing the verified precomputed pipeline fallback.'
-      :'Live AWS request failed for this selection. Try again shortly or return to the default Ford F-150 fallback preset.';
+      ?'Showing verified precomputed 2021 asking-price context and owner-review evidence. Live inference is paused.'
+      :'No precomputed evidence exists for this selection. Only the supported 2004 Ford F-150 example is available offline.';
     if(rendered)els.results.classList.add('show');
   }
   els.bar.style.width='100%';
