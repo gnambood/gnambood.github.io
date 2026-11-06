@@ -1,0 +1,32 @@
+name: Auto Market Offline Demo
+
+on:
+  pull_request:
+    paths:
+      - 'auto-market-assistant.html'
+      - 'tests/auto-market-offline.mjs'
+      - '.github/workflows/auto-market-offline.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'auto-market-assistant.html'
+      - 'tests/auto-market-offline.mjs'
+      - '.github/workflows/auto-market-offline.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test browser
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Verify saved demo without AWS
+        run: node tests/auto-market-offline.mjs
