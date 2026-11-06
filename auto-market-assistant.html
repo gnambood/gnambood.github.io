@@ -6,6 +6,8 @@
 <meta name="description" content="Auto Market Assistant — used-car price estimation and grounded owner-review RAG by Gayathri Namboodiri." />
 <title>Auto Market Assistant | Gayathri Namboodiri</title>
 <style>
+.compare-control{border-top:1px solid var(--line);margin-top:22px;padding-top:18px}.compare-control label,#metrics label{display:block;color:var(--muted);font-size:.82rem;margin-bottom:8px}.compare-control select,#metricFocus{background:#0a2032;border:1px solid #436882;border-radius:10px;padding:10px;color:var(--text);font:inherit;width:100%}#benchmarkDifference{color:var(--accent);font-size:1.65rem;display:block}.source{color:var(--text);font:inherit;text-align:left;cursor:pointer;width:100%}.source[aria-pressed=true]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}.source-detail{font-size:.83rem;color:var(--muted);padding:14px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;margin-top:12px}.barplot{margin:18px 0}.bar-row{margin:11px 0}.bar-head{display:flex;justify-content:space-between;gap:12px;font-size:.87rem}.metric-track{background:#223a55;border-radius:90px;height:13px;overflow:hidden;margin-top:5px}.metric-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:90px}.btn:disabled{opacity:.5;cursor:wait}.verified{color:var(--good)}.compare-control p{margin:12px 0 0}
+
 :root{--bg:#07111f;--panel:#0d1b2a;--panel2:#10243a;--text:#eef6ff;--muted:#9db0c8;--line:#213b56;--accent:#63e6be;--accent2:#7aa2ff;--warn:#ffd166;--good:#7ee787;--shadow:0 18px 60px rgba(0,0,0,.28)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% 0%,#102845 0,#07111f 38%,#050b14 100%);color:var(--text);line-height:1.55}
 a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justify-content:space-between;align-items:center;padding:22px 0}.brand{font-weight:800;letter-spacing:.02em}.home{color:var(--muted);text-decoration:none;font-size:.95rem}.hero{padding:72px 0 42px}.eyebrow{color:var(--accent);font-weight:800;text-transform:uppercase;letter-spacing:.14em;font-size:.78rem}.hero h1{font-size:clamp(2.7rem,7vw,6rem);line-height:.96;letter-spacing:-.055em;margin:.35em 0 .3em;max-width:950px}.lead{font-size:clamp(1.05rem,2vw,1.35rem);color:var(--muted);max-width:800px}.hero-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:24px;margin-top:42px}.card{background:linear-gradient(180deg,rgba(16,36,58,.9),rgba(8,22,36,.96));border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}.story{padding:28px}.story h3{margin:0 0 18px}.twoq{display:grid;grid-template-columns:1fr 1fr;gap:14px}.q{padding:18px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.025)}.q b{display:block;font-size:1.1rem;margin-bottom:6px}.q span{color:var(--muted)}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:18px}.metric{padding:18px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid var(--line)}.metric strong{display:block;font-size:1.7rem;letter-spacing:-.03em}.metric span{color:var(--muted);font-size:.9rem}.section{padding:66px 0}.section h2{font-size:clamp(2rem,4vw,3.5rem);letter-spacing:-.04em;margin:0 0 12px}.section-intro{color:var(--muted);max-width:760px;margin-bottom:30px}.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.step{padding:18px 16px;text-align:center;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.025);position:relative}.step small{display:block;color:var(--accent);font-weight:800;margin-bottom:8px}.step b{font-size:.95rem}.step:not(:last-child):after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--accent2);font-weight:900;z-index:4}.demo{padding:28px}.demo-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.tag{font-size:.8rem;padding:6px 10px;border-radius:99px;background:rgba(99,230,190,.1);border:1px solid rgba(99,230,190,.35);color:var(--accent);white-space:nowrap}.controls{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0 14px}.control{padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:#081522}.control label{display:block;color:var(--muted);font-size:.75rem;margin-bottom:5px}.control select,.control input{width:100%;background:transparent;color:var(--text);border:0;outline:0;font:inherit;font-weight:800}.control select{appearance:auto}.control select option{background:#0d1b2a;color:var(--text)}.control input::placeholder{color:#6f8399;font-weight:600}.custom-question{display:none;grid-column:span 2}.control strong{font-size:.97rem}.demo-mode{margin:8px 0 4px;color:var(--muted);font-size:.82rem}.prompt{display:flex;gap:12px;margin-top:12px}.prompt-box{flex:1;padding:15px 16px;border:1px solid var(--line);border-radius:14px;background:#081522;color:#d9e8f6}.btn{border:0;border-radius:14px;background:linear-gradient(135deg,var(--accent),#43c7ff);color:#04101a;font-weight:900;padding:0 22px;cursor:pointer;min-height:52px}.btn:hover{filter:brightness(1.04)}.progress{height:4px;background:#10243a;border-radius:99px;overflow:hidden;margin:18px 0 0}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 1.5s ease}.results{display:none;margin-top:24px}.results.show{display:block;animation:rise .45s ease}@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}.result-grid{display:grid;grid-template-columns:.82fr 1.18fr;gap:16px}.price-card,.review-card{padding:22px;border:1px solid var(--line);border-radius:20px;background:#081522}.big-price{font-size:3rem;line-height:1;font-weight:900;letter-spacing:-.055em;margin:12px 0 8px}.sub{color:var(--muted)}.gauge{position:relative;height:12px;border-radius:99px;background:linear-gradient(90deg,#3d71ff,#63e6be,#ffd166);margin:28px 5px 8px}.pin{position:absolute;top:-8px;left:27%;height:28px;width:3px;background:#fff;border-radius:3px}.pin:after{content:attr(data-label);position:absolute;top:30px;left:50%;transform:translateX(-50%);font-size:.73rem;white-space:nowrap;color:#fff}.range{display:flex;justify-content:space-between;color:var(--muted);font-size:.78rem}.review-card h3{margin-top:0}.answer{font-size:1.02rem;white-space:pre-line}.suggestion{display:none;margin-top:14px;padding:13px 14px;border:1px solid rgba(99,230,190,.32);border-radius:13px;background:rgba(99,230,190,.06);color:#d9e8f6}.suggestion.show{display:block}.suggestion b{color:var(--accent)}.sources{display:grid;gap:9px;margin-top:16px}.source{padding:12px;border-radius:13px;background:rgba(255,255,255,.03);border:1px solid var(--line);font-size:.88rem}.source b{color:var(--accent)}.source-meta{color:var(--muted);font-size:.78rem;margin-top:4px}.source-excerpt{margin-top:8px;line-height:1.5;color:#d9e8f6}.verified{display:inline-flex;align-items:center;gap:7px;color:var(--good);font-weight:800;font-size:.84rem;margin-top:14px}.tabs{display:flex;gap:8px;margin-top:22px;flex-wrap:wrap}.tab{background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:8px 13px;cursor:pointer}.tab.active{color:#04101a;background:var(--accent);border-color:var(--accent)}.tabpane{display:none;margin-top:14px;padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}.tabpane.active{display:block}.mini-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.node{padding:9px 11px;border-radius:11px;background:#0d1b2a;border:1px solid var(--line);font-size:.84rem}.arrow{color:var(--accent2)}.metric-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.metric-strip .metric{text-align:center}.metric-strip strong{font-size:1.55rem}.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.phase{padding:20px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.025)}.phase .n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#04101a;font-weight:900;margin-bottom:12px}.phase p{color:var(--muted);font-size:.91rem;margin-bottom:0}.note{padding:18px 20px;border-left:3px solid var(--warn);background:rgba(255,209,102,.06);border-radius:12px;color:#d8e4f0}.footer{padding:45px 0 60px;color:var(--muted);border-top:1px solid var(--line);margin-top:40px}.footer strong{color:var(--text)}
@@ -41,21 +43,20 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
 
   <section class="section" id="demo">
     <div class="eyebrow">Interactive portfolio demo</div>
-    <h2>Try one real pipeline example.</h2>
-    <p class="section-intro">AWS live inference is paused to reduce hosting costs. This offline portfolio demonstration shows one verified, precomputed 2004 Ford F-150 example based on historical 2021 Craigslist asking prices and Edmunds owner reviews.</p>
+    <h2>Explore an actual saved ML result.</h2>
+    <p class="section-intro">This is a browser-only explorer of previously recorded 2021 model output and owner-review evidence. There is no AWS connection, no paid inference, and no fabricated predictions for unsupported vehicles. More verified snapshots can be added using the canonical export script.</p>
     <div class="card demo">
-      <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">Saved, verified example. Full vehicle selection is available when the FastAPI service is running locally or in AWS.</div></div><span class="tag" id="modeTag">OFFLINE EXAMPLE</span></div>
+      <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">Saved CatBoost prediction and cited retrieval output. Selections grow only when additional verified snapshots are published.</div></div><span class="tag" id="modeTag">STATIC · NO AWS</span></div>
       <div class="controls">
         <div class="control"><label for="makeSelect">Make</label><select id="makeSelect"></select></div>
         <div class="control"><label for="modelSelect">Model</label><select id="modelSelect"></select></div>
         <div class="control"><label for="yearSelect">Year</label><select id="yearSelect"></select></div>
         <div class="control"><label for="mileageSelect">Mileage</label><select id="mileageSelect"></select></div>
         <div class="control"><label for="conditionSelect">Condition</label><select id="conditionSelect"></select></div>
-        <div class="control"><label for="questionSelect">Available owner question</label><select id="questionSelect"></select></div>
-        <div class="control custom-question" id="customQuestionWrap"><label for="customQuestion">Ask your own question</label><input id="customQuestion" type="text" minlength="5" maxlength="500" placeholder="e.g. Do owners mention transmission problems?" autocomplete="off"></div>
+        <div class="control"><label for="questionSelect">Owner question (saved evidence only)</label><select id="questionSelect"></select></div>
       </div>
-      <div class="demo-mode" id="dataModeNote">Loading the saved historical example…</div>
-      <div class="prompt"><div class="prompt-box" id="promptText">What do owners mention about reliability and common problems?</div><button class="btn" id="runDemo">View saved example</button></div>
+      <div class="demo-mode" id="dataModeNote">Loading local, precomputed results…</div>
+      <div class="prompt"><div class="prompt-box" id="promptText">What do owners mention about reliability and common problems?</div><button class="btn" id="runDemo" disabled>Explore saved result</button></div>
       <div class="progress"><div class="bar" id="bar"></div></div>
 
       <div class="results" id="results">
@@ -66,7 +67,9 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
             <div class="sub">model estimate</div>
             <div class="gauge"><span class="pin" id="estimatePin" data-label="$10.7k"></span></div>
             <div class="range"><span id="q1">$9,500 Q1</span><span id="q3">$14,125 Q3</span></div>
-            <p style="margin-top:42px"><strong id="medianPrice">$11,995</strong> comparable median<br/><span class="sub" id="compMeta">60 similar listings • 2021 market context</span></p>
+            <p style="margin-top:42px"><strong id="medianPrice">$11,995</strong> comparable median<br/><span class="sub" id="compMeta">60 saved comparable listings • 2021 market context</span></p>
+            <div class="compare-control"><label for="benchmarkSelect">Compare the estimate against</label><select id="benchmarkSelect"><option value="comparable_median">Observed median</option><option value="comparable_q25">Lower quartile (Q1)</option><option value="comparable_q75">Upper quartile (Q3)</option></select><p><strong id="benchmarkDifference">—</strong><span id="benchmarkDescription" class="sub"></span></p></div>
+            <p class="sub" style="font-size:.78rem">The comparable-price quartile range is not a confidence interval.</p>
           </div>
           <div class="review-card">
             <div class="eyebrow">Owner-review evidence</div>
@@ -78,18 +81,19 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
               <div class="source"><b>[edm_9e0350ab472a]</b> • 2004 • “Ron's Review”</div>
               <div class="source"><b>[edm_08f6175402a2]</b> • 2003 • “New F-150, problems already”</div>
             </div>
+            <div class="source-detail" id="sourceDetail" role="status" aria-live="polite">Select a cited review to inspect its recorded ID, year and title. Full review text is not included in the published snapshot.</div>
             <div class="verified" id="verification">✓ Final response source IDs validated</div>
           </div>
         </div>
 
         <div class="tabs">
-          <button class="tab active" data-tab="pipeline">How it worked</button>
-          <button class="tab" data-tab="safety">Grounding safety</button>
-          <button class="tab" data-tab="metrics">Measured performance</button>
+          <button class="tab active" role="tab" aria-selected="true" data-tab="pipeline">How it worked</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="safety">Grounding safety</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="metrics">Measured performance</button>
         </div>
         <div class="tabpane active" id="pipeline"><div class="mini-flow"><span class="node">vehicle fields</span><span class="arrow">→</span><span class="node">engineered price features</span><span class="arrow">→</span><span class="node">CatBoost</span><span class="arrow">+</span><span class="node">70,665 reviews</span><span class="arrow">→</span><span class="node">MiniLM + FAISS</span><span class="arrow">→</span><span class="node">grounded response</span></div></div>
         <div class="tabpane" id="safety"><strong>The system can abstain.</strong><p class="sub">Questions first pass a capability guard that blocks exact-vehicle condition/history, current transactional data and authoritative-specification requests. In-scope questions then pass a calibrated evidence gate using max similarity, mean top-3 similarity and the number of supporting reviews. Generated source IDs are validated against the reviews that were actually retrieved.</p></div>
-        <div class="tabpane" id="metrics"><div class="mini-flow"><span class="node">Hit@5 81.7%</span><span class="node">MRR@10 0.626</span><span class="node">Answerability F1 87.1%</span><span class="node">Precision 90.0%</span><span class="node">Recall 84.4%</span><span class="node">recorded p95 retrieval 21.35 ms</span></div></div>
+        <div class="tabpane" id="metrics"><label for="metricFocus">Examine project-level evaluation</label><select id="metricFocus"><option value="price">Price estimation (chronological holdout)</option><option value="retrieval">Vehicle-identity retrieval</option><option value="answerability">Answerability (weakly supervised)</option></select><div class="barplot" id="metricBars" aria-label="Saved project evaluation values"></div><p class="sub" id="metricExplanation"></p><p class="sub" style="font-size:.8rem">Metrics evaluate separate tasks, not the accuracy of this one saved vehicle example. See <a href="https://github.com/gnambood/auto-market-assistant/blob/main/MODEL_CARD.md">the model card</a>.</p></div>
       </div>
     </div>
   </section>
@@ -105,335 +109,6 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
   </section>
   <footer class="footer"><strong>Auto Market Assistant</strong> — end-to-end ML application by Gayathri Namboodiri.<br/>CatBoost • MiniLM • FAISS • FastAPI • Docker • Parquet • AWS (compute paused) · <a href="https://github.com/gnambood/auto-market-assistant" target="_blank" rel="noopener noreferrer">Source code</a></footer>
 </div>
-<script>
-const LIVE_API_BASE="https://au-31cea16fe69c481c8dd923a37b6252df.ecs.ca-central-1.on.aws";
-const ENABLE_CLOUD_DEMO=false; // Turn on only after ECS service is restored and tested.
-const QUESTIONS={
-  reliability:"What do owners mention about reliability and common problems?",
-  maintenance:"What maintenance issues and repair costs do owners mention?",
-  comfort:"What do owners say about comfort and everyday driving?",
-  fuel_economy:"What do owners mention about fuel economy and efficiency?"
-};
-const FALLBACK_DATA={
-  market_year:2021,
-  questions:QUESTIONS,
-  vehicles:{
-    "ford-f150":{
-      display_make:"Ford",display_model:"F-150",make:"ford",model:"f-150",
-      years:[2004],mileages:[65000],conditions:["good"],
-      defaults:{fuel:"gas",title_status:"clean",transmission:"automatic",drive:"4wd",vehicle_type:"truck",state:"ca"},
-      price_grid:{
-        "2004|65000|good":{
-          predicted_price:10739,comparable_count:60,comparable_median:11995,
-          comparable_q25:9500,comparable_q75:14125,
-          comparable_scope:"same model family + similar age/mileage",market_year:2021
-        }
-      },
-      reviews:{
-        "2004|reliability":{
-          heading:"Reliability experiences were mixed.",
-          answer:"Retrieved reviews included owners describing costly reliability problems as well as owners reporting long-term dependability. The system keeps the answer tied to the specific retrieved evidence instead of presenting one anecdote as universal.",
-          citation_valid:true,fallback_used:true,
-          sources:[
-            {review_id:"edm_95c73ef84557",vehicle_year:2005,review_title:"let the buyer beware....."},
-            {review_id:"edm_9e0350ab472a",vehicle_year:2004,review_title:"Ron's Review"},
-            {review_id:"edm_08f6175402a2",vehicle_year:2003,review_title:"New F-150, problems already"}
-          ]
-        }
-      }
-    }
-  }
-};
-
-let DEMO_DATA=FALLBACK_DATA;
-let LIVE_API_AVAILABLE=false;
-let USING_LIVE_CATALOG=false;
-
-const els={
-  make:document.getElementById('makeSelect'),model:document.getElementById('modelSelect'),
-  year:document.getElementById('yearSelect'),mileage:document.getElementById('mileageSelect'),
-  condition:document.getElementById('conditionSelect'),question:document.getElementById('questionSelect'),
-  customQuestion:document.getElementById('customQuestion'),customQuestionWrap:document.getElementById('customQuestionWrap'),
-  title:document.getElementById('vehicleTitle'),note:document.getElementById('dataModeNote'),
-  modeTag:document.getElementById('modeTag'),prompt:document.getElementById('promptText'),
-  btn:document.getElementById('runDemo'),bar:document.getElementById('bar'),
-  results:document.getElementById('results')
-};
-
-const money=v=>'$'+Math.round(Number(v)).toLocaleString('en-US');
-const compactMoney=v=>'$'+(Number(v)/1000).toFixed(1)+'k';
-const option=(value,label)=>{const o=document.createElement('option');o.value=value;o.textContent=label;return o};
-const vehicleEntries=()=>Object.entries(DEMO_DATA.vehicles||{});
-const currentVehicle=()=>DEMO_DATA.vehicles[els.model.value];
-const currentQuestion=()=>{
-  if(els.question.value==='custom')return (els.customQuestion.value||'').trim();
-  return QUESTIONS[els.question.value]||QUESTIONS.reliability;
-};
-
-function fillSelect(select,items,labeler=x=>x){
-  select.innerHTML='';
-  items.forEach(x=>select.appendChild(option(String(x),labeler(x))));
-}
-function catalogToDemoData(catalog){
-  const vehicles={};
-  (catalog.manufacturers||[]).forEach(make=>{
-    (make.models||[]).forEach((model,idx)=>{
-      const key=[make.value,model.family||model.value,idx].join('-').replace(/[^a-z0-9-]/gi,'-');
-      vehicles[key]={
-        display_make:make.label,
-        display_model:model.label,
-        make:make.value,
-        model:model.value,
-        family:model.family,
-        years:model.years||[],
-        mileages:model.mileages||[],
-        conditions:model.conditions||['good'],
-        defaults:model.defaults||{},
-        listing_count:model.listing_count||0,
-        review_count:model.review_count||0,
-        price_grid:{},
-        reviews:{}
-      };
-    });
-  });
-  return {market_year:catalog.market_year||2021,questions:QUESTIONS,vehicles};
-}
-function populateMakes(){
-  const makes=[...new Set(vehicleEntries().map(([,v])=>v.display_make))];
-  fillSelect(els.make,makes);
-  populateModels();
-}
-function populateModels(){
-  const list=vehicleEntries().filter(([,v])=>v.display_make===els.make.value);
-  els.model.innerHTML='';
-  list.forEach(([key,v])=>els.model.appendChild(option(key,v.display_model)));
-  populateVehicleFields();
-}
-function populateVehicleFields(){
-  const v=currentVehicle(); if(!v)return;
-  fillSelect(els.year,v.years);
-  fillSelect(els.mileage,v.mileages,x=>Number(x).toLocaleString('en-US')+' mi');
-  fillSelect(els.condition,v.conditions,x=>String(x).replace(/\b\w/g,c=>c.toUpperCase()));
-  els.question.innerHTML='';
-  Object.entries(QUESTIONS).filter(([key])=>LIVE_API_AVAILABLE || (v.reviews && v.reviews[els.year.value+'|'+key])).forEach(([key,text])=>els.question.appendChild(option(key,text)));
-  if(LIVE_API_AVAILABLE)els.question.appendChild(option('custom','Ask your own question…'));
-  syncPrompt();
-}
-function syncPrompt(){
-  const v=currentVehicle(); if(!v)return;
-  const isCustom=els.question.value==='custom';
-  const question=currentQuestion();
-  els.customQuestionWrap.style.display=isCustom?'block':'none';
-  els.title.textContent=els.year.value+' '+v.display_make+' '+v.display_model;
-  els.prompt.textContent=question||(isCustom?'Type your owner question above.':QUESTIONS.reliability);
-  els.results.classList.remove('show');
-  els.bar.style.width='0';
-  els.btn.textContent=LIVE_API_AVAILABLE?'Analyze vehicle':'View saved example';
-  els.btn.disabled=isCustom && question.length<5;
-}
-function renderStaticResult(){
-  if(els.question.value==='custom')return false;
-  const v=currentVehicle();
-  const p=v&&v.price_grid?v.price_grid[[els.year.value,els.mileage.value,els.condition.value].join('|')]:null;
-  const r=v&&v.reviews?(v.reviews[[els.year.value,els.question.value].join('|')]):null;
-  if(!p||!r)return false;
-  renderPrice(p);
-  document.getElementById('reviewHeading').textContent=r.heading||'Owner review evidence';
-  document.getElementById('reviewAnswer').textContent=r.answer;
-  renderSources(r.sources||[]);
-  document.getElementById('verification').textContent=r.citation_valid?'✓ Final response source IDs validated':'Evidence shown directly from retrieved reviews';
-  return true;
-}
-function renderPrice(p){
-  document.getElementById('predPrice').textContent=money(p.predicted_price);
-  document.getElementById('q1').textContent=money(p.comparable_q25)+' Q1';
-  document.getElementById('q3').textContent=money(p.comparable_q75)+' Q3';
-  document.getElementById('medianPrice').textContent=money(p.comparable_median);
-  document.getElementById('compMeta').textContent=p.comparable_count+' similar listings • '+p.market_year+' market context';
-  const span=Math.max(1,p.comparable_q75-p.comparable_q25);
-  const pct=Math.max(3,Math.min(97,100*(p.predicted_price-p.comparable_q25)/span));
-  const pin=document.getElementById('estimatePin');
-  pin.style.left=pct+'%'; pin.dataset.label=compactMoney(p.predicted_price);
-}
-function renderSources(sources){
-  const src=document.getElementById('reviewSources');src.innerHTML='';
-  sources.slice(0,5).forEach(source=>{
-    const d=document.createElement('div');d.className='source';
-
-    const title=document.createElement('b');
-    title.textContent='['+source.review_id+'] '+String(source.review_title||'Owner review');
-    d.appendChild(title);
-
-    const meta=document.createElement('div');meta.className='source-meta';
-    const parts=[source.vehicle_year??'year n/a'];
-    if(source.rating!=null)parts.push('rating '+Number(source.rating).toFixed(1)+'/5');
-    if(source.similarity!=null)parts.push('similarity '+Number(source.similarity).toFixed(3));
-    meta.textContent=parts.join(' • ');
-    d.appendChild(meta);
-
-    if(source.excerpt){
-      const excerpt=document.createElement('div');excerpt.className='source-excerpt';
-      excerpt.textContent=source.excerpt;
-      d.appendChild(excerpt);
-    }
-    src.appendChild(d);
-  });
-}
-function questionHeading(key){
-  return {
-    reliability:"Reliability & common problems",
-    maintenance:"Maintenance & repair evidence",
-    comfort:"Comfort & everyday driving",
-    fuel_economy:"Fuel-economy owner evidence"
-  }[key]||(key==='custom'?"Your owner question":"Owner review evidence");
-}
-async function fetchJson(url,options={},timeoutMs=120000){
-  const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),timeoutMs);
-  try{
-    const res=await fetch(url,{...options,signal:controller.signal});
-    const body=await res.json().catch(()=>({}));
-    if(!res.ok)throw new Error(body.detail||('HTTP '+res.status));
-    return body;
-  }finally{clearTimeout(timer)}
-}
-function renderLiveResult(p,r){
-  renderPrice(p);
-  const heading=document.getElementById('reviewHeading');
-  const answer=document.getElementById('reviewAnswer');
-  const suggestion=document.getElementById('reviewSuggestion');
-  const verification=document.getElementById('verification');
-
-  if(r.answerable===false){
-    heading.textContent='Not answerable from available evidence';
-    answer.textContent=r.reason||r.answer||'The available owner reviews do not support a grounded answer.';
-    renderSources([]);
-    if(r.suggested_question){
-      suggestion.innerHTML='<b>Try instead:</b> '+String(r.suggested_question).replace(/[<>]/g,'');
-      suggestion.classList.add('show');
-    }else{
-      suggestion.classList.remove('show');
-      suggestion.textContent='';
-    }
-    verification.textContent='✓ Guardrail active • '+r.generation_mode;
-    return;
-  }
-
-  suggestion.classList.remove('show');
-  suggestion.textContent='';
-  heading.textContent=questionHeading(els.question.value);
-  answer.textContent=r.answer;
-  renderSources(r.sources||[]);
-  verification.textContent=r.citation_valid
-    ?'✓ Live retrieved source IDs validated • '+r.generation_mode
-    :'Live evidence returned from retrieved owner reviews';
-}
-async function runLiveAnalysis(){
-  const v=currentVehicle();
-  const d=v.defaults||{};
-  const headers={'Content-Type':'application/json'};
-  const pricePayload={
-    manufacturer:v.make||String(v.display_make).toLowerCase(),
-    model:v.model||String(v.display_model).toLowerCase(),
-    year:Number(els.year.value),
-    mileage:Number(els.mileage.value),
-    condition:els.condition.value,
-    fuel:d.fuel??null,title_status:d.title_status??null,
-    transmission:d.transmission??null,drive:d.drive??null,
-    vehicle_type:d.vehicle_type??null,state:d.state??null
-  };
-  const askPayload={
-    manufacturer:pricePayload.manufacturer,
-    model:pricePayload.model,
-    year:pricePayload.year,
-    question:currentQuestion(),
-    k:5
-  };
-  const [price,review]=await Promise.all([
-    fetchJson(LIVE_API_BASE+'/predict-price',{method:'POST',headers,body:JSON.stringify(pricePayload)}),
-    fetchJson(LIVE_API_BASE+'/ask',{method:'POST',headers,body:JSON.stringify(askPayload)})
-  ]);
-  renderLiveResult(price,review);
-}
-async function loadDemoData(){
-  // Never leave the controls blank while the cloud catalog is warming up.
-  // Populate the verified fallback immediately, then replace it with the
-  // dataset-backed catalog as soon as AWS responds.
-  DEMO_DATA=FALLBACK_DATA;
-  LIVE_API_AVAILABLE=false;
-  USING_LIVE_CATALOG=false;
-  populateMakes();
-  els.modeTag.textContent='OFFLINE • SAVED 2021 EXAMPLE';
-  els.note.textContent='Cloud inference is paused. This 2004 Ford F-150 example is precomputed; only supported questions are shown.';
-  if(!ENABLE_CLOUD_DEMO)return;
-
-  try{
-    const health=await fetchJson(LIVE_API_BASE+'/health',{cache:'no-store'},8000);
-    if(health.status!=='ok')throw new Error('health check failed');
-    const catalog=await fetchJson(LIVE_API_BASE+'/catalog',{cache:'no-store'},120000);
-    const converted=catalogToDemoData(catalog);
-    if(!Object.keys(converted.vehicles).length)throw new Error('catalog empty');
-
-    DEMO_DATA=converted;
-    LIVE_API_AVAILABLE=true;
-    USING_LIVE_CATALOG=true;
-    populateMakes();
-    els.modeTag.textContent='LIVE • AWS ECS';
-    els.note.textContent=(catalog.model_count||Object.keys(converted.vehicles).length)+' supported model families across '+(catalog.manufacturer_count||'multiple')+' makes loaded from the production dataset.';
-  }catch(e){
-    // Keep the already-populated verified fallback controls.
-    LIVE_API_AVAILABLE=false;
-    USING_LIVE_CATALOG=false;
-    els.modeTag.textContent='STATIC FALLBACK • VERIFIED';
-    els.note.textContent='Live vehicle catalog is unavailable right now; the verified Ford F-150 fallback remains available.';
-  }
-}
-
-els.make.addEventListener('change',populateModels);
-els.model.addEventListener('change',populateVehicleFields);
-[els.year,els.mileage,els.condition,els.question].forEach(x=>x.addEventListener('change',syncPrompt));
-els.customQuestion.addEventListener('input',syncPrompt);
-
-els.btn.addEventListener('click',async()=>{
-  if(currentQuestion().length<5){
-    els.note.textContent='Please enter an owner question with at least 5 characters.';
-    return;
-  }
-  els.btn.textContent=LIVE_API_AVAILABLE?'Analyzing live pipeline…':'Loading saved example…';els.btn.disabled=true;els.bar.style.width='70%';
-  try{
-    if(!LIVE_API_AVAILABLE)throw new Error('live API unavailable');
-    await runLiveAnalysis();
-    els.modeTag.textContent='LIVE • AWS ECS';
-    els.note.textContent='Live result from AWS ECS Express Mode: CatBoost price inference + calibrated guarded MiniLM/FAISS owner-review retrieval.';
-    els.results.classList.add('show');
-  }catch(e){
-    const rendered=renderStaticResult();
-    els.modeTag.textContent='STATIC FALLBACK • VERIFIED';
-    els.note.textContent=rendered
-      ?'Showing verified precomputed 2021 asking-price context and owner-review evidence. Live inference is paused.'
-      :'No precomputed evidence exists for this selection. Only the supported 2004 Ford F-150 example is available offline.';
-    if(rendered)els.results.classList.add('show');
-  }
-  els.bar.style.width='100%';
-  els.btn.textContent=LIVE_API_AVAILABLE?'Analysis complete ✓':'View saved example ✓';els.btn.disabled=false;
-  if(els.results.classList.contains('show'))els.results.scrollIntoView({behavior:'smooth',block:'nearest'});
-});
-
-document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-  document.querySelectorAll('.tabpane').forEach(x=>x.classList.remove('active'));
-  t.classList.add('active');
-  document.getElementById(t.dataset.tab).classList.add('active');
-}));
-
-if(new URLSearchParams(location.search).get('embed')==='1'){
-  document.documentElement.classList.add('embed-mode');
-  const sendHeight=()=>parent.postMessage({type:'auto-market-height',height:document.documentElement.scrollHeight},location.origin);
-  new ResizeObserver(sendHeight).observe(document.body);
-  window.addEventListener('load',sendHeight);
-  setTimeout(sendHeight,250);
-}
-loadDemoData();
-</script>
+<script src="./scripts/auto-market-demo.js" defer></script>
 </body>
 </html>

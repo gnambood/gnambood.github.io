@@ -1,4 +1,5 @@
 """Validate portfolio files and links without the deleted app source tree."""
+import json
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -50,13 +51,32 @@ def main():
     assert not (ROOT / "projects/auto-market-assistant").exists(), "Duplicate app source remains"
     assert (ROOT / "PROFILE_README.md").exists(), "Prepared GitHub profile README missing"
 
+    snapshot = json.loads((ROOT / "data/auto-market-snapshots.v1.json").read_text(encoding="utf-8"))
+    assert snapshot["schema_version"] == 1
+    assert snapshot["market_year"] == 2021
+    assert snapshot["vehicles"], "No saved model scenarios"
+    for vehicle in snapshot["vehicles"].values():
+        assert vehicle.get("price_grid"), "No precomputed model output"
+        for price in vehicle["price_grid"].values():
+            assert 0 < price["comparable_q25"] <= price["comparable_median"] <= price["comparable_q75"]
+            assert price["predicted_price"] > 0 and price["comparable_count"] > 0
+        for review in vehicle.get("reviews", {}).values():
+            ids = [source["review_id"] for source in review.get("sources", [])]
+            assert len(ids) == len(set(ids)), "Duplicate review citation IDs"
+            assert all(identifier.startswith("edm_") for identifier in ids), "Unexpected citation scheme"
+    js = (ROOT / "scripts/auto-market-demo.js").read_text(encoding="utf-8")
+    assert "data/auto-market-snapshots.v1.json" in js
+    assert "ecs.ca-central-1.on.aws" not in js
+    assert "ENABLE_CLOUD_DEMO" not in js
+    assert "ecs.ca-central-1.on.aws" not in case_study.read_text(encoding="utf-8")
+
     homepage = validate(index)
     case = validate(case_study)
     assert {"work", "about", "experience", "contact"} <= homepage.ids
     assert "demo" in case.ids and "runDemo" in case.ids
     assert any("/auto-market-assistant.html" in href for href in homepage.hrefs)
     assert any("github.com/gnambood/auto-market-assistant" in href for href in homepage.hrefs)
-    print("Portfolio markup, anchors, internal links and source-of-truth boundaries OK")
+    print("Portfolio markup, saved output bundle, no-AWS JavaScript, and internal links OK")
 
 
 if __name__ == "__main__":
