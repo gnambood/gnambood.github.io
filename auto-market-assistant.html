@@ -26,7 +26,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
         <h3>One purchase. Two different questions.</h3>
         <div class="twoq">
           <div class="q"><b>How much is this car worth?</b><span>CatBoost learns asking-price patterns from Craigslist listings.</span></div>
-          <div class="q"><b>What do owners actually say?</b><span>MiniLM + FAISS retrieves relevant Edmunds reviews before generation.</span></div>
+          <div class="q"><b>What do owners actually say?</b><span>MiniLM + FAISS retrieves cited Edmunds review evidence. Optional Qwen generation was evaluated separately.</span></div>
         </div>
       </div>
       <div class="card metrics">
@@ -38,23 +38,10 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
     </div>
   </header>
 
-  <section class="section">
-    <div class="eyebrow">System design</div>
-    <h2>Numbers from code. Opinions from evidence.</h2>
-    <p class="section-intro">The language model never invents a market price. Price estimation and owner-review generation stay separate until the final response.</p>
-    <div class="flow">
-      <div class="step"><small>01</small><b>Vehicle inputs</b></div>
-      <div class="step"><small>02</small><b>CatBoost price model</b></div>
-      <div class="step"><small>03</small><b>Review retrieval</b></div>
-      <div class="step"><small>04</small><b>Grounded summary / fallback</b></div>
-      <div class="step"><small>05</small><b>Citation check</b></div>
-    </div>
-  </section>
-
   <section class="section" id="demo">
     <div class="eyebrow">Interactive portfolio demo</div>
     <h2>Try one real pipeline example.</h2>
-    <p class="section-intro">This demo loads selectable vehicle options from the <strong>deployed dataset</strong> and calls the live FastAPI service on AWS ECS Express Mode. If cloud inference is unavailable, the page falls back to one verified precomputed example.</p>
+    <p class="section-intro">This demo presents historical, dataset-backed vehicle examples and calls the retrieval-only FastAPI service on AWS ECS when available. If cloud inference is unavailable, the page falls back to one verified precomputed example.</p>
     <div class="card demo">
       <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">Choose from dataset-backed makes, models, years, mileage bands and conditions</div></div><span class="tag" id="modeTag">CHECKING LIVE API</span></div>
       <div class="controls">
@@ -105,68 +92,16 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
       </div>
     </div>
   </section>
-
-  <section class="section">
-    <div class="eyebrow">Measured results</div>
-    <h2>Performance at a glance.</h2>
-    <div class="metric-strip">
-      <div class="metric"><strong>$2,866</strong><span>test MAE</span></div>
-      <div class="metric"><strong>0.883</strong><span>test R²</span></div>
-      <div class="metric"><strong>84.9%</strong><span>within $5K</span></div>
-      <div class="metric"><strong>81.7%</strong><span>Hit@5</span></div>
-      <div class="metric"><strong>0.626</strong><span>MRR@10</span></div>
-      <div class="metric"><strong>17.6 ms</strong><span>median retrieval</span></div>
+  <section class="section" aria-labelledby="source-heading">
+    <div class="eyebrow">Canonical engineering source</div>
+    <h2 id="source-heading">Architecture, evaluation and reproducibility live in GitHub.</h2>
+    <p class="section-intro">This portfolio is a presentation layer. The one maintained implementation of CatBoost, MiniLM/FAISS, optional Qwen 2.5 generation experiments, data quality checks and historical market trends lives in the canonical Auto Market Assistant repository.</p>
+    <div class="card story">
+      <p><a href="https://github.com/gnambood/auto-market-assistant"><strong>Open canonical source repository</strong></a></p>
+      <p><a href="https://github.com/gnambood/auto-market-assistant/blob/main/MODEL_CARD.md">Model card and metric definitions</a> · <a href="https://github.com/gnambood/auto-market-assistant/blob/main/ARCHITECTURE.md">Architecture</a> · <a href="https://github.com/gnambood/auto-market-assistant/blob/main/MARKET_TRENDS.md">Historical market trends</a> · <a href="https://github.com/gnambood/auto-market-assistant/blob/main/DEPLOY_AWS.md">Deployment details</a></p>
+      <p class="sub">Data: historical 2021 Craigslist asking prices. Live AWS may be off to control cost; a labelled static fallback is available. Qwen 2.5 is optional and is not enabled in the deployed retrieval-only service.</p>
     </div>
   </section>
-
-  <section class="section">
-    <div class="eyebrow">Experiment story</div>
-    <h2>What changed as the system matured?</h2>
-    <div class="timeline">
-      <div class="phase"><span class="n">1</span><strong>Start simple</strong><p>A hierarchical median baseline established whether ML was actually adding value.</p></div>
-      <div class="phase"><span class="n">2</span><strong>Fix representation</strong><p>Model-family normalization produced a much larger gain than simply adding more numeric features.</p></div>
-      <div class="phase"><span class="n">3</span><strong>Evaluate retrieval</strong><p>Hit@k, MRR and latency were measured so retrieval quality was not hidden behind one demo.</p></div>
-      <div class="phase"><span class="n">4</span><strong>Calibrate abstention</strong><p>A held-out weakly supervised benchmark separated source capability from retrieval relevance and selected a multi-signal operating point instead of a magic cosine cutoff.</p></div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="eyebrow">Data platform</div>
-    <h2>One curated data definition for ML, RAG and analytics.</h2>
-    <p class="section-intro">As the project moved beyond notebooks, the Craigslist and Edmunds transformations were extracted into a tested batch pipeline so downstream consumers do not silently drift apart.</p>
-    <div class="twoq">
-      <div class="q"><b>Reusable batch ETL</b><span>Raw CSV snapshots are normalized, deduplicated, validated and transformed into manufacturer-partitioned Parquet datasets using the same cleaning and model-family rules as the final notebooks.</span></div>
-      <div class="q"><b>Data quality gates</b><span>Each run reconciles source/curated row counts and checks vehicle-retention, review-retention and review-match thresholds before publishing outputs.</span></div>
-      <div class="q"><b>Lineage & idempotency</b><span>SHA-256 source fingerprints identify each run, while deterministic Hive-style partition paths and Parquet object names make reruns safe and traceable.</span></div>
-      <div class="q"><b>Analytics-ready AWS layer</b><span>Infrastructure-as-code defines Glue external tables and a cost-controlled Athena workgroup for querying the curated S3 layer; deployment is kept separate from the live ECS serving path.</span></div>
-    </div>
-    <div class="mini-flow" style="margin-top:18px"><span class="node">raw CSV</span><span class="arrow">→</span><span class="node">Python ETL</span><span class="arrow">→</span><span class="node">quality gates</span><span class="arrow">→</span><span class="node">partitioned Parquet</span><span class="arrow">→</span><span class="node">S3</span><span class="arrow">→</span><span class="node">ML / RAG / Athena</span></div>
-  </section>
-
-  <section class="section">
-    <div class="eyebrow">Data & evaluation</div>
-    <h2>Why the numbers are not presented as “accuracy”.</h2>
-    <p class="section-intro">Price prediction is regression. Review search is information retrieval. They need different evaluation language.</p>
-    <div class="twoq">
-      <div class="q"><b>Price model</b><span>Chronological holdout • MAE • RMSE • MAPE • R² • tolerance bands. Asking price is the target, not final sale price.</span></div>
-      <div class="q"><b>Review retrieval</b><span>Hit@1/3/5 • MRR@10 • latency • held-out answerability precision/recall/F1. Identity retrieval and weak-label answerability are reported separately rather than collapsed into one “RAG accuracy” number.</span></div>
-    </div>
-    <div class="note" style="margin-top:18px"><strong>External-comparison rule:</strong> public Craigslist and RAG projects are used to motivate experiments and evaluation design, not to claim a misleading leaderboard win across different splits, features or relevance labels.</div>
-  </section>
-
-  <section class="section">
-    <div class="eyebrow">Future work</div>
-    <h2>What I would test next.</h2>
-    <p class="section-intro">The production-oriented pipeline is intentionally frozen at a validated operating point. The next improvements are research extensions, not required fixes.</p>
-    <div class="twoq">
-      <div class="q"><b>Human-labelled relevance set</b><span>Manually grade question-review pairs and use that gold set to compare dense retrieval with cross-encoder reranking.</span></div>
-      <div class="q"><b>Stronger retrieval representations</b><span>Test passage-level chunking and newer embedding families such as BGE or E5 on the exact same held-out labels.</span></div>
-      <div class="q"><b>Faithfulness evaluation</b><span>Add claim-level entailment checks so citation validity is complemented by evidence-to-claim support measurement.</span></div>
-      <div class="q"><b>Production generation</b><span>Evaluate whether a managed or larger generator improves synthesis enough to justify additional latency and infrastructure cost.</span></div>
-    </div>
-    <div class="note" style="margin-top:18px"><strong>Current answerability result:</strong> 80.95% accuracy, 90.0% precision, 84.38% recall and 87.10% F1 on a held-out weakly supervised benchmark across unseen vehicle families. These are not presented as universal RAG accuracy.</div>
-  </section>
-
   <footer class="footer"><strong>Auto Market Assistant</strong> — portfolio case study by Gayathri Namboodiri.<br/>CatBoost • Sentence Transformers • FAISS • Qwen • FastAPI • Docker • Parquet • AWS ECS • S3 • ECR</footer>
 </div>
 <script>
