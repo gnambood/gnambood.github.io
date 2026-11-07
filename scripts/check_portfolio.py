@@ -54,7 +54,11 @@ def main():
     assert (ROOT / "styles/coffee.css").exists(), "Coffee design stylesheet missing"
     assert (ROOT / "scripts/coffee-motion.js").exists(), "Accessible motion script missing"
     homepage_html = index.read_text(encoding="utf-8")
-    assert "Ideas into useful systems" in homepage_html and "gayathri-coffee-portrait.png" in homepage_html
+    assert "ideas into insights" in homepage_html and "gayathri-coffee-portrait.png" in homepage_html
+    assert 'class="atom-orbit"' in homepage_html, "Portrait orbital decoration missing"
+    assert "PYTORCH" in homepage_html and "ML ENGINEERING" in homepage_html, "Relevant skills ticker missing"
+    ticker = homepage_html.split('<div class="ticker"', 1)[1].split('</div></div>', 1)[0]
+    assert "COFFEE" not in ticker, "Personal hobbies should not appear in the skills ticker"
     assert "76.02%" in homepage_html and "99.04%" in homepage_html, "Verified research metrics changed"
     assert all(anchor in homepage_html for anchor in ['id="research"', 'id="market"', 'id="security"']), "Long-form project stories missing"
     assert 'href="/styles/coffee.css"' in homepage_html and 'src="/scripts/coffee-motion.js"' in homepage_html
