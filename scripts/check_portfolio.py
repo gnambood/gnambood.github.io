@@ -65,6 +65,11 @@ def main():
     assert all(anchor in homepage_html for anchor in ['id="research"', 'id="market"', 'id="security"']), "Long-form project stories missing"
     assert 'href="/styles/coffee.css"' in homepage_html and 'src="/scripts/coffee-motion.js"' in homepage_html
     assert homepage_html.count('class="chapter ') >= 10, "Research and engineering story chapters missing"
+    assert homepage_html.count('class="pipeline-track"') == 2, "Expected two distinct ML workflows"
+    assert homepage_html.count('<li><span>') == 6, "Expected three steps per workflow"
+    assert 'class="path-diagram"' not in homepage_html, "Old wrapping pipeline remains"
+    assert "Asking-price estimate" in homepage_html and "Cited evidence" in homepage_html
+
 
 
     snapshot = json.loads((ROOT / "data/auto-market-snapshots.v1.json").read_text(encoding="utf-8"))
