@@ -85,37 +85,45 @@ try {
   assert(width.content <= width.viewport + 4, JSON.stringify(width));
 
 
-  // The coffee-themed homepage restores the original portrait and personal narrative.
+  // The new coffee site should tell the full story and reuse the original portrait.
   await page.goto(base + "/index.html");
   assert.match(await page.locator(".hero h1").innerText(), /Gayathri/);
-  assert.match(await page.locator(".hero h1").innerText(), /stories worth telling/);
-  assert.match(await page.locator(".coffee-note").innerText(), /ideas into insights/);
+  assert.match(await page.locator(".hero h1").innerText(), /Curious by nature/);
+  assert.match(await page.locator(".coffee-stamp").innerText(), /Currently brewing/);
   assert.equal(await page.locator(".project").count(), 3);
+  assert.equal(await page.locator("#research .chapter").count(), 5);
+  assert.equal(await page.locator("#market .chapter").count(), 5);
+  assert.equal(await page.locator("#security .chapter").count(), 3);
+  assert.match(await page.locator("#research").innerText(), /57 participants/);
+  assert.match(await page.locator("#market").innerText(), /chronological holdout/);
   assert.equal(await page.locator('a[href="/auto-market-assistant.html"]').count(), 1);
   const coffee = await page.evaluate(() => {
     const picture = document.querySelector(".portrait-stage img");
-    const bodyStyle = getComputedStyle(document.body);
     return {
       loaded: picture.complete && picture.naturalWidth > 1000,
       photoSrc: picture.getAttribute("src"),
-      background: bodyStyle.backgroundColor,
-      steam: getComputedStyle(document.querySelector(".steam span")).animationName,
-      note: getComputedStyle(document.querySelector(".coffee-note")).animationName,
+      background: getComputedStyle(document.body).backgroundColor,
+      steam: getComputedStyle(document.querySelector(".steam.s1")).animationName,
+      portrait: getComputedStyle(picture).animationName,
       width: document.documentElement.clientWidth,
       scrollWidth: document.documentElement.scrollWidth
     };
   });
-  assert(coffee.loaded, "Recovered original portrait must render");
+  assert(coffee.loaded, "Original illustrated portrait should load");
   assert.equal(coffee.photoSrc, "/assets/gayathri-coffee-portrait.png");
   assert.equal(coffee.background, "rgb(245, 235, 221)");
-  assert.equal(coffee.steam, "steam-rise");
-  assert.equal(coffee.note, "note-float");
+  assert.equal(coffee.steam, "steam");
+  assert.equal(coffee.portrait, "float-photo");
   assert(coffee.scrollWidth <= coffee.width + 4, JSON.stringify(coffee));
 
-  // Motion remains optional for visitors who prefer reduced movement.
+  // Motion is decorative and must respect reduced-motion preferences.
   await page.emulateMedia({reducedMotion: "reduce"});
-  const reduced = await page.evaluate(() => getComputedStyle(document.querySelector(".coffee-note")).animationName);
-  assert.equal(reduced, "none");
+  const reduced = await page.evaluate(() => ({
+    steam: getComputedStyle(document.querySelector(".steam.s1")).animationName,
+    portrait: getComputedStyle(document.querySelector(".portrait-stage img")).animationName,
+    ticker: getComputedStyle(document.querySelector(".ticker-inner")).animationName
+  }));
+  assert.deepEqual(reduced, {steam: "none", portrait: "none", ticker: "none"});
   await page.emulateMedia({reducedMotion: "no-preference"});
 
   assert.deepEqual(errors, [], "Client-side exceptions are not allowed");
