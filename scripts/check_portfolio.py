@@ -56,6 +56,8 @@ def main():
     homepage_html = index.read_text(encoding="utf-8")
     assert "ideas into insights" in homepage_html and "gayathri-coffee-portrait.png" in homepage_html
     assert 'class="atom-orbit"' in homepage_html, "Portrait orbital decoration missing"
+    assert all(f'class="orbit-dot orbit-dot-{part}"' in homepage_html for part in "abc"), "Independent orbiting dots missing"
+    assert 'class="atom-core"' not in homepage_html and 'class="portrait-ring"' not in homepage_html, "Old nucleus or rotating backdrop remains"
     assert "PYTORCH" in homepage_html and "ML ENGINEERING" in homepage_html, "Relevant skills ticker missing"
     ticker = homepage_html.split('<div class="ticker"', 1)[1].split('</div></div>', 1)[0]
     assert "COFFEE" not in ticker, "Personal hobbies should not appear in the skills ticker"
