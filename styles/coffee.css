@@ -30,17 +30,15 @@ button{font:inherit}
 .portrait-wrap{position:relative;width:100%;max-width:500px;justify-self:center;isolation:isolate;animation:portrait-enter 1.1s ease-out .1s both}
 .portrait-stage{position:relative;z-index:1;border-radius:45% 45% 36% 36%/42% 42% 29% 29%;background:var(--cream);overflow:hidden;transition:transform .28s ease-out;isolation:isolate}
 .portrait-stage img{display:block;width:100%;height:auto;max-height:none;mix-blend-mode:multiply;mask-image:radial-gradient(ellipse 78% 75% at 50% 49%,#000 74%,transparent 100%)}
-.portrait-ring{border:1px dashed rgba(181,84,53,.55);border-radius:50%;position:absolute;inset:5% -3% 8% 1%;z-index:0;animation:portrait-ring-orbit 38s linear infinite}
-.atom-orbit{position:absolute;right:-6%;top:0;width:138px;height:138px;z-index:2;pointer-events:none;filter:drop-shadow(0 3px 4px rgba(52,36,31,.08))}
-.atom-path{position:absolute;left:8%;top:32%;width:84%;height:36%;border:1.5px solid rgba(111,78,55,.62);border-radius:50%;animation:atom-spin 15s linear infinite}
-.atom-path:after{content:"";position:absolute;top:calc(50% - 4px);left:-4px;width:8px;height:8px;background:var(--rust);border:1px solid var(--paper);border-radius:50%}
-.atom-path-b{transform:rotate(60deg);animation-name:atom-spin-b;animation-duration:19s}
-.atom-path-c{transform:rotate(120deg);animation-name:atom-spin-c;animation-duration:22s}
-.atom-core{position:absolute;left:calc(50% - 7px);top:calc(50% - 7px);width:14px;height:14px;border-radius:50%;background:var(--rust);box-shadow:0 0 0 4px rgba(181,84,53,.12)}
-@keyframes atom-spin{to{transform:rotate(360deg)}}
-@keyframes atom-spin-b{to{transform:rotate(420deg)}}
-@keyframes atom-spin-c{to{transform:rotate(480deg)}}
-@keyframes portrait-ring-orbit{to{transform:rotate(360deg)}}
+.atom-orbit{position:absolute;right:2%;top:2%;width:130px;height:130px;z-index:2;pointer-events:none}
+.orbit-dot{position:absolute;inset:0;animation:orbit-dot-spin 16s linear infinite}
+.orbit-dot::after{content:"";position:absolute;left:50%;top:0;width:9px;height:9px;border-radius:50%;background:var(--rust);box-shadow:0 0 0 2px var(--cream)}
+.orbit-dot-a{inset:5%;animation-duration:14s}
+.orbit-dot-b{inset:21%;animation-duration:19s;animation-direction:reverse;animation-delay:-6s}
+.orbit-dot-b::after{width:7px;height:7px;background:var(--coffee)}
+.orbit-dot-c{inset:35%;animation-duration:11s;animation-delay:-3s}
+.orbit-dot-c::after{width:6px;height:6px;background:var(--sage)}
+@keyframes orbit-dot-spin{to{transform:rotate(360deg)}}
 .coffee-note{position:absolute;bottom:24px;right:-13px;z-index:2;background:var(--paper);color:var(--coffee);border:1px solid #d8bda7;border-radius:8px;padding:14px 19px;box-shadow:0 14px 35px #3b261b1c;font-size:.84rem;line-height:1.5;animation:note-float 5.4s ease-in-out infinite}
 .coffee-note span{font-size:1.25rem;margin-right:6px}.coffee-note strong{font:500 1.13rem Georgia,serif;color:var(--espresso)}
 .portrait-wrap .steam{position:absolute;left:60%;top:72%;z-index:3;display:flex;gap:9px;pointer-events:none}
@@ -126,7 +124,7 @@ section{padding:92px 0;border-bottom:1px solid var(--line)}
 @media(max-width:960px){.hero{grid-template-columns:1.1fr .9fr;gap:28px}.portrait-wrap{max-width:500px}.personal-grid{gap:38px}.chapter.featured{grid-template-columns:1fr}.project-heading{grid-template-columns:1fr}}
 @media(max-width:720px){.shell{width:calc(100% - 32px)}.nav{min-height:76px;align-items:flex-start;flex-direction:column;gap:12px;padding:15px 0}.navlinks{gap:15px}.hero{grid-template-columns:1fr;padding:52px 0 56px;min-height:auto}.hero h1{font-size:clamp(3.15rem,12vw,4.7rem)}.portrait-wrap{max-width:450px;margin-top:18px}.coffee-note{right:0;bottom:10px}.personal-grid,.story-grid,.interest-grid,.experience{grid-template-columns:1fr}.personal-aside{position:static}.path-strip{grid-template-columns:1fr;gap:16px}.chapter.featured{grid-column:auto}.interests{grid-template-columns:1fr 1fr}.contact{padding:70px 0}.project-heading{gap:12px}.project{margin-top:44px;padding-top:40px}section{padding:64px 0}.ticker-inner{animation-duration:60s}}
 @media(max-width:430px){.navlinks{gap:12px}.navlinks a{font-size:.8rem}.portrait-wrap{max-width:100%}.coffee-note{right:0;bottom:2%}.chapter{padding:20px}.evidence-number{min-width:45%}.interests{grid-template-columns:1fr}.path-diagram{justify-content:flex-start}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.portrait-wrap,.portrait-wrap .steam span,.coffee-note,.ticker-inner,.hero-copy,.portrait-ring,.atom-path{animation:none!important}.has-js .reveal{opacity:1;transform:none;transition:none}.cta{transition:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.portrait-wrap,.portrait-wrap .steam span,.coffee-note,.ticker-inner,.hero-copy,.orbit-dot{animation:none!important}.has-js .reveal{opacity:1;transform:none;transition:none}.cta{transition:none}}
 
 @media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
   .portrait-stage{transform:translate3d(var(--pointer-x,0px),var(--pointer-y,0px),0);transition:transform .18s ease-out}
@@ -134,4 +132,4 @@ section{padding:92px 0;border-bottom:1px solid var(--line)}
 
 /* Keep the portrait ornaments within the hero on narrow screens. */
 @media(max-width:720px){.atom-orbit{right:0;top:0;width:104px;height:104px}}
-@media(max-width:430px){.atom-orbit{width:82px;height:82px}.portrait-ring{inset:7% 1% 10% 1%}}
+@media(max-width:430px){.atom-orbit{width:82px;height:82px;right:3%;top:3%}}
