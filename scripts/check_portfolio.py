@@ -54,10 +54,11 @@ def main():
     assert (ROOT / "styles/coffee.css").exists(), "Coffee design stylesheet missing"
     assert (ROOT / "scripts/coffee-motion.js").exists(), "Accessible motion script missing"
     homepage_html = index.read_text(encoding="utf-8")
-    assert "ideas into insights" in homepage_html and "gayathri-coffee-portrait.png" in homepage_html
-    assert 'class="atom-orbit"' in homepage_html, "Portrait orbital decoration missing"
-    assert all(f'class="orbit-dot orbit-dot-{part}"' in homepage_html for part in "abc"), "Independent orbiting dots missing"
-    assert 'class="atom-core"' not in homepage_html and 'class="portrait-ring"' not in homepage_html, "Old nucleus or rotating backdrop remains"
+    assert "gayathri-coffee-portrait.png" in homepage_html, "Original portrait missing"
+    assert 'class="portrait-stage"' in homepage_html, "Editorial hero portrait missing"
+    assert 'class="portrait-caption"' in homepage_html, "Portrait caption missing"
+    assert "colourful data plots" in homepage_html, "Original plots not described"
+    assert 'class="atom-orbit"' not in homepage_html and 'class="coffee-note"' not in homepage_html, "Unnecessary overlays returned"
     assert "PYTORCH" in homepage_html and "ML ENGINEERING" in homepage_html, "Relevant skills ticker missing"
     ticker = homepage_html.split('<div class="ticker"', 1)[1].split('</div></div>', 1)[0]
     assert "COFFEE" not in ticker, "Personal hobbies should not appear in the skills ticker"
