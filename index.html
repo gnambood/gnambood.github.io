@@ -21,19 +21,17 @@
 </header>
 <section class="hero" aria-labelledby="hello-title">
 <div class="hero-copy">
-<div class="eyebrow">Hello from Ontario · Coffee enthusiast &amp; ML engineer</div>
+<div class="eyebrow">Hello from Ontario · Machine learning &amp; curiosity</div>
 <h1 id="hello-title">I'm Gayathri.<br/>Curious by nature, <em>analytical</em> by training.</h1>
 <p class="hero-text">I love questions that don't have neat answers. These days, I explore them with data, machine learning and a lot of coffee. I’m an MEng graduate from Western University, with a background in technical support, enterprise systems and the messy business of making things actually work.</p>
 <div class="hero-actions"><a class="cta primary" href="#work">Come see what I've built</a><a class="cta text" href="#story">Get to know me ↓</a></div>
 <p class="handwritten">A little research, a little creativity, and one more cup.</p>
 </div>
-<div class="portrait-stage" aria-label="Portrait from Gayathri's original coffee-themed portfolio">
-<div class="portrait-backdrop" aria-hidden="true"></div>
-<img src="/assets/gayathri-coffee-portrait.png" alt="Illustrated portrait of Gayathri at a laptop, surrounded by coffee and data visuals" width="1118" height="1407" fetchpriority="high">
-<div class="coffee-stamp" aria-hidden="true">
-<span class="cup"><span class="steam s1"></span><span class="steam s2"></span><span class="steam s3"></span></span>
-<b>Currently brewing</b><small>Ideas into useful systems</small>
-</div>
+<div class="portrait-wrap" aria-label="Illustrated portrait of Gayathri">
+<div class="portrait-ring" aria-hidden="true"></div>
+<div class="portrait-stage"><img src="/assets/gayathri-coffee-portrait.png" alt="Illustration of Gayathri smiling at her laptop with a coffee cup and data charts" width="1118" height="1407" fetchpriority="high"></div>
+<div class="steam" aria-hidden="true"><span></span><span></span><span></span></div>
+<div class="coffee-note"><span aria-hidden="true">☕</span>Currently brewing<br><strong>ideas into insights</strong></div>
 </div>
 </section>
 </div>
@@ -48,7 +46,7 @@
 <h2 class="section-title" id="story-title">Here's the short version of my story.</h2>
 <div class="line"></div>
 <p class="small-note">A bit of structure. A lot of curiosity.</p>
-<p>Based in Ontario, Canada · MEng, Western University</p>
+<p>From enterprise systems to applied machine learning.</p>
 </div>
 <div class="personal-copy reveal">
 <p>I didn't start with neural networks. My work began much closer to the people using technology: <strong>managing enterprise devices, handling technical problems, and coordinating solutions across teams.</strong></p>
@@ -86,7 +84,7 @@
 <div class="chapter reveal"><div class="chapter-kicker">04 · The evaluation</div><h3>Keep people separate across folds</h3><p>The reported TimeSformer result covers 57 participants and 171 sessions across five participant-disjoint outer folds and three training seeds. The preserved evaluation reports 76.02% accuracy and 76.05% macro-F1. It is a frozen downstream replay on the accepted feature lineage, not a claim of byte-identical end-to-end regeneration.</p></div>
 <div class="chapter reveal"><div class="chapter-kicker">05 · The parallel experiment</div><h3>What if you know someone's sober baseline?</h3><p>VideoMAE investigated a different condition, using same-participant sober calibration. Its frozen post-hoc result is 66.08% accuracy. Because the inference conditions and evaluation details differ, I do not rank it directly against the reference-free TimeSformer system.</p></div>
 </div>
-<div class="project-bottom"><div class="evidence-row"><div class="evidence-number"><strong>171</strong><span>retained sessions</span></div><div class="evidence-number"><strong>76.05%</strong><span>TimeSformer macro-F1</span></div></div><p>Manuscript in preparation. Research code and participant data are private. The website reports the accepted evaluation, including its reproducibility boundaries.</p></div>
+<div class="project-bottom"><p>Manuscript in preparation. Research code and participant data are private. The website reports the accepted evaluation, including its reproducibility boundaries.</p></div>
 <details class="disclosure"><summary>What this project taught me</summary><p>It reinforced that experimental design begins before training: with what is visible in the data, how it is cropped, who is allowed into a held-out fold and what a result actually supports. A more complex model isn't automatically a more defensible result.</p></details>
 </article>
 
@@ -104,7 +102,7 @@
 <div class="chapter reveal"><div class="chapter-kicker">04 · A decision not to overpromise</div><h3>Not enough history to forecast responsibly</h3><p>The inspected source dates span roughly one month in 2021. That is not a sound basis for claiming reliable multi-month price forecasts. Instead, I built descriptive price and listing-volume trends by comparable make, model family and vehicle year, with sample-size gates and lineage checks.</p></div>
 <div class="chapter reveal"><div class="chapter-kicker">05 · The way you can try it</div><h3>Show genuine saved results without a cloud bill</h3><p>The portfolio's interactive case study runs entirely in the browser, replaying a verified saved CatBoost result and cited review IDs. It is not live inference. The actual AWS ECS service has been deployed, but compute is paused to limit cost. The canonical GitHub repository retains the technical implementation.</p></div>
 </div>
-<div class="project-bottom"><div class="evidence-row"><div class="evidence-number"><strong>0.883</strong><span>chronological test R²</span></div><div class="evidence-number"><strong>81.67%</strong><span>review retrieval Hit@5</span></div></div><p><a href="/auto-market-assistant.html">Explore the saved-result demo</a> · <a href="https://github.com/gnambood/auto-market-assistant">View source and methodology</a></p></div>
+<div class="project-bottom"><p><a href="/auto-market-assistant.html">Explore the saved-result demo</a> · <a href="https://github.com/gnambood/auto-market-assistant">View source and methodology</a></p></div>
 <details class="disclosure"><summary>What this project taught me</summary><p>A useful system needs more than a model: it needs a reproducible data definition, a trustworthy explanation of what its metrics measure and an interface that doesn't claim more than the evidence supports.</p></details>
 </article>
 
@@ -142,7 +140,7 @@
 <h2 class="section-title" id="experience-title">The experience behind the projects.</h2>
 <p class="section-intro">Different roles, one recurring theme: understand what isn't working, communicate clearly and make a system more dependable.</p>
 <div class="experience reveal">
-<div><small>2026</small><h3>Graduate Research · AiX Lab, Western University</h3><p>RGB/IR driver-facing video, spatiotemporal models and participant-separated evaluation.</p></div>
+<div><small>2026</small><h3>Graduate Research · Computer Vision</h3><p>RGB/IR driver-facing video, spatiotemporal models and participant-separated evaluation.</p></div>
 <div><small>2023–2025</small><h3>Customer Liaison · Execulink Telecom</h3><p>Technical troubleshooting, customer conversations and coordination across escalation teams.</p></div>
 <div><small>2019–2022</small><h3>Assistant Manager · South Indian Bank</h3><p>Enterprise mobile device management, security and compliance reporting across 7,000+ devices.</p></div>
 </div>
