@@ -4,11 +4,11 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="description" content="Auto Market Assistant — a Python ML application for historical vehicle asking prices and cited owner-review evidence." />
-<meta name="theme-color" content="#f5f5f1" />
+<meta name="theme-color" content="#f5ebdd" />
 <title>Auto Market Assistant | Gayathri Namboodiri</title>
 <style>
 
-:root{color-scheme:light;--bg:#f5f5f1;--panel:#fffefa;--panel2:#ecefeb;--text:#1d2926;--muted:#52605a;--line:#d7ddd6;--accent:#275d4f;--accent2:#416f63;--warn:#7c5732;--good:#275d4f}
+:root{color-scheme:light;--bg:#f5ebdd;--panel:#fffaf3;--panel2:#f0e2d0;--text:#34241f;--muted:#76645a;--line:#d9c6b4;--accent:#6f4e37;--accent2:#b55435;--warn:#8c642c;--good:#526d46}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--text);font:16px/1.62 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
@@ -52,8 +52,8 @@ a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(
 .controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:30px 0 16px}
 .control{min-width:0}
 .control label{display:block;color:var(--muted);font-size:.8rem;margin-bottom:7px}
-.control select,.control input,.compare-control select,#metricFocus{font:inherit;font-size:.93rem;width:100%;min-height:44px;background:#fff;color:var(--text);border:1px solid #bec9bf;border-radius:4px;padding:10px 12px}
-.control select option{background:#fff;color:var(--text)}
+.control select,.control input,.compare-control select,#metricFocus{font:inherit;font-size:.93rem;width:100%;min-height:44px;background:#fffaf3;color:var(--text);border:1px solid #cdb7a6;border-radius:4px;padding:10px 12px}
+.control select option{background:var(--panel);color:var(--text)}
 .control input::placeholder{color:var(--muted)}
 .custom-question{display:none;grid-column:span 2}
 .demo-mode{font-size:.81rem;color:var(--muted);margin:12px 0}
@@ -62,7 +62,7 @@ a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(
 .btn{flex:none;min-height:48px;padding:12px 18px;border:1px solid var(--accent);border-radius:4px;color:#fff;background:var(--accent);font-family:inherit;font-weight:600;font-size:.92rem;line-height:1.2;cursor:pointer}
 .btn:hover{background:#367464}
 .btn:disabled{opacity:.5;cursor:wait}
-.progress{height:4px;background:#e0e7df;margin-top:22px;overflow:hidden}
+.progress{height:4px;background:#dfc9b2;margin-top:22px;overflow:hidden}
 .bar{height:100%;width:0;background:var(--accent);transition:width .75s ease}
 .results{display:none;margin-top:30px}
 .results.show{display:block;animation:rise .35s ease}
@@ -72,7 +72,7 @@ a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(
 .price-card{background:var(--panel2)}
 .big-price{font:500 3.1rem/1.1 Georgia,serif;font-variant-numeric:tabular-nums;letter-spacing:-.035em;margin:12px 0 8px}
 .sub{color:var(--muted)}
-.gauge{height:8px;position:relative;background:#d2ddd4;margin:34px 4px 18px}
+.gauge{height:8px;position:relative;background:#dfc9b2;margin:34px 4px 18px}
 .pin{position:absolute;top:-7px;left:27%;height:22px;width:3px;background:var(--accent)}
 .pin:after{content:attr(data-label);position:absolute;top:25px;left:50%;transform:translateX(-50%);font-size:.74rem;white-space:nowrap;color:var(--text)}
 .range{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.8rem}
@@ -82,8 +82,8 @@ a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(
 .suggestion.show{display:block}
 .suggestion b{color:var(--accent)}
 .sources{display:grid;gap:10px;margin-top:18px}
-.source{width:100%;text-align:left;cursor:pointer;color:var(--text);background:#f5f6f2;border:1px solid var(--line);border-radius:4px;padding:12px 14px;font:inherit;font-size:.88rem}
-.source:hover,.source[aria-pressed=true]{border-color:var(--accent);background:#eaf1eb}
+.source{width:100%;text-align:left;cursor:pointer;color:var(--text);background:#fff7ee;border:1px solid var(--line);border-radius:4px;padding:12px 14px;font:inherit;font-size:.88rem}
+.source:hover,.source[aria-pressed=true]{border-color:var(--accent);background:#f1dfce}
 .source b{color:var(--accent);font-weight:600}
 .source-meta{color:var(--muted);font-size:.78rem;margin-top:4px}
 .source-excerpt{margin-top:8px;line-height:1.55}
@@ -99,7 +99,7 @@ a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(
 .tabpane{display:none;margin-top:20px;padding:24px;background:var(--panel2);border-radius:4px}
 .tabpane.active{display:block}
 .mini-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.node{border:1px solid #cbd4cc;background:#fff;padding:8px 10px;font-size:.85rem;border-radius:3px}
+.node{border:1px solid #d9c6b4;background:#fffaf3;padding:8px 10px;font-size:.85rem;border-radius:3px}
 .arrow{color:var(--accent)}
 .metric-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .timeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
@@ -110,7 +110,7 @@ a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(
 .barplot{margin:20px 0}
 .bar-row{margin:14px 0}
 .bar-head{display:flex;justify-content:space-between;gap:12px;font-size:.87rem}
-.metric-track{height:8px;background:#dce5dd;margin-top:6px;overflow:hidden}
+.metric-track{height:8px;background:#e2ccba;margin-top:6px;overflow:hidden}
 .metric-fill{height:100%;background:var(--accent)}
 .footer{padding:36px 0 52px;color:var(--muted);font-size:.83rem}
 .footer strong{color:var(--text);font-weight:600}
@@ -122,14 +122,21 @@ a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(
 .embed-mode .wrap{width:min(1120px,calc(100% - 24px))}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.bar{transition:none}.results.show{animation:none}}
 
+
+/* Subtle warm notes and link tone shared with the main coffee-themed portfolio. */
+.nav{border-bottom:1px solid var(--line)}
+.hero{position:relative}
+.hero h1{font-style:normal}
+.card.story{background:var(--panel)}
+.source[aria-pressed="true"]{background:#f3e5d6}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <nav class="nav"><div class="brand">Gayathri Namboodiri</div><a class="home" href="/">← Portfolio home</a></nav>
+  <nav class="nav"><div class="brand">Gayathri Namboodiri · Research &amp; coffee</div><a class="home" href="/#market">← Back to my story</a></nav>
 
   <header class="hero">
-    <div class="eyebrow">Project 01 / ML application</div>
+    <div class="eyebrow">From the project notebook / 02</div>
     <h1>Auto Market<br/>Assistant</h1>
     <p class="lead">Historical vehicle asking-price estimates and owner-review evidence answer two different questions. This project brings CatBoost, MiniLM and FAISS together behind a tested Python application, while evaluating the two tasks separately.</p>
     <p class="sub"><a href="https://github.com/gnambood/auto-market-assistant" target="_blank" rel="noopener noreferrer">Explore the Python project and tests on GitHub ↗</a></p>
