@@ -2,155 +2,116 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Gayathri Namboodiri — machine learning, data science and applied AI. Research, deployed systems and engineering case studies.">
-<meta name="theme-color" content="#f5f5f1">
-<title>Gayathri Namboodiri | Machine Learning & Data Science</title>
-<style>
-
-:root{color-scheme:light;--page:#f5f5f1;--paper:#fffefa;--ink:#1d2926;--muted:#52605a;--line:#d7ddd6;--accent:#275d4f;--deep:#20332e}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--page);color:var(--ink);font:16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-a{color:inherit;text-underline-offset:4px}
-a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
-.wrap{width:min(1160px,calc(100% - 48px));margin-inline:auto}
-nav{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:20px 0;border-bottom:1px solid var(--line)}
-.name{font-size:.96rem;font-weight:600;text-decoration:none;letter-spacing:0}
-.name-mark{font:500 .8rem/1.3 ui-monospace,"SFMono-Regular",Consolas,monospace;color:var(--accent);margin-right:12px}
-.links{display:flex;flex-wrap:wrap;gap:28px}
-.links a{font-size:.89rem;text-decoration:none;color:var(--muted)}
-.links a:hover,.project a:hover{color:var(--accent)}
-h1,h2,h3,p{margin-top:0}
-h1,h2{font-family:Georgia,"Times New Roman",serif;font-weight:400}
-h1{font-size:clamp(3.25rem,6vw,5.5rem);line-height:1.05;letter-spacing:-.04em;margin:18px 0 24px}
-h1 span{color:var(--ink);text-decoration:underline;text-decoration-thickness:3px;text-decoration-color:#9abcae;text-underline-offset:.13em}
-h2{font-size:clamp(2.1rem,3.5vw,3.1rem);line-height:1.17;letter-spacing:-.025em;margin-bottom:12px}
-h3{font-weight:600;letter-spacing:-.015em}
-.eyebrow,.number,.evidence-meta,.evidence-footer{font:500 .79rem/1.5 ui-monospace,"SFMono-Regular",Consolas,monospace;letter-spacing:.01em;color:var(--accent)}
-.hero{display:grid;grid-template-columns:minmax(0,1.06fr) minmax(310px,.94fr);align-items:center;gap:clamp(40px,6vw,88px);padding:90px 0 104px;border-bottom:1px solid var(--line)}
-.hero-copy{max-width:670px}
-.lead{font-size:1.12rem;color:var(--muted);max-width:580px;line-height:1.75;margin-bottom:30px}
-.actions{display:flex;flex-wrap:wrap;align-items:center;gap:18px}
-.action{display:inline-flex;align-items:center;min-height:44px;padding:10px 16px;text-decoration:none;font-weight:600;font-size:.92rem;border-radius:5px;border:1px solid transparent;transition:background-color .15s,color .15s}
-.action.primary{background:var(--deep);color:#fff}
-.action.primary:hover{background:#35554b}
-.action.secondary{background:transparent;border-color:var(--line);color:var(--ink)}
-.action.secondary:hover{background:#e8ede7}
-.skills-line{margin:24px 0 0;color:var(--muted);font-size:.84rem;letter-spacing:.01em}
-.evidence{background:var(--deep);color:#f3f5ef;padding:30px;min-height:380px;display:flex;flex-direction:column;border-radius:6px}
-.evidence-meta{color:#b9d1c6;display:flex;justify-content:space-between;gap:12px}
-.evidence h2{color:#f4f6f1;font-size:clamp(1.75rem,2.4vw,2.3rem);line-height:1.25;margin:38px 0 24px}
-.evidence-stats{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:0 0 26px}
-.evidence-stats div{border-top:1px solid #50655e;padding-top:14px}
-.evidence-stats dt{color:#bccbc2;font-size:.82rem}
-.evidence-stats dd{margin:4px 0 0;font:500 2.1rem/1.15 Georgia,serif;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
-.evidence-track{margin-top:auto}
-.evidence-track-head{display:flex;justify-content:space-between;gap:14px;font-size:.84rem}
-.evidence-track-head strong{font-weight:500;font-variant-numeric:tabular-nums}
-.evidence-track .track{height:8px;background:#495d55;margin:12px 0 10px}
-.evidence-track .fill{width:84.9%;height:100%;background:#a6ccbc}
-.evidence-footer{color:#b9d1c6;font-size:.72rem;margin:0}
-.evidence-footer a:hover{color:#fff}
-section{padding:72px 0;border-bottom:1px solid var(--line)}
-.intro{max-width:720px;color:var(--muted);margin-bottom:40px}
-.project-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 40px}
-.project{padding:24px 0 0;border-top:1px solid #b6c4bc;min-width:0}
-.project.featured{grid-column:1/-1;background:var(--paper);padding:32px;border:1px solid var(--line)}
-.project .number{color:var(--accent)}
-.project h3{font-size:1.48rem;line-height:1.25;margin:13px 0 12px}
-.project.featured h3{font-family:Georgia,serif;font-weight:400;font-size:2rem}
-.project p{color:var(--muted);line-height:1.72}
-.project a{font-weight:600;color:var(--accent);text-decoration-thickness:1px}
-.stats{display:flex;flex-wrap:wrap;margin:26px 0;gap:0}
-.stat{padding:0 24px 0 0;margin:0 24px 12px 0;border-right:1px solid var(--line);min-width:100px}
-.stat:last-child{border-right:none}
-.stat b{display:block;font:500 1.65rem/1.25 Georgia,serif;font-variant-numeric:tabular-nums;color:var(--ink)}
-.stat span{font-size:.76rem;color:var(--muted);line-height:1.4}
-.note{font-size:.84rem;color:var(--muted);margin-top:20px;max-width:80ch}
-.columns{display:grid;grid-template-columns:1fr 1fr;gap:64px}
-.panel{border-top:1px solid var(--line);padding-top:20px}
-.panel h3{margin-bottom:12px}
-.panel p{color:var(--muted)}
-.stack{display:flex;flex-wrap:wrap;gap:8px}
-.stack span{border-bottom:1px solid #b6c4bc;padding:6px 2px;color:var(--ink);font-size:.9rem;margin-right:13px}
-.timeline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}
-.job{border-top:1px solid var(--line);padding:20px 0 0}
-.job h3{font-size:1.02rem;line-height:1.4;margin:10px 0 0}
-.job small{font:500 .78rem/1.5 ui-monospace,monospace;color:var(--accent)}
-.job p{color:var(--muted);font-size:.92rem;margin:12px 0 0}
-#contact{padding-bottom:76px}
-.contact{padding:32px 0 0;border-top:2px solid var(--deep)}
-.contact h2{margin:12px 0}
-.contact .intro{margin-bottom:26px}
-footer{padding:28px 0 36px;color:var(--muted);font-size:.82rem}
-@media(max-width:900px){.hero{gap:40px}.evidence{padding:24px}.timeline{grid-template-columns:1fr 1fr}}
-@media(max-width:740px){.wrap{width:min(100% - 32px,1160px)}nav{align-items:flex-start;flex-direction:column;gap:16px}.links{gap:20px}.hero{grid-template-columns:1fr;padding:64px 0 76px}.evidence{min-height:330px}.project-grid,.columns,.timeline{grid-template-columns:1fr}.project.featured{grid-column:auto;padding:24px}.project-grid{gap:20px}.columns{gap:30px}.timeline{gap:22px}section{padding:52px 0}h1{font-size:clamp(3rem,11vw,4.5rem)}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.action{transition:none}}
-
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f5ebdd">
+<meta name="description" content="Gayathri Namboodiri — curious, creative and analytical. Machine learning, data science, computer vision, and a good cup of coffee.">
+<title>Gayathri Namboodiri | Data, AI & a little coffee</title>
+<link rel="preload" href="/assets/gayathri-coffee-portrait.png" as="image" type="image/png">
+<link rel="stylesheet" href="/styles/coffee.css">
 </head>
 <body>
-<div class="wrap">
-<nav aria-label="Primary navigation"><a class="name" href="/" aria-label="Gayathri Namboodiri home"><span class="name-mark">GN/</span> Gayathri Namboodiri</a><div class="links"><a href="#work">Projects</a><a href="#about">About</a><a href="#experience">Experience</a><a href="#contact">Contact</a></div></nav>
+<nav class="nav shell" aria-label="Primary navigation">
+  <a class="brand" href="#home" aria-label="Gayathri Namboodiri, home"><span>GN</span>Gayathri Namboodiri</a>
+  <div class="nav-links"><a href="#work">Work</a><a href="#about">About me</a><a href="#experience">Experience</a><a href="#contact" class="nav-contact">Let's talk</a></div>
+</nav>
 <main>
-<header class="hero">
-<div class="hero-copy">
-<div class="eyebrow">Gayathri Namboodiri / Machine learning engineer</div>
-<h1>I build ML systems and <span>show the work.</span></h1>
-<p class="lead">MEng graduate from Western University. I work across model evaluation, Python data pipelines, computer vision and deployment, building on several years of enterprise IT experience.</p>
-<div class="actions"><a class="action primary" href="#work">View selected projects</a><a class="action secondary" href="https://github.com/gnambood" target="_blank" rel="noopener noreferrer">GitHub profile</a></div>
-<p class="skills-line">Python · PyTorch · CatBoost · SQL · FastAPI · AWS</p>
-</div>
-<aside class="evidence" aria-labelledby="evidence-title">
-<div class="evidence-meta"><span>Case note / 01</span><span>Saved evaluation</span></div>
-<h2 id="evidence-title">Historical vehicle pricing, measured on a chronological holdout</h2>
-<dl class="evidence-stats">
-<div><dt>Test mean absolute error</dt><dd>$2,866</dd></div>
-<div><dt>Test R²</dt><dd>0.883</dd></div>
-</dl>
-<div class="evidence-track">
-<div class="evidence-track-head"><span>Predictions within ±$5,000</span><strong>84.9%</strong></div>
-<div class="track" role="img" aria-label="84.9 percent of test predictions were within 5,000 dollars of the listed asking price"><div class="fill"></div></div>
-<p class="evidence-footer">238,959 historical listings · <a href="https://github.com/gnambood/auto-market-assistant/blob/main/MODEL_CARD.md">Model card and evaluation limits</a></p>
-</div>
-</aside>
-</header>
-<section id="work" aria-labelledby="work-title">
-<div class="eyebrow">01 / Selected work</div><h2 id="work-title">Projects and evidence</h2>
-<p class="intro">A used-vehicle ML application, RGB/IR research, and a security classification experiment. Each has a different evaluation boundary.</p>
-<div class="project-grid">
-<article class="project featured">
-<div class="number">01 / Used-vehicle ML application</div><h3>Auto Market Assistant</h3>
-<p>Historical vehicle asking-price estimation with CatBoost, owner-review retrieval using MiniLM and FAISS, reusable Parquet ETL, and a FastAPI service previously deployed with Docker and AWS ECS (compute currently paused to control costs). Optional Qwen 2.5 generation was evaluated separately; the deployed service deliberately runs in retrieval-only mode.</p>
-<div class="stats"><div class="stat"><b>$2,866</b><span>chronological test MAE</span></div><div class="stat"><b>0.883</b><span>test R²</span></div><div class="stat"><b>70,665</b><span>matched owner reviews</span></div></div>
-<p><a href="/auto-market-assistant.html">Explore interactive saved-result demo</a> · <a href="https://github.com/gnambood/auto-market-assistant">Source &amp; technical documentation</a> · <a href="https://github.com/gnambood/auto-market-assistant/blob/main/MARKET_INTELLIGENCE.md">Historical market trends</a></p>
-<div class="note">The interactive demo replays saved model outputs; it does not run live inference. Price estimates reflect historical 2021 Craigslist asking prices, not current valuations or completed sales.</div>
-</article>
-<article class="project">
-<div class="number">02 / Graduate research</div><h3>Driver Impairment Classification</h3>
-<p>Explored TimeSformer, Video Swin and ViViT during model development. Final retained work includes reference-free RGB/IR TimeSformer and a separate personalized VideoMAE pipeline, with participant-separated evaluation and reproducibility records.</p>
-<div class="stats"><div class="stat"><b>76.02%</b><span>reference-free TimeSformer accuracy</span></div><div class="stat"><b>57</b><span>participants in final cohort</span></div></div>
-<div class="note">Manuscript in preparation. Research code is private; results are from the retained evaluation artifacts, with documented reproduction limits.</div>
-</article>
-<article class="project">
-<div class="number">03 / Security classification</div><h3>Insider Threat Detection</h3>
-<p>Built activity-based features from simulated enterprise security logs and compared Logistic Regression, an RBF SVM and Random Forest for insider-threat classification.</p>
-<div class="stats"><div class="stat"><b>99.04%</b><span>saved notebook Random Forest accuracy</span></div><div class="stat"><b>0.97</b><span>saved notebook macro-F1</span></div></div>
-<p><a href="https://github.com/gnambood/Insider_Threat_Detection">Inspect experiment notebook</a></p>
-<div class="note">Exploratory notebook result; evaluation and leakage audit remains outstanding, so this is not a deployed threat-detection product.</div>
-</article>
-</div>
-</section>
-<section id="about"><div class="eyebrow">02 / Practice</div><h2>How I approach the work</h2>
-<div class="columns"><div class="panel"><h3>Engineering</h3><p>I care about clear experiments, defensible evaluation, reusable transformations and explainable limitations. My project work spans tabular models, retrieval, computer vision, APIs, data validation and deployment.</p></div>
-<div class="panel"><h3>Tools I use</h3><div class="stack"><span>Python</span><span>SQL</span><span>pandas</span><span>NumPy</span><span>scikit-learn</span><span>CatBoost</span><span>PyTorch</span><span>FAISS</span><span>Docker</span><span>AWS S3 / ECS / Athena</span><span>FastAPI</span><span>GitHub Actions</span><span>Power BI</span></div></div></div>
-</section>
-<section id="experience"><div class="eyebrow">03 / Experience</div><h2>Research and operations</h2>
-<div class="timeline"><article class="job"><small>2026</small><h3>Graduate Research Student · AiX Lab, Western University</h3><p>RGB/IR facial video preprocessing, participant-aware splits, spatiotemporal model experiments and documented evaluation.</p></article>
-<article class="job"><small>2023–2025</small><h3>Customer Liaison · Execulink Telecom</h3><p>Investigated ISP and customer technology issues, coordinated escalations and worked across teams toward resolution.</p></article>
-<article class="job"><small>2019–2022</small><h3>Assistant Manager, Mobile Device Management · South Indian Bank</h3><p>Supported an enterprise mobility program across more than 7,000 devices, including compliance reporting, device security, audit readiness and team coordination.</p></article></div>
-</section>
-<section id="contact"><div class="contact"><div class="eyebrow">04 / Contact</div><h2>Let's connect</h2><p class="intro">Based in Ontario, Canada. Interested in machine learning engineering, data science and related applied-AI roles.</p><div class="actions"><a class="action primary" href="mailto:gayathripnambu@gmail.com">Email me</a><a class="action secondary" href="https://www.linkedin.com/in/gayathripn/">LinkedIn</a><a class="action secondary" href="https://github.com/gnambood">GitHub</a></div></div></section>
-</main><footer>© Gayathri Namboodiri · Engineering evidence and source links live in the canonical project repositories.</footer>
-</div></body></html>
+  <header class="hero shell" id="home">
+    <div class="hero-copy">
+      <div class="eyebrow">London, Ontario · Machine learning & data science</div>
+      <h1>Hi, I'm Gayathri.<br>I turn data into <em>stories worth telling.</em></h1>
+      <p class="lede">Curious by nature, analytical by training, and creative in how I solve problems. I work across machine learning, computer vision and data engineering, turning complex ideas into useful, well-tested systems.</p>
+      <div class="actions"><a class="primary" href="#work">Explore my work <span aria-hidden="true">↘</span></a><a class="text-link" href="mailto:gayathripnambu@gmail.com">Say hello <span aria-hidden="true">↗</span></a></div>
+      <div class="traits" aria-label="Personal qualities"><span>Curious</span><i aria-hidden="true">✦</i><span>Creative</span><i aria-hidden="true">✦</i><span>Analytical</span></div>
+    </div>
+    <div class="portrait-wrap" aria-label="Illustrated portrait of Gayathri">
+      <div class="portrait-ring" aria-hidden="true"></div>
+      <div class="portrait-stage"><img src="/assets/gayathri-coffee-portrait.png" alt="Illustration of Gayathri smiling at her laptop with a coffee cup, notebook and data charts" width="1118" height="1407" fetchpriority="high"></div>
+      <div class="steam" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="coffee-note"><span aria-hidden="true">☕</span>Currently brewing<br><strong>ideas into insights</strong></div>
+    </div>
+  </header>
+
+  <div class="ticker" aria-label="Skills and interests">
+    <div class="ticker-track" aria-hidden="true">
+      <span>Python</span><i>✦</i><span>Machine learning</span><i>✦</i><span>Data storytelling</span><i>✦</i><span>Computer vision</span><i>✦</i><span>Photography</span><i>✦</i><span>Good coffee</span><i>✦</i>
+      <span>Python</span><i>✦</i><span>Machine learning</span><i>✦</i><span>Data storytelling</span><i>✦</i><span>Computer vision</span><i>✦</i><span>Photography</span><i>✦</i><span>Good coffee</span><i>✦</i>
+    </div>
+  </div>
+
+  <section class="section shell" id="work" aria-labelledby="work-title">
+    <div class="section-top" data-reveal>
+      <div><p class="kicker">01 / Selected work</p><h2 class="section-heading" id="work-title">From raw data to<br><em>real answers.</em></h2></div>
+      <p class="section-intro">I like projects that ask interesting questions, demand careful evaluation, and end with something another person can explore.</p>
+    </div>
+    <div class="project-grid">
+      <article class="project featured" data-reveal>
+        <div>
+          <span class="project-number">01 · ML application / deployed architecture</span>
+          <h3>Auto Market Assistant</h3>
+          <p>What should a comparable used car cost, and what do its owners actually say? I built historical asking-price estimation with CatBoost and cited review retrieval with MiniLM and FAISS, supported by curated Parquet data, FastAPI, Docker and an AWS ECS deployment.</p>
+          <p>Optional Qwen 2.5 generation was evaluated separately. The deployed service uses retrieval-only answers and its cloud compute is currently paused. The portfolio demo explores saved model outputs without contacting AWS.</p>
+          <div class="project-links"><a href="/auto-market-assistant.html">Explore the interactive saved-result demo ↗</a><a href="https://github.com/gnambood/auto-market-assistant">Code and documentation ↗</a><a href="https://github.com/gnambood/auto-market-assistant/blob/main/MARKET_INTELLIGENCE.md">Historical market trends ↗</a></div>
+          <p class="note">Historical 2021 Craigslist asking prices, not current valuations or completed sale prices.</p>
+          <div class="journey"><span>Curate</span><b>→</b><span>Model</span><b>→</b><span>Retrieve</span><b>→</b><span>Validate</span><b>→</b><span>Serve</span></div>
+        </div>
+        <div class="metrics" aria-label="Auto Market Assistant evaluation">
+          <div class="metric"><strong>$2,866</strong><span>Price-estimation MAE · chronological test holdout</span></div>
+          <div class="metric"><strong>0.883</strong><span>Price-estimation test R²</span></div>
+          <div class="metric"><strong>70,665</strong><span>Matched owner reviews</span></div>
+        </div>
+      </article>
+
+      <article class="project" data-reveal>
+        <span class="project-number">02 · Graduate research / computer vision</span>
+        <h3>Driver Impairment Classification</h3>
+        <p>Can tiny changes in facial behaviour help distinguish impairment levels? At Western University's AiX Lab, I investigated synchronized RGB and infrared video, explored TimeSformer, Video Swin and ViViT, and retained separately evaluated TimeSformer and personalized VideoMAE research pipelines.</p>
+        <div class="metrics"><div class="metric"><strong>76.02%</strong><span>Reference-free TimeSformer accuracy</span></div><div class="metric"><strong>57</strong><span>Participants in final cohort</span></div></div>
+        <p class="note">Manuscript in preparation. Research code is private, with detailed reproducibility and evaluation limits recorded in the project.</p>
+      </article>
+
+      <article class="project" data-reveal>
+        <span class="project-number">03 · Security analytics / machine learning</span>
+        <h3>Insider Threat Detection</h3>
+        <p>What happens when suspicious activity is scattered across many logs? I developed behaviour-based features from simulated enterprise records and compared Logistic Regression, RBF SVM and Random Forest to investigate insider-risk classification.</p>
+        <div class="metrics"><div class="metric"><strong>99.04%</strong><span>Saved notebook Random Forest accuracy</span></div><div class="metric"><strong>0.97</strong><span>Saved notebook macro-F1</span></div></div>
+        <div class="project-links"><a href="https://github.com/gnambood/Insider_Threat_Detection">Explore the experiment ↗</a></div>
+        <p class="note">Exploratory notebook result. Independent evaluation and leakage audit are outstanding.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section shell" id="about" aria-labelledby="about-title">
+    <div class="section-top" data-reveal><div><p class="kicker">02 / Beyond the datasets</p><h2 class="section-heading" id="about-title">A little more<br><em>about me.</em></h2></div><p class="section-intro">I care as much about how a problem is understood and explained as I do about the model that solves it.</p></div>
+    <div class="about-grid">
+      <div class="about-copy" data-reveal>
+        <p>I'm an MEng graduate from Western University with a background in enterprise IT, technical support and operations. <strong>I enjoy finding the thread that connects messy information, human needs and practical solutions.</strong></p>
+        <p>Outside data and AI, you'll often find me <strong>photographing moments, designing something, organizing an event, hunting for good coffee, or watching a movie.</strong> That creative side comes with me into the way I work.</p>
+        <div class="tools"><span>Python</span><span>PyTorch</span><span>SQL</span><span>scikit-learn</span><span>CatBoost</span><span>FAISS</span><span>FastAPI</span><span>Docker</span><span>AWS</span><span>Power BI</span></div>
+      </div>
+      <aside class="personal-card" data-reveal>
+        <p class="kicker">A few things I enjoy</p><h3>Not everything has to be a dataset.</h3>
+        <div class="interests"><span>Photography</span><span>Design</span><span>Events</span><span>Good coffee</span><span>Movies</span></div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section shell" id="experience" aria-labelledby="experience-title">
+    <div class="section-top" data-reveal><div><p class="kicker">03 / The journey</p><h2 class="section-heading" id="experience-title">Research meets<br><em>real-world experience.</em></h2></div><p class="section-intro">Technical problem-solving, customer communication, and enterprise-scale systems taught me to look beyond model metrics.</p></div>
+    <div class="timeline">
+      <article class="job" data-reveal><time>2026</time><h3>Graduate Research · AiX Lab, Western University</h3><p>RGB/IR facial-video processing, video transformer experiments, participant-aware splits and reproducible evaluation.</p></article>
+      <article class="job" data-reveal><time>2023–2025</time><h3>Customer Liaison · Execulink Telecom</h3><p>Investigated ISP issues, supported customers, coordinated escalations and worked across teams toward faster resolution.</p></article>
+      <article class="job" data-reveal><time>2019–2022</time><h3>Assistant Manager, Mobile Device Management · South Indian Bank</h3><p>Enterprise mobility and compliance reporting across more than 7,000 devices, including audit readiness and team coordination.</p></article>
+    </div>
+  </section>
+
+  <section class="contact-section" id="contact" aria-labelledby="contact-title">
+    <div class="shell contact-inner" data-reveal>
+      <div><p class="kicker">04 / Let's connect</p><h2 id="contact-title">Have an interesting problem?<br><em>Let's brew some ideas.</em></h2><p>I'm exploring opportunities in machine learning, data science and related engineering roles across Canada. I would love to hear about a project or team where I can contribute.</p></div>
+      <div class="contact-links"><a href="mailto:gayathripnambu@gmail.com">Email me ↗</a><a href="https://www.linkedin.com/in/gayathripn/">LinkedIn ↗</a><a href="https://github.com/gnambood">GitHub ↗</a></div>
+    </div>
+  </section>
+</main>
+<footer class="footer shell"><span>© Gayathri Namboodiri · Made with curiosity and coffee.</span><span>Project code and technical documentation live in their canonical repositories.</span></footer>
+<script src="/scripts/coffee-motion.js" defer></script>
+</body>
+</html>
