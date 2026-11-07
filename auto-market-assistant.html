@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="description" content="Auto Market Assistant — a Python ML application for historical vehicle asking prices and cited owner-review evidence." />
 <meta name="theme-color" content="#f5ebdd" />
+<meta property="og:title" content="Auto Market Assistant | Gayathri Namboodiri" />
+<meta property="og:description" content="An evidence-led case study on vehicle pricing, owner-review retrieval, and the decisions behind an ML application." />
 <title>Auto Market Assistant | Gayathri Namboodiri</title>
 <style>
 
@@ -129,17 +131,52 @@ a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(
 .hero h1{font-style:normal}
 .card.story{background:var(--panel)}
 .source[aria-pressed="true"]{background:#f3e5d6}
+
+/* Shared coffee portfolio chrome: same design language as the homepage. */
+.case-nav{min-height:82px;display:flex;align-items:center;justify-content:space-between;gap:24px;border-bottom:1px solid var(--line)}
+.case-brand{font-family:Georgia,"Times New Roman",serif;font-size:1.15rem;font-weight:bold;letter-spacing:-.025em;text-decoration:none;color:var(--text)}
+.case-brand span{color:var(--accent2);margin-right:8px}
+.case-navlinks{display:flex;gap:24px;flex-wrap:wrap}
+.case-navlinks a{font-size:.88rem;text-decoration:none;color:#59473e}
+.case-navlinks a:hover,.case-navlinks a[aria-current="page"]{color:var(--accent2)}
+.case-progress{position:fixed;top:0;left:0;width:100%;height:3px;background:var(--accent2);transform:scaleX(0);transform-origin:left;z-index:100}
+.case-hero-note{font:italic 1rem/1.5 Georgia,serif;color:var(--accent);margin-top:26px}
+.case-ticker{background:#34241f;color:#f5ebdd;overflow:hidden;white-space:nowrap;font:500 .76rem/1.4 Consolas,monospace;letter-spacing:.09em;padding:15px 0;margin:0 calc(50% - 50vw)}
+.case-ticker-track{width:max-content;animation:case-ticker 42s linear infinite}
+.case-ticker-track span{padding-right:55px}
+.case-ticker-track i{color:#d6a784;font-style:normal;padding:0 24px}
+@keyframes case-ticker{to{transform:translateX(-50%)}}
+.case-contact{background:#34241f;color:#f5ebdd;padding:74px max(24px,calc((100vw - 1120px)/2));margin:34px calc(50% - 50vw) 0}
+.case-contact .eyebrow{color:#d7ab84}
+.case-contact h2{font:400 clamp(2.5rem,5vw,4.5rem)/1.15 Georgia,serif;letter-spacing:-.04em;margin:18px 0}
+.case-contact p{color:#e0cbbc;max-width:650px}
+.case-contact-links{display:flex;flex-wrap:wrap;gap:16px;margin-top:28px}
+.case-contact-links a{display:inline-flex;min-height:44px;align-items:center;padding:10px 19px;border:1px solid #b69c86;border-radius:5px;color:#fffaf3;text-decoration:none;font-weight:600;font-size:.9rem}
+.case-contact-links a:first-child{background:#f5ebdd;color:#34241f;border-color:#f5ebdd}
+.case-contact-links a:hover{transform:translateY(-2px)}
+.case-footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.case-footer a{color:var(--accent)}
+.case-reveal{animation:case-rise .7s ease both}
+@keyframes case-rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.embed-mode .case-nav,.embed-mode .case-ticker,.embed-mode .case-contact,.embed-mode .case-progress{display:none!important}
+@media(max-width:650px){.case-nav{min-height:76px;align-items:flex-start;flex-direction:column;gap:12px;padding:15px 0}.case-navlinks{gap:15px}.case-navlinks a{font-size:.82rem}.case-contact{padding:60px 24px}}
+@media(prefers-reduced-motion:reduce){.case-ticker-track{animation:none}.case-reveal{animation:none}.case-contact-links a:hover{transform:none}}
 </style>
 </head>
 <body>
+<div class="case-progress" id="caseProgress" aria-hidden="true"></div>
 <div class="wrap">
-  <nav class="nav"><div class="brand">Gayathri Namboodiri · Research &amp; coffee</div><a class="home" href="/#market">← Back to my story</a></nav>
+  <nav class="case-nav" aria-label="Main navigation">
+    <a class="case-brand" href="/"><span>GN.</span> Gayathri Namboodiri</a>
+    <div class="case-navlinks"><a href="/#story">My story</a><a href="/#work">Projects</a><a href="/#experience">Experience</a><a href="/#contact">Say hello</a></div>
+  </nav>
 
-  <header class="hero">
-    <div class="eyebrow">From the project notebook / 02</div>
+  <header class="hero case-reveal">
+    <div class="eyebrow">02 / From the project notebook · An ML engineering story</div>
     <h1>Auto Market<br/>Assistant</h1>
     <p class="lead">Historical vehicle asking-price estimates and owner-review evidence answer two different questions. This project brings CatBoost, MiniLM and FAISS together behind a tested Python application, while evaluating the two tasks separately.</p>
     <p class="sub"><a href="https://github.com/gnambood/auto-market-assistant" target="_blank" rel="noopener noreferrer">Explore the Python project and tests on GitHub ↗</a></p>
+    <p class="case-hero-note">One project, two questions, and quite a few lessons along the way. ☕</p>
     <div class="hero-grid">
       <div class="card story">
         <h3>One purchase. Two different questions.</h3>
@@ -157,6 +194,7 @@ a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(
     </div>
   </header>
 
+  <div class="case-ticker" aria-hidden="true"><div class="case-ticker-track"><span>CATBOOST <i>✳</i> OWNER REVIEWS <i>✳</i> DATA QUALITY <i>✳</i> EVIDENCE <i>✳</i> PYTHON <i>✳</i> COFFEE <i>✳</i></span><span>CATBOOST <i>✳</i> OWNER REVIEWS <i>✳</i> DATA QUALITY <i>✳</i> EVIDENCE <i>✳</i> PYTHON <i>✳</i> COFFEE <i>✳</i></span></div></div>
   <section class="section" id="demo">
     <div class="eyebrow">Saved evaluation / Browser preview</div>
     <h2>Inspect a saved model result</h2>
@@ -223,8 +261,15 @@ a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(
       <p class="sub">This showcase uses saved 2021 Craigslist asking-price results and recorded review evidence, not real-time predictions. The actual FastAPI service has been deployed on AWS ECS, but cloud inference is currently paused to control costs. Optional Qwen 2.5 generation was evaluated separately; the deployed service runs in retrieval-only mode when active.</p>
     </div>
   </section>
-  <footer class="footer"><strong>Auto Market Assistant</strong> — end-to-end ML application by Gayathri Namboodiri.<br/>CatBoost • MiniLM • FAISS • FastAPI • Docker • Parquet • AWS (compute paused) · <a href="https://github.com/gnambood/auto-market-assistant" target="_blank" rel="noopener noreferrer">Source code</a></footer>
+  <section class="case-contact" aria-labelledby="case-contact-title">
+    <div class="eyebrow">03 / Keep the conversation going</div>
+    <h2 id="case-contact-title">Want to talk about the work behind the model?</h2>
+    <p>I love talking through the choices, false starts and practical engineering that turn an experiment into something useful. Coffee is optional.</p>
+    <div class="case-contact-links"><a href="mailto:gayathripnambu@gmail.com">Say hello</a><a href="https://www.linkedin.com/in/gayathripn/">Connect on LinkedIn</a><a href="/#work">See more of my work</a></div>
+  </section>
+  <footer class="footer case-footer"><span><strong>Gayathri Namboodiri</strong> · Built with curiosity &amp; coffee.</span><span><a href="/">Back to portfolio</a> · <a href="https://github.com/gnambood/auto-market-assistant">Project source</a></span></footer>
 </div>
 <script src="./scripts/auto-market-demo.js" defer></script>
+<script defer src="./scripts/case-study-motion.js"></script>
 </body>
 </html>
