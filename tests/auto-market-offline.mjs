@@ -84,6 +84,35 @@ try {
   }));
   assert(width.content <= width.viewport + 4, JSON.stringify(width));
 
+
+  // The design pass must retain a calm presentation and a working homepage.
+  const visual = await page.evaluate(() => ({
+    scheme: getComputedStyle(document.documentElement).colorScheme,
+    body: getComputedStyle(document.body).backgroundColor,
+    demo: getComputedStyle(document.querySelector(".demo")).backgroundImage,
+    button: getComputedStyle(document.querySelector("#runDemo")).backgroundImage
+  }));
+  assert.equal(visual.scheme, "light");
+  assert.equal(visual.body, "rgb(245, 245, 241)");
+  assert.equal(visual.demo, "none");
+  assert.equal(visual.button, "none");
+
+  await page.goto(base + "/index.html");
+  assert.match(await page.locator(".hero h1").innerText(), /show the work/);
+  assert.match(await page.locator(".evidence-track-head").innerText(), /84.9%/);
+  assert.equal(await page.locator(".evidence-stats dd").count(), 2);
+  assert.equal(await page.locator(".project").count(), 3);
+  assert.equal(await page.locator('a[href="/auto-market-assistant.html"]').count(), 1);
+  const homeViewport = await page.evaluate(() => ({
+    width: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+    canvas: getComputedStyle(document.body).backgroundColor,
+    evidence: getComputedStyle(document.querySelector(".evidence")).backgroundImage
+  }));
+  assert(homeViewport.scrollWidth <= homeViewport.width + 4, JSON.stringify(homeViewport));
+  assert.equal(homeViewport.canvas, "rgb(245, 245, 241)");
+  assert.equal(homeViewport.evidence, "none");
+
   assert.deepEqual(errors, [], "Client-side exceptions are not allowed");
   assert(
     network.every(url => url.startsWith(base + "/")),

@@ -3,16 +3,125 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<meta name="description" content="Auto Market Assistant — used-car price estimation and grounded owner-review RAG by Gayathri Namboodiri." />
+<meta name="description" content="Auto Market Assistant — a Python ML application for historical vehicle asking prices and cited owner-review evidence." />
+<meta name="theme-color" content="#f5f5f1" />
 <title>Auto Market Assistant | Gayathri Namboodiri</title>
 <style>
-.compare-control{border-top:1px solid var(--line);margin-top:22px;padding-top:18px}.compare-control label,#metrics label{display:block;color:var(--muted);font-size:.82rem;margin-bottom:8px}.compare-control select,#metricFocus{background:#0a2032;border:1px solid #436882;border-radius:10px;padding:10px;color:var(--text);font:inherit;width:100%}#benchmarkDifference{color:var(--accent);font-size:1.65rem;display:block}.source{color:var(--text);font:inherit;text-align:left;cursor:pointer;width:100%}.source[aria-pressed=true]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}.source-detail{font-size:.83rem;color:var(--muted);padding:14px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;margin-top:12px}.barplot{margin:18px 0}.bar-row{margin:11px 0}.bar-head{display:flex;justify-content:space-between;gap:12px;font-size:.87rem}.metric-track{background:#223a55;border-radius:90px;height:13px;overflow:hidden;margin-top:5px}.metric-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:90px}.btn:disabled{opacity:.5;cursor:wait}.verified{color:var(--good)}.compare-control p{margin:12px 0 0}
 
-:root{--bg:#07111f;--panel:#0d1b2a;--panel2:#10243a;--text:#eef6ff;--muted:#9db0c8;--line:#213b56;--accent:#63e6be;--accent2:#7aa2ff;--warn:#ffd166;--good:#7ee787;--shadow:0 18px 60px rgba(0,0,0,.28)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% 0%,#102845 0,#07111f 38%,#050b14 100%);color:var(--text);line-height:1.55}
-a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justify-content:space-between;align-items:center;padding:22px 0}.brand{font-weight:800;letter-spacing:.02em}.home{color:var(--muted);text-decoration:none;font-size:.95rem}.hero{padding:72px 0 42px}.eyebrow{color:var(--accent);font-weight:800;text-transform:uppercase;letter-spacing:.14em;font-size:.78rem}.hero h1{font-size:clamp(2.7rem,7vw,6rem);line-height:.96;letter-spacing:-.055em;margin:.35em 0 .3em;max-width:950px}.lead{font-size:clamp(1.05rem,2vw,1.35rem);color:var(--muted);max-width:800px}.hero-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:24px;margin-top:42px}.card{background:linear-gradient(180deg,rgba(16,36,58,.9),rgba(8,22,36,.96));border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}.story{padding:28px}.story h3{margin:0 0 18px}.twoq{display:grid;grid-template-columns:1fr 1fr;gap:14px}.q{padding:18px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.025)}.q b{display:block;font-size:1.1rem;margin-bottom:6px}.q span{color:var(--muted)}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:18px}.metric{padding:18px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid var(--line)}.metric strong{display:block;font-size:1.7rem;letter-spacing:-.03em}.metric span{color:var(--muted);font-size:.9rem}.section{padding:66px 0}.section h2{font-size:clamp(2rem,4vw,3.5rem);letter-spacing:-.04em;margin:0 0 12px}.section-intro{color:var(--muted);max-width:760px;margin-bottom:30px}.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.step{padding:18px 16px;text-align:center;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.025);position:relative}.step small{display:block;color:var(--accent);font-weight:800;margin-bottom:8px}.step b{font-size:.95rem}.step:not(:last-child):after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--accent2);font-weight:900;z-index:4}.demo{padding:28px}.demo-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.tag{font-size:.8rem;padding:6px 10px;border-radius:99px;background:rgba(99,230,190,.1);border:1px solid rgba(99,230,190,.35);color:var(--accent);white-space:nowrap}.controls{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0 14px}.control{padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:#081522}.control label{display:block;color:var(--muted);font-size:.75rem;margin-bottom:5px}.control select,.control input{width:100%;background:transparent;color:var(--text);border:0;outline:0;font:inherit;font-weight:800}.control select{appearance:auto}.control select option{background:#0d1b2a;color:var(--text)}.control input::placeholder{color:#6f8399;font-weight:600}.custom-question{display:none;grid-column:span 2}.control strong{font-size:.97rem}.demo-mode{margin:8px 0 4px;color:var(--muted);font-size:.82rem}.prompt{display:flex;gap:12px;margin-top:12px}.prompt-box{flex:1;padding:15px 16px;border:1px solid var(--line);border-radius:14px;background:#081522;color:#d9e8f6}.btn{border:0;border-radius:14px;background:linear-gradient(135deg,var(--accent),#43c7ff);color:#04101a;font-weight:900;padding:0 22px;cursor:pointer;min-height:52px}.btn:hover{filter:brightness(1.04)}.progress{height:4px;background:#10243a;border-radius:99px;overflow:hidden;margin:18px 0 0}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 1.5s ease}.results{display:none;margin-top:24px}.results.show{display:block;animation:rise .45s ease}@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}.result-grid{display:grid;grid-template-columns:.82fr 1.18fr;gap:16px}.price-card,.review-card{padding:22px;border:1px solid var(--line);border-radius:20px;background:#081522}.big-price{font-size:3rem;line-height:1;font-weight:900;letter-spacing:-.055em;margin:12px 0 8px}.sub{color:var(--muted)}.gauge{position:relative;height:12px;border-radius:99px;background:linear-gradient(90deg,#3d71ff,#63e6be,#ffd166);margin:28px 5px 8px}.pin{position:absolute;top:-8px;left:27%;height:28px;width:3px;background:#fff;border-radius:3px}.pin:after{content:attr(data-label);position:absolute;top:30px;left:50%;transform:translateX(-50%);font-size:.73rem;white-space:nowrap;color:#fff}.range{display:flex;justify-content:space-between;color:var(--muted);font-size:.78rem}.review-card h3{margin-top:0}.answer{font-size:1.02rem;white-space:pre-line}.suggestion{display:none;margin-top:14px;padding:13px 14px;border:1px solid rgba(99,230,190,.32);border-radius:13px;background:rgba(99,230,190,.06);color:#d9e8f6}.suggestion.show{display:block}.suggestion b{color:var(--accent)}.sources{display:grid;gap:9px;margin-top:16px}.source{padding:12px;border-radius:13px;background:rgba(255,255,255,.03);border:1px solid var(--line);font-size:.88rem}.source b{color:var(--accent)}.source-meta{color:var(--muted);font-size:.78rem;margin-top:4px}.source-excerpt{margin-top:8px;line-height:1.5;color:#d9e8f6}.verified{display:inline-flex;align-items:center;gap:7px;color:var(--good);font-weight:800;font-size:.84rem;margin-top:14px}.tabs{display:flex;gap:8px;margin-top:22px;flex-wrap:wrap}.tab{background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:8px 13px;cursor:pointer}.tab.active{color:#04101a;background:var(--accent);border-color:var(--accent)}.tabpane{display:none;margin-top:14px;padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}.tabpane.active{display:block}.mini-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.node{padding:9px 11px;border-radius:11px;background:#0d1b2a;border:1px solid var(--line);font-size:.84rem}.arrow{color:var(--accent2)}.metric-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.metric-strip .metric{text-align:center}.metric-strip strong{font-size:1.55rem}.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.phase{padding:20px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.025)}.phase .n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#04101a;font-weight:900;margin-bottom:12px}.phase p{color:var(--muted);font-size:.91rem;margin-bottom:0}.note{padding:18px 20px;border-left:3px solid var(--warn);background:rgba(255,209,102,.06);border-radius:12px;color:#d8e4f0}.footer{padding:45px 0 60px;color:var(--muted);border-top:1px solid var(--line);margin-top:40px}.footer strong{color:var(--text)}
-@media(max-width:900px){.hero-grid,.result-grid{grid-template-columns:1fr}.flow{grid-template-columns:1fr 1fr}.step:not(:last-child):after{display:none}.metric-strip{grid-template-columns:repeat(3,1fr)}.timeline{grid-template-columns:1fr 1fr}.controls{grid-template-columns:1fr 1fr}}
-.embed-mode body{background:#07111f}.embed-mode .nav,.embed-mode .hero,.embed-mode .section:not(#demo),.embed-mode .footer{display:none!important}.embed-mode #demo{padding:36px 0}.embed-mode .wrap{width:min(1120px,94vw)}\n@media(max-width:600px){.hero{padding-top:42px}.twoq,.flow,.controls,.metric-strip,.timeline{grid-template-columns:1fr}.prompt{flex-direction:column}.btn{min-height:50px}.demo-head{flex-direction:column}.metrics{grid-template-columns:1fr 1fr}.hero h1{font-size:3.3rem}}
+:root{color-scheme:light;--bg:#f5f5f1;--panel:#fffefa;--panel2:#ecefeb;--text:#1d2926;--muted:#52605a;--line:#d7ddd6;--accent:#275d4f;--accent2:#416f63;--warn:#7c5732;--good:#275d4f}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.62 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-underline-offset:4px}
+a:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{width:min(1120px,calc(100% - 48px));margin:0 auto}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px 0;border-bottom:1px solid var(--line)}
+.brand{font-weight:600;font-size:.95rem}
+.home{font-size:.9rem;text-decoration:none}
+.hero{padding:76px 0 70px;border-bottom:1px solid var(--line)}
+.eyebrow{font:500 .79rem/1.5 ui-monospace,"SFMono-Regular",Consolas,monospace;color:var(--accent);letter-spacing:0}
+.hero h1,.section h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.035em}
+.hero h1{font-size:clamp(3.4rem,7vw,6rem);line-height:1.04;margin:16px 0 24px;max-width:800px}
+.lead{color:var(--muted);font-size:1.1rem;max-width:800px;line-height:1.75}
+.hero .sub{font-size:.92rem;margin-top:22px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(270px,.65fr);gap:44px;margin-top:42px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:5px}
+.story{padding:28px}
+.story h3{margin:0 0 18px;font-size:1.1rem;font-weight:600}
+.twoq{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.q{border-top:1px solid var(--line);padding-top:16px}
+.q b{display:block;font-weight:600;font-size:1.02rem;margin-bottom:7px}
+.q span{color:var(--muted);font-size:.94rem}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;padding:24px}
+.metric{padding:14px 10px 14px 0;border-bottom:1px solid var(--line)}
+.metric strong{display:block;font:500 1.9rem/1.25 Georgia,serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.metric span{display:block;color:var(--muted);font-size:.78rem;line-height:1.4;margin-top:3px}
+.section{padding:72px 0;border-bottom:1px solid var(--line)}
+.section h2{font-size:clamp(2.15rem,4vw,3.3rem);line-height:1.18;margin:10px 0 18px}
+.section-intro{max-width:810px;color:var(--muted);margin-bottom:32px;line-height:1.72}
+.section-intro strong{font-weight:600;color:var(--text)}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.step{border-top:1px solid var(--line);padding:18px 12px 14px}
+.step small{display:block;color:var(--accent);font:500 .78rem ui-monospace,monospace;margin-bottom:12px}
+.step b{font-weight:600;font-size:.95rem}
+.demo{padding:32px}
+.demo-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.demo-head h3{font-size:1.4rem;font-weight:600}
+.demo-head .sub{max-width:670px;line-height:1.65;margin-top:8px}
+.tag{display:inline-block;flex:none;font:500 .72rem/1.2 ui-monospace,monospace;border:1px solid var(--line);border-radius:4px;color:var(--muted);padding:8px 10px;background:var(--panel2);white-space:nowrap}
+.controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:30px 0 16px}
+.control{min-width:0}
+.control label{display:block;color:var(--muted);font-size:.8rem;margin-bottom:7px}
+.control select,.control input,.compare-control select,#metricFocus{font:inherit;font-size:.93rem;width:100%;min-height:44px;background:#fff;color:var(--text);border:1px solid #bec9bf;border-radius:4px;padding:10px 12px}
+.control select option{background:#fff;color:var(--text)}
+.control input::placeholder{color:var(--muted)}
+.custom-question{display:none;grid-column:span 2}
+.demo-mode{font-size:.81rem;color:var(--muted);margin:12px 0}
+.prompt{display:flex;gap:14px;margin-top:16px}
+.prompt-box{flex:1;min-width:0;border:1px solid var(--line);background:var(--panel2);padding:14px 16px;border-radius:4px;color:var(--text)}
+.btn{flex:none;min-height:48px;padding:12px 18px;border:1px solid var(--accent);border-radius:4px;color:#fff;background:var(--accent);font-family:inherit;font-weight:600;font-size:.92rem;line-height:1.2;cursor:pointer}
+.btn:hover{background:#367464}
+.btn:disabled{opacity:.5;cursor:wait}
+.progress{height:4px;background:#e0e7df;margin-top:22px;overflow:hidden}
+.bar{height:100%;width:0;background:var(--accent);transition:width .75s ease}
+.results{display:none;margin-top:30px}
+.results.show{display:block;animation:rise .35s ease}
+@keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.result-grid{display:grid;grid-template-columns:minmax(0,.83fr) minmax(0,1.17fr);gap:20px}
+.price-card,.review-card{padding:24px;border:1px solid var(--line);border-radius:4px;background:#fff}
+.price-card{background:var(--panel2)}
+.big-price{font:500 3.1rem/1.1 Georgia,serif;font-variant-numeric:tabular-nums;letter-spacing:-.035em;margin:12px 0 8px}
+.sub{color:var(--muted)}
+.gauge{height:8px;position:relative;background:#d2ddd4;margin:34px 4px 18px}
+.pin{position:absolute;top:-7px;left:27%;height:22px;width:3px;background:var(--accent)}
+.pin:after{content:attr(data-label);position:absolute;top:25px;left:50%;transform:translateX(-50%);font-size:.74rem;white-space:nowrap;color:var(--text)}
+.range{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.8rem}
+.review-card h3{font-size:1.25rem;font-weight:600;margin-top:12px;line-height:1.35}
+.answer{font-size:.98rem;line-height:1.75;white-space:pre-line}
+.suggestion{display:none;margin-top:14px;padding:12px 14px;background:var(--panel2);border-left:2px solid var(--accent);color:var(--text)}
+.suggestion.show{display:block}
+.suggestion b{color:var(--accent)}
+.sources{display:grid;gap:10px;margin-top:18px}
+.source{width:100%;text-align:left;cursor:pointer;color:var(--text);background:#f5f6f2;border:1px solid var(--line);border-radius:4px;padding:12px 14px;font:inherit;font-size:.88rem}
+.source:hover,.source[aria-pressed=true]{border-color:var(--accent);background:#eaf1eb}
+.source b{color:var(--accent);font-weight:600}
+.source-meta{color:var(--muted);font-size:.78rem;margin-top:4px}
+.source-excerpt{margin-top:8px;line-height:1.55}
+.source-detail{font-size:.82rem;color:var(--muted);padding:12px;border-top:1px solid var(--line);margin-top:12px}
+.verified{display:inline-flex;align-items:center;gap:8px;color:var(--good);font-weight:600;font-size:.83rem;margin-top:16px}
+.compare-control{margin-top:24px;padding-top:18px;border-top:1px solid var(--line)}
+.compare-control label,#metrics label{display:block;color:var(--muted);font-size:.82rem;margin-bottom:8px}
+.compare-control p{margin:12px 0 0}
+#benchmarkDifference{color:var(--text);font:500 1.55rem Georgia,serif;display:block}
+.tabs{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;border-bottom:1px solid var(--line)}
+.tab{border:0;border-bottom:2px solid transparent;background:transparent;color:var(--muted);padding:12px 3px;margin-right:16px;font-family:inherit;font-weight:500;font-size:.9rem;line-height:1.3;cursor:pointer}
+.tab.active{border-bottom-color:var(--accent);color:var(--text)}
+.tabpane{display:none;margin-top:20px;padding:24px;background:var(--panel2);border-radius:4px}
+.tabpane.active{display:block}
+.mini-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.node{border:1px solid #cbd4cc;background:#fff;padding:8px 10px;font-size:.85rem;border-radius:3px}
+.arrow{color:var(--accent)}
+.metric-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.timeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.phase{border-top:1px solid var(--line);padding-top:18px}
+.phase .n{font:500 .81rem ui-monospace,monospace;color:var(--accent)}
+.phase p{font-size:.92rem;color:var(--muted)}
+.note{margin-top:18px;padding:16px 20px;border-left:2px solid #b69d78;background:#f0ede5;color:var(--text)}
+.barplot{margin:20px 0}
+.bar-row{margin:14px 0}
+.bar-head{display:flex;justify-content:space-between;gap:12px;font-size:.87rem}
+.metric-track{height:8px;background:#dce5dd;margin-top:6px;overflow:hidden}
+.metric-fill{height:100%;background:var(--accent)}
+.footer{padding:36px 0 52px;color:var(--muted);font-size:.83rem}
+.footer strong{color:var(--text);font-weight:600}
+@media(max-width:900px){.hero-grid,.result-grid{grid-template-columns:1fr}.flow{grid-template-columns:repeat(2,1fr)}.timeline{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.wrap{width:calc(100% - 32px)}.nav{align-items:flex-start;flex-direction:column;gap:12px}.hero{padding:56px 0 52px}.hero h1{font-size:clamp(3.1rem,12vw,4.3rem)}.hero-grid{gap:16px}.twoq,.controls,.flow,.timeline,.metric-strip{grid-template-columns:1fr}.demo{padding:20px}.demo-head{flex-direction:column}.custom-question{grid-column:auto}.prompt{flex-direction:column}.btn{width:100%}.section{padding:52px 0}.story{padding:22px}.metric{padding:12px 6px 12px 0}}
+.embed-mode body{background:var(--bg)}
+.embed-mode .nav,.embed-mode .hero,.embed-mode .section:not(#demo),.embed-mode .footer{display:none!important}
+.embed-mode #demo{padding:24px 0;border-bottom:0}
+.embed-mode .wrap{width:min(1120px,calc(100% - 24px))}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.bar{transition:none}.results.show{animation:none}}
+
 </style>
 </head>
 <body>
@@ -20,9 +129,9 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
   <nav class="nav"><div class="brand">Gayathri Namboodiri</div><a class="home" href="/">← Portfolio home</a></nav>
 
   <header class="hero">
-    <div class="eyebrow">End-to-end ML + RAG case study</div>
+    <div class="eyebrow">Project 01 / ML application</div>
     <h1>Auto Market<br/>Assistant</h1>
-    <p class="lead">An end-to-end ML application for historical vehicle asking prices and evidence-backed owner reviews. CatBoost handles numerical estimates; MiniLM and FAISS find relevant owner experiences. <strong>Data, inference, and the browser demo are separate, testable parts.</strong></p>
+    <p class="lead">Historical vehicle asking-price estimates and owner-review evidence answer two different questions. This project brings CatBoost, MiniLM and FAISS together behind a tested Python application, while evaluating the two tasks separately.</p>
     <p class="sub"><a href="https://github.com/gnambood/auto-market-assistant" target="_blank" rel="noopener noreferrer">Explore the Python project and tests on GitHub ↗</a></p>
     <div class="hero-grid">
       <div class="card story">
@@ -42,8 +151,8 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
   </header>
 
   <section class="section" id="demo">
-    <div class="eyebrow">Interactive portfolio demo</div>
-    <h2>Explore the system through a real, saved result.</h2>
+    <div class="eyebrow">Saved evaluation / Browser preview</div>
+    <h2>Inspect a saved model result</h2>
     <p class="section-intro"><strong>Interactive portfolio preview, not live inference.</strong> Explore a previously recorded result from the full Auto Market Assistant pipeline, including the historical CatBoost asking-price estimate, comparable listings and cited owner-review evidence. Everything runs locally in your browser using saved data: this page does not generate new predictions or contact AWS. The complete implementation and evaluation are available in the <a href="https://github.com/gnambood/auto-market-assistant">project repository</a>.</p>
     <div class="card demo">
       <div class="demo-head"><div><h3 id="vehicleTitle" style="margin:0">2004 Ford F-150</h3><div class="sub">A recorded model estimate and cited review evidence, presented as an interactive example rather than a live prediction.</div></div><span class="tag" id="modeTag">SAVED-RESULT DEMO</span></div>
@@ -62,7 +171,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
       <div class="results" id="results">
         <div class="result-grid">
           <div class="price-card">
-            <div class="eyebrow">Market context</div>
+            <div class="eyebrow">Recorded price estimate</div>
             <div class="big-price" id="predPrice">$10,739</div>
             <div class="sub">model estimate</div>
             <div class="gauge"><span class="pin" id="estimatePin" data-label="$10.7k"></span></div>
@@ -72,7 +181,7 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
             <p class="sub" style="font-size:.78rem">The comparable-price quartile range is not a confidence interval.</p>
           </div>
           <div class="review-card">
-            <div class="eyebrow">Owner-review evidence</div>
+            <div class="eyebrow">Retrieved review evidence</div>
             <h3 id="reviewHeading">Reliability experiences were mixed.</h3>
             <p class="answer" id="reviewAnswer">Retrieved reviews included owners describing costly reliability problems as well as owners reporting long-term dependability. The system keeps the answer tied to the specific retrieved evidence instead of presenting one anecdote as universal.</p>
             <div class="suggestion" id="reviewSuggestion"></div>
@@ -92,14 +201,14 @@ a{color:inherit}.wrap{width:min(1120px,92vw);margin:auto}.nav{display:flex;justi
           <button class="tab" role="tab" aria-selected="false" data-tab="metrics">Measured performance</button>
         </div>
         <div class="tabpane active" id="pipeline"><div class="mini-flow"><span class="node">vehicle fields</span><span class="arrow">→</span><span class="node">engineered price features</span><span class="arrow">→</span><span class="node">CatBoost</span><span class="arrow">+</span><span class="node">70,665 reviews</span><span class="arrow">→</span><span class="node">MiniLM + FAISS</span><span class="arrow">→</span><span class="node">grounded response</span></div></div>
-        <div class="tabpane" id="safety"><strong>The system can abstain.</strong><p class="sub">Questions first pass a capability guard that blocks exact-vehicle condition/history, current transactional data and authoritative-specification requests. In-scope questions then pass a calibrated evidence gate using max similarity, mean top-3 similarity and the number of supporting reviews. Generated source IDs are validated against the reviews that were actually retrieved.</p></div>
+        <div class="tabpane" id="safety"><strong>The application can abstain</strong><p class="sub">Questions first pass a capability guard that blocks exact-vehicle condition/history, current transactional data and authoritative-specification requests. In-scope questions then pass a calibrated evidence gate using max similarity, mean top-3 similarity and the number of supporting reviews. Generated source IDs are validated against the reviews that were actually retrieved.</p></div>
         <div class="tabpane" id="metrics"><label for="metricFocus">Examine project-level evaluation</label><select id="metricFocus"><option value="price">Price estimation (chronological holdout)</option><option value="retrieval">Vehicle-identity retrieval</option><option value="answerability">Answerability (weakly supervised)</option></select><div class="barplot" id="metricBars" aria-label="Saved project evaluation values"></div><p class="sub" id="metricExplanation"></p><p class="sub" style="font-size:.8rem">Metrics evaluate separate tasks, not the accuracy of this one saved vehicle example. See <a href="https://github.com/gnambood/auto-market-assistant/blob/main/MODEL_CARD.md">the model card</a>.</p></div>
       </div>
     </div>
   </section>
   <section class="section" aria-labelledby="source-heading">
-    <div class="eyebrow">Canonical engineering source</div>
-    <h2 id="source-heading">Architecture, evaluation and reproducibility live in GitHub.</h2>
+    <div class="eyebrow">Repository / Source of truth</div>
+    <h2 id="source-heading">The implementation, in one place</h2>
     <p class="section-intro">This portfolio is a presentation layer. The one maintained implementation of CatBoost, MiniLM/FAISS, optional Qwen 2.5 generation experiments, data quality checks and historical market trends lives in the canonical Auto Market Assistant repository.</p>
     <div class="card story">
       <p><a href="https://github.com/gnambood/auto-market-assistant"><strong>Open canonical source repository</strong></a></p>

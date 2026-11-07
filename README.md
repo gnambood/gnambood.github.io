@@ -32,6 +32,19 @@ The existing evidence currently supports **one** published F-150 example with a 
 
 Static output can be regenerated locally without ongoing AWS charges, but generation from the original models still requires having those saved artifacts available. GitHub Pages is a presentation layer only.
 
+
+## Visual design
+
+The portfolio uses an evidence-led editorial direction inspired by Damir Sokolovsky's [unslop](https://github.com/heydamir/unslop) design method (CC BY 4.0).
+
+- **Product:** A technical portfolio for ML and data science hiring teams.
+- **Character:** Measured, precise, approachable.
+- **World:** Research field notes and model evaluation records, rather than speculative AI imagery.
+- **Moments:** A real CatBoost holdout-evaluation panel on the homepage; an inspectable saved-result demonstration in the case study.
+- **Signature:** Numbered case notes, quiet monospace provenance, and linked evidence.
+
+The design removes decorative gradient washes, glow effects, pill-heavy labels and redundant card chrome. It keeps the existing project facts, research limitations, page hierarchy, source links, and browser-only functionality. The source repository linked above remains authoritative for ML implementation and evaluation. No assets or code from `unslop` are bundled; its design methodology informed the refactor.
+
 ## Changes and deployment
 
 Propose future changes through pull requests and check the GitHub Pages publish result. The optional manual AWS deployment workflow remains separate and is **not** invoked by the static demo. AWS resources other than paused ECS tasks can still incur costs; this feature does not modify their lifecycle.
