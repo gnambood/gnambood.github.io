@@ -50,6 +50,13 @@ def main():
     assert index.stat().st_size < 100_000, "Homepage has excessive embedded assets"
     assert not (ROOT / "projects/auto-market-assistant").exists(), "Duplicate app source remains"
     assert (ROOT / "PROFILE_README.md").exists(), "Prepared GitHub profile README missing"
+    assert (ROOT / "assets/gayathri-coffee-portrait.png").stat().st_size > 100_000, "Restored portrait missing"
+    assert (ROOT / "styles/coffee.css").exists(), "Coffee design stylesheet missing"
+    assert (ROOT / "scripts/coffee-motion.js").exists(), "Accessible motion script missing"
+    homepage_html = index.read_text(encoding="utf-8")
+    assert "ideas into insights" in homepage_html and "gayathri-coffee-portrait.png" in homepage_html
+    assert "76.02%" in homepage_html and "99.04%" in homepage_html, "Verified research metrics changed"
+
 
     snapshot = json.loads((ROOT / "data/auto-market-snapshots.v1.json").read_text(encoding="utf-8"))
     assert snapshot["schema_version"] == 1
