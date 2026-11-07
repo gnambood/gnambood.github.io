@@ -44,6 +44,16 @@ Static output can be regenerated locally without ongoing AWS charges, but genera
 
 We kept the engineering/evidence clarity from the [unslop](https://github.com/heydamir/unslop) design review (Damir Sokolovsky, CC BY 4.0) while restoring the user's own visual identity. This is not a recreation of outdated metrics or old cloud status; verified results and links supersede the September source.
 
+## Expanded story-led portfolio
+
+The coffee-themed homepage now has a personal introduction, the original illustrated Gayathri portrait, scroll/ticker/steam animations (disabled under `prefers-reduced-motion`), and three evidence-based case-study stories. The stories are written as problem → exploration → engineering choices → results → limitations/lessons:
+
+- **Driver impairment:** RGB/IR source QC (60-source to 57-participant publication cohort), exploratory TimeSformer/Video Swin/ViViT work, matched Crop A vs B comparison, reference-free TimeSformer evaluation, and separate sober-calibrated VideoMAE condition.
+- **Auto Market Assistant:** the dual problem of historical asking-price estimation vs. owner-review evidence, CatBoost chronological holdout, MiniLM/FAISS, the decision not to forecast from one month of data, and the verified static demo.
+- **Insider threat:** feature construction from activity logs, saved notebook model comparisons and the unresolved independent reproduction/leakage audit.
+
+The site is deliberately narrative, not a claim that the manuscript is published or that the saved demo is a live AWS model. The original illustration is reused unchanged and described as an illustration rather than a photograph. Engineering code and canonical technical documentation remain in the project repositories.
+
 ## Changes and deployment
 
 Propose future changes through pull requests and check the GitHub Pages publish result. The optional manual AWS deployment workflow remains separate and is **not** invoked by the static demo. AWS resources other than paused ECS tasks can still incur costs; this feature does not modify their lifecycle.
