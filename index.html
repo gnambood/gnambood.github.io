@@ -102,7 +102,24 @@
 <div class="story-grid">
 <div class="chapter reveal"><div class="chapter-kicker">01 · The pricing problem</div><h3>Estimate first, explain the context</h3><p>I trained CatBoost on 238,959 historical Craigslist listing records and used a chronological holdout instead of treating later listings as interchangeable with earlier ones. The result was a test MAE of $2,866 and R² of 0.883. These are <em>asking prices from 2021</em>, not today's market values or completed sales.</p></div>
 <div class="chapter reveal"><div class="chapter-kicker">02 · The owner experience</div><h3>Retrieve evidence rather than invent certainty</h3><p>A second system embeds matched Edmunds owner reviews using MiniLM, then searches them with FAISS. It indexes 70,665 matched reviews. The recorded vehicle-identity retrieval benchmark reports Hit@5 of 81.67%; evidence gates and citation validation prevent weak support from being presented as a confident answer.</p></div>
-<div class="chapter featured reveal"><div><div class="chapter-kicker">03 · From notebook to application</div><h3>Two models, one usable workflow</h3><p>I refactored the data cleaning into validated Parquet pipelines, built a FastAPI service and packaged the application with Docker. Qwen 2.5 generation was tested separately, while the deployed AWS service was configured to return deterministic retrieval-backed evidence.</p></div><div class="path-diagram" aria-label="Auto Market Assistant pipeline"><span>2021 listings</span><i>→</i><span>CatBoost</span><i>→</i><span>Price</span><span>Owner reviews</span><i>→</i><span>MiniLM / FAISS</span><i>→</i><span>Cited evidence</span></div></div>
+<div class="chapter featured reveal"><div><div class="chapter-kicker">03 · From notebook to application</div><h3>Two models, one usable workflow</h3><p>I refactored the data cleaning into validated Parquet pipelines, built a FastAPI service and packaged the application with Docker. Qwen 2.5 generation was tested separately, while the deployed AWS service was configured to return deterministic retrieval-backed evidence.</p></div><div class="pipeline-diagram" aria-label="Two Auto Market Assistant workflows">
+  <div class="pipeline-track">
+    <div class="pipeline-label"><span class="pipeline-marker" aria-hidden="true"></span><strong>01 / Price estimation</strong><small>Structured data</small></div>
+    <ol class="pipeline-steps" aria-label="2021 listings to CatBoost to historical price estimate">
+      <li><span>Input</span><strong>2021 listings</strong></li>
+      <li><span>Model</span><strong>CatBoost</strong></li>
+      <li><span>Output</span><strong>Asking-price estimate</strong></li>
+    </ol>
+  </div>
+  <div class="pipeline-track">
+    <div class="pipeline-label"><span class="pipeline-marker" aria-hidden="true"></span><strong>02 / Owner-review retrieval</strong><small>Text evidence</small></div>
+    <ol class="pipeline-steps" aria-label="Owner reviews to MiniLM and FAISS to cited evidence">
+      <li><span>Input</span><strong>Owner reviews</strong></li>
+      <li><span>Retrieval</span><strong>MiniLM + FAISS</strong></li>
+      <li><span>Output</span><strong>Cited evidence</strong></li>
+    </ol>
+  </div>
+</div></div>
 <div class="chapter reveal"><div class="chapter-kicker">04 · A decision not to overpromise</div><h3>Not enough history to forecast responsibly</h3><p>The inspected source dates span roughly one month in 2021. That is not a sound basis for claiming reliable multi-month price forecasts. Instead, I built descriptive price and listing-volume trends by comparable make, model family and vehicle year, with sample-size gates and lineage checks.</p></div>
 <div class="chapter reveal"><div class="chapter-kicker">05 · The way you can try it</div><h3>Show genuine saved results without a cloud bill</h3><p>The portfolio's interactive case study runs entirely in the browser, replaying a verified saved CatBoost result and cited review IDs. It is not live inference. The actual AWS ECS service has been deployed, but compute is paused to limit cost. The canonical GitHub repository retains the technical implementation.</p></div>
 </div>

@@ -84,9 +84,22 @@ section{padding:92px 0;border-bottom:1px solid var(--line)}
 .chapter p+p{margin-top:14px}
 .chapter ul{margin:16px 0 0;padding-left:18px;color:#614e44;font-size:.93rem}
 .chapter li{margin-bottom:8px}
-.path-diagram{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
-.path-diagram span{padding:9px 12px;border:1px solid #c7aa91;background:var(--paper);font:500 .83rem/1.45 Consolas,monospace}
-.path-diagram i{font-style:normal;color:var(--rust)}
+/* Two distinct ML workflows, with connectors that never wrap away from their nodes. */
+.pipeline-diagram{display:grid;gap:20px;min-width:0}
+.pipeline-track{min-width:0}
+.pipeline-track+.pipeline-track{padding-top:20px;border-top:1px solid #d1b7a0}
+.pipeline-label{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 12px;color:var(--espresso)}
+.pipeline-label strong{font-size:.83rem;font-weight:700;letter-spacing:.01em}
+.pipeline-label small{margin-left:auto;font-size:.72rem;color:var(--muted)}
+.pipeline-marker{width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:var(--rust)}
+.pipeline-steps{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin:0;padding:0}
+.pipeline-steps li{position:relative;min-width:0;padding:13px 12px;background:var(--paper);border:1px solid #d0b59c;border-radius:6px}
+.pipeline-steps li:not(:last-child)::after{content:"";position:absolute;left:calc(100% + 1px);top:50%;width:20px;border-top:1.5px solid var(--rust)}
+.pipeline-steps li:not(:last-child)::before{content:"";position:absolute;left:calc(100% + 16px);top:calc(50% - 3px);width:5px;height:5px;border-right:1.5px solid var(--rust);border-top:1.5px solid var(--rust);transform:rotate(45deg)}
+.pipeline-steps li span{display:block;margin-bottom:5px;color:var(--muted);font:600 .65rem/1.4 Consolas,monospace;text-transform:uppercase;letter-spacing:.055em}
+.pipeline-steps li strong{display:block;font-size:.8rem;font-weight:650;line-height:1.4;overflow-wrap:break-word}
+@media(max-width:600px){.pipeline-steps{grid-template-columns:1fr;gap:18px}.pipeline-steps li{padding:11px 14px}.pipeline-steps li:not(:last-child)::after{left:20px;top:100%;height:17px;width:0;border-top:0;border-left:1.5px solid var(--rust)}.pipeline-steps li:not(:last-child)::before{left:17px;top:calc(100% + 12px);transform:rotate(135deg)}.pipeline-label small{margin-left:0}}
+
 .evidence-row{display:flex;gap:14px;flex-wrap:wrap;margin:32px 0 0}
 .evidence-number{border-left:2px solid var(--rust);padding:0 20px 0 16px}
 .evidence-number strong{display:block;font:400 2rem/1.2 Georgia,serif;font-variant-numeric:tabular-nums}
@@ -123,7 +136,7 @@ section{padding:92px 0;border-bottom:1px solid var(--line)}
 .has-js .reveal.in-view{opacity:1;transform:none}
 @media(max-width:960px){.hero{grid-template-columns:1.1fr .9fr;gap:28px}.portrait-wrap{max-width:500px}.personal-grid{gap:38px}.chapter.featured{grid-template-columns:1fr}.project-heading{grid-template-columns:1fr}}
 @media(max-width:720px){.shell{width:calc(100% - 32px)}.nav{min-height:76px;align-items:flex-start;flex-direction:column;gap:12px;padding:15px 0}.navlinks{gap:15px}.hero{grid-template-columns:1fr;padding:52px 0 56px;min-height:auto}.hero h1{font-size:clamp(3.15rem,12vw,4.7rem)}.portrait-wrap{max-width:450px;margin-top:18px}.coffee-note{right:0;bottom:10px}.personal-grid,.story-grid,.interest-grid,.experience{grid-template-columns:1fr}.personal-aside{position:static}.path-strip{grid-template-columns:1fr;gap:16px}.chapter.featured{grid-column:auto}.interests{grid-template-columns:1fr 1fr}.contact{padding:70px 0}.project-heading{gap:12px}.project{margin-top:44px;padding-top:40px}section{padding:64px 0}.ticker-inner{animation-duration:60s}}
-@media(max-width:430px){.navlinks{gap:12px}.navlinks a{font-size:.8rem}.portrait-wrap{max-width:100%}.coffee-note{right:0;bottom:2%}.chapter{padding:20px}.evidence-number{min-width:45%}.interests{grid-template-columns:1fr}.path-diagram{justify-content:flex-start}}
+@media(max-width:430px){.navlinks{gap:12px}.navlinks a{font-size:.8rem}.portrait-wrap{max-width:100%}.coffee-note{right:0;bottom:2%}.chapter{padding:20px}.evidence-number{min-width:45%}.interests{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.portrait-wrap,.portrait-wrap .steam span,.coffee-note,.ticker-inner,.hero-copy,.orbit-dot{animation:none!important}.has-js .reveal{opacity:1;transform:none;transition:none}.cta{transition:none}}
 
 @media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
