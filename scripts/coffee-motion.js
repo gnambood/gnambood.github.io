@@ -1,27 +1,29 @@
-// Decorative motion only: no model inference, network calls or data changes.
-(() => {
-  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-  if (!prefersReduced.matches && "IntersectionObserver" in window) {
-    document.documentElement.classList.add("js");
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
-      }
-    }, {threshold: 0.1, rootMargin: "0px 0px -25px 0px"});
-    document.querySelectorAll("[data-reveal]").forEach(el => observer.observe(el));
+// Decorative motion for the personal portfolio; no external requests or model calls.
+(function(){
+  var progress=document.getElementById("readProgress");
+  var scrolling=false;
+  function updateProgress(){var doc=document.documentElement;var max=doc.scrollHeight-innerHeight;progress.style.transform="scaleX("+(max>0?Math.min(1,Math.max(0,scrollY/max)):0)+")";scrolling=false}
+  addEventListener("scroll",function(){if(!scrolling){scrolling=true;requestAnimationFrame(updateProgress)}},{passive:true});
+  addEventListener("resize",updateProgress);updateProgress();
+  if("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches){
+    document.documentElement.classList.add("has-js");
+    var observer=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting){entry.target.classList.add("in-view");observer.unobserve(entry.target)}})},{threshold:.08});
+    document.querySelectorAll(".reveal").forEach(function(node){observer.observe(node)});
   }
-  const wrap = document.querySelector(".portrait-wrap");
-  const stage = document.querySelector(".portrait-stage");
-  if (!wrap || !stage || prefersReduced.matches ||
-      !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-  wrap.addEventListener("pointermove", event => {
-    const r = wrap.getBoundingClientRect();
-    const x = (event.clientX - r.left - r.width / 2) / r.width;
-    const y = (event.clientY - r.top - r.height / 2) / r.height;
-    stage.style.transform = "translate3d(" + (x * 9).toFixed(2) + "px," +
-      (y * 7).toFixed(2) + "px,0)";
-  });
-  wrap.addEventListener("pointerleave", () => { stage.style.transform = ""; });
+
+  // Gently follow the pointer on large screens. Do not affect touch devices.
+  var stage=document.querySelector(".portrait-stage");
+  if(stage && !matchMedia("(prefers-reduced-motion: reduce)").matches && matchMedia("(hover:hover) and (pointer:fine)").matches){
+    stage.addEventListener("pointermove",function(event){
+      var bounds=stage.getBoundingClientRect();
+      var x=(event.clientX-bounds.left-bounds.width/2)/bounds.width;
+      var y=(event.clientY-bounds.top-bounds.height/2)/bounds.height;
+      stage.style.setProperty("--pointer-x",(x*8).toFixed(2)+"px");
+      stage.style.setProperty("--pointer-y",(y*6).toFixed(2)+"px");
+    });
+    stage.addEventListener("pointerleave",function(){
+      stage.style.removeProperty("--pointer-x");
+      stage.style.removeProperty("--pointer-y");
+    });
+  }
 })();
