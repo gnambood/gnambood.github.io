@@ -11,19 +11,22 @@
     document.querySelectorAll(".reveal").forEach(function(node){observer.observe(node)});
   }
 
-  // Gently follow the pointer on large screens. Do not affect touch devices.
+  // Slight, input-driven 3D perspective only on precise pointers.
+  // No perpetual motion or additional decoration over the original artwork.
+  var frame=document.querySelector(".portrait-wrap");
   var stage=document.querySelector(".portrait-stage");
-  if(stage && !matchMedia("(prefers-reduced-motion: reduce)").matches && matchMedia("(hover:hover) and (pointer:fine)").matches){
-    stage.addEventListener("pointermove",function(event){
-      var bounds=stage.getBoundingClientRect();
-      var x=(event.clientX-bounds.left-bounds.width/2)/bounds.width;
-      var y=(event.clientY-bounds.top-bounds.height/2)/bounds.height;
-      stage.style.setProperty("--pointer-x",(x*8).toFixed(2)+"px");
-      stage.style.setProperty("--pointer-y",(y*6).toFixed(2)+"px");
+  var reduce=matchMedia("(prefers-reduced-motion: reduce)");
+  if(frame && stage && !reduce.matches && matchMedia("(hover:hover) and (pointer:fine)").matches){
+    frame.addEventListener("pointermove",function(event){
+      var bounds=frame.getBoundingClientRect();
+      var x=(event.clientX-bounds.left)/bounds.width-.5;
+      var y=(event.clientY-bounds.top)/bounds.height-.5;
+      stage.style.setProperty("--tilt-x",(x*3).toFixed(2)+"deg");
+      stage.style.setProperty("--tilt-y",(-y*3).toFixed(2)+"deg");
     });
-    stage.addEventListener("pointerleave",function(){
-      stage.style.removeProperty("--pointer-x");
-      stage.style.removeProperty("--pointer-y");
+    frame.addEventListener("pointerleave",function(){
+      stage.style.removeProperty("--tilt-x");
+      stage.style.removeProperty("--tilt-y");
     });
   }
 })();
