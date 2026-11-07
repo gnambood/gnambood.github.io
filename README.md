@@ -35,15 +35,14 @@ Static output can be regenerated locally without ongoing AWS charges, but genera
 
 ## Visual design
 
-The portfolio uses an evidence-led editorial direction inspired by Damir Sokolovsky's [unslop](https://github.com/heydamir/unslop) design method (CC BY 4.0).
+**Restored coffee-themed direction (November 6, 2026).** The original September portfolio used an espresso (#34241f), coffee (#6f4e37), rust (#b55435) and cream (#f5ebdd) palette, plus a personalized coffee-and-laptop portrait illustration. That exact original image is recovered from the earlier GitHub history and stored once as `assets/gayathri-coffee-portrait.png` (~2.17 MB), instead of embedding multiple base64 copies in the homepage.
 
-- **Product:** A technical portfolio for ML and data science hiring teams.
-- **Character:** Measured, precise, approachable.
-- **World:** Research field notes and model evaluation records, rather than speculative AI imagery.
-- **Moments:** A real CatBoost holdout-evaluation panel on the homepage; an inspectable saved-result demonstration in the case study.
-- **Signature:** Numbered case notes, quiet monospace provenance, and linked evidence.
+- `styles/coffee.css`: warm personal design with a responsive portrait-led hero, project story cards, and calm typography.
+- `scripts/coffee-motion.js`: staggered entrance, scroll reveals, decorative steam, floating note and restrained desktop pointer parallax. Motion is disabled through `prefers-reduced-motion`.
+- `index.html`: personal narrative, photography/design/coffee interests, and current evidence-backed project descriptions.
+- The Auto Market Assistant case study retains its separate, tested browser-only saved-result demo, with no AWS runtime requirement.
 
-The design removes decorative gradient washes, glow effects, pill-heavy labels and redundant card chrome. It keeps the existing project facts, research limitations, page hierarchy, source links, and browser-only functionality. The source repository linked above remains authoritative for ML implementation and evaluation. No assets or code from `unslop` are bundled; its design methodology informed the refactor.
+We kept the engineering/evidence clarity from the [unslop](https://github.com/heydamir/unslop) design review (Damir Sokolovsky, CC BY 4.0) while restoring the user's own visual identity. This is not a recreation of outdated metrics or old cloud status; verified results and links supersede the September source.
 
 ## Changes and deployment
 
