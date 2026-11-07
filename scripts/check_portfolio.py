@@ -54,8 +54,11 @@ def main():
     assert (ROOT / "styles/coffee.css").exists(), "Coffee design stylesheet missing"
     assert (ROOT / "scripts/coffee-motion.js").exists(), "Accessible motion script missing"
     homepage_html = index.read_text(encoding="utf-8")
-    assert "ideas into insights" in homepage_html and "gayathri-coffee-portrait.png" in homepage_html
+    assert "Ideas into useful systems" in homepage_html and "gayathri-coffee-portrait.png" in homepage_html
     assert "76.02%" in homepage_html and "99.04%" in homepage_html, "Verified research metrics changed"
+    assert all(anchor in homepage_html for anchor in ['id="research"', 'id="market"', 'id="security"']), "Long-form project stories missing"
+    assert 'href="/styles/coffee.css"' in homepage_html and 'src="/scripts/coffee-motion.js"' in homepage_html
+    assert homepage_html.count('class="chapter ') >= 10, "Research and engineering story chapters missing"
 
 
     snapshot = json.loads((ROOT / "data/auto-market-snapshots.v1.json").read_text(encoding="utf-8"))
