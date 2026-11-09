@@ -62,16 +62,17 @@ def main():
     assert "PYTORCH" in homepage_html and "ML ENGINEERING" in homepage_html, "Relevant skills ticker missing"
     ticker = homepage_html.split('<div class="ticker"', 1)[1].split('</div></div>', 1)[0]
     assert "COFFEE" not in ticker, "Personal hobbies should not appear in the skills ticker"
-    assert "76.02%" in homepage_html and "99.04%" in homepage_html, "Verified research metrics changed"
-    assert all(anchor in homepage_html for anchor in ['id="research"', 'id="market"', 'id="security"']), "Long-form project stories missing"
-    assert 'href="/styles/coffee.css"' in homepage_html and 'src="/scripts/coffee-motion.js"' in homepage_html
-    assert homepage_html.count('class="chapter ') >= 10, "Research and engineering story chapters missing"
-    assert homepage_html.count('class="pipeline-track"') == 2, "Expected two distinct ML workflows"
-    assert homepage_html.count('<li><span>') == 6, "Expected three steps per workflow"
-    assert 'class="path-diagram"' not in homepage_html, "Old wrapping pipeline remains"
-    assert "Asking-price estimate" in homepage_html and "Cited evidence" in homepage_html
-
-
+    research_html = (ROOT / "driver-impairment-research.html").read_text(encoding="utf-8")
+    assert "76.05%" in homepage_html and "99.04%" in homepage_html, "Project previews lost measured results"
+    assert "76.02%" in research_html and "TimeSformer, Video Swin and ViViT" in research_html, "Research case study lost its methodology or evaluation"
+    assert all(anchor in homepage_html for anchor in ['id="research"', 'id="market"', 'id="security"']), "Homepage project anchors missing"
+    assert homepage_html.count('class="feature-card') == 3, "Homepage should feature exactly three curated projects"
+    assert 'href="/driver-impairment-research.html"' in homepage_html, "Research deep dive must be discoverable"
+    assert 'href="/auto-market-assistant.html"' in homepage_html, "Saved-result demo link missing"
+    assert "class=\"pipeline-track\"" not in homepage_html, "Technical diagrams belong on detail pages"
+    assert 'class="chapter ' not in homepage_html, "Long-form chapters should not overwhelm the homepage"
+    assert research_html.count('class="chapter ') >= 5, "Long-form research chapters missing"
+    assert "COFFEE" not in ticker, "Skills ticker should show technical capabilities"
 
     snapshot = json.loads((ROOT / "data/auto-market-snapshots.v1.json").read_text(encoding="utf-8"))
     assert snapshot["schema_version"] == 1
@@ -94,6 +95,8 @@ def main():
 
     homepage = validate(index)
     case = validate(case_study)
+    research = validate(ROOT / "driver-impairment-research.html")
+    assert "research" in research.ids, "Research page chapter anchor missing"
     assert {"work", "about", "experience", "contact"} <= homepage.ids
     assert "demo" in case.ids and "runDemo" in case.ids
     assert any("/auto-market-assistant.html" in href for href in homepage.hrefs)
