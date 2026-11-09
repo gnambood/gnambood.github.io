@@ -39,106 +39,54 @@
 <span>PYTHON <i>✳</i> PYTORCH <i>✳</i> COMPUTER VISION <i>✳</i> MODEL EVALUATION <i>✳</i> DATA PIPELINES <i>✳</i> ML ENGINEERING <i>✳</i></span><span>PYTHON <i>✳</i> PYTORCH <i>✳</i> COMPUTER VISION <i>✳</i> MODEL EVALUATION <i>✳</i> DATA PIPELINES <i>✳</i> ML ENGINEERING <i>✳</i></span>
 </div></div>
 <div class="shell">
-<section id="story" aria-labelledby="story-title">
+<section id="work" aria-labelledby="work-title" class="featured-work">
+<div class="works-header reveal">
+<div class="section-kicker">01 / Selected work</div>
+<h2 class="section-title" id="work-title">Work worth a closer look.</h2>
+<p class="section-intro">Research, practical ML engineering and security analytics. Choose a project for the full story, implementation and evaluation.</p>
+</div>
+<div class="feature-grid">
+<article class="feature-card reveal" id="research">
+<div class="feature-topline"><span>01 / Computer vision research</span><span>RGB + infrared</span></div>
+<h3>Recognising driver impairment from video</h3>
+<p>Explored spatiotemporal video models and facial crop choices, with evaluation separated by participant.</p>
+<div class="feature-proof"><strong>76.05%</strong><span>TimeSformer macro-F1 · held-out evaluation</span></div>
+<p class="feature-stack">PyTorch · TimeSformer · Video classification</p>
+<a class="feature-link" href="/driver-impairment-research.html">Read the research case study <span aria-hidden="true">↗</span></a>
+</article>
+<article class="feature-card reveal" id="market">
+<div class="feature-topline"><span>02 / Applied ML system</span><span>Interactive example</span></div>
+<h3>Auto Market Assistant</h3>
+<p>Combined historical asking-price estimation with evidence-backed owner-review retrieval in a tested application.</p>
+<div class="feature-proof"><strong>0.883</strong><span>CatBoost R² · chronological test holdout</span></div>
+<p class="feature-stack">CatBoost · MiniLM · FAISS · FastAPI</p>
+<div class="feature-actions"><a class="feature-link" href="/auto-market-assistant.html">Explore the saved-result demo <span aria-hidden="true">↗</span></a><a class="feature-link feature-link-secondary" href="https://github.com/gnambood/auto-market-assistant">Source code <span aria-hidden="true">↗</span></a></div>
+</article>
+<article class="feature-card feature-card-wide reveal" id="security">
+<div>
+<div class="feature-topline"><span>03 / Security analytics</span><span>Exploratory study</span></div>
+<h3>Insider Threat Detection</h3>
+<p>Engineered features from simulated enterprise activity logs and compared supervised classifiers. The saved notebook records a strong result, with splitting and leakage review still important before practical use.</p>
+</div>
+<div class="feature-wide-right">
+<div class="feature-proof"><strong>99.04%</strong><span>Random Forest accuracy · historical notebook result</span></div>
+<a class="feature-link" href="https://github.com/gnambood/Insider_Threat_Detection">Inspect the notebook <span aria-hidden="true">↗</span></a>
+</div>
+</article>
+</div>
+</section>
+<section id="story" aria-labelledby="story-title" class="short-story">
 <div class="personal-grid">
 <div class="personal-aside reveal">
-<div class="section-kicker">01 / Before the models</div>
-<h2 class="section-title" id="story-title">Here's the short version of my story.</h2>
-<div class="line"></div>
-<p class="small-note">Where my engineering approach comes from.</p>
-<p>From enterprise systems to applied machine learning.</p>
+<div class="section-kicker">02 / The person behind the work</div>
+<h2 class="section-title" id="story-title">The path to machine learning.</h2>
 </div>
 <div class="personal-copy reveal">
-<p>I didn't start with neural networks. My work began much closer to the people using technology: <strong>managing enterprise devices, handling technical problems, and coordinating solutions across teams.</strong></p>
-<p>At South Indian Bank, I worked on mobile device management and compliance for more than 7,000 devices. Later, at Execulink, I learned how important it is to investigate a problem carefully and explain it to someone who doesn't want a lecture. They want an answer that works.</p>
-<p>That experience follows me into machine learning. I love building models, but I keep asking the questions around them: <strong>Is the data trustworthy? Is the evaluation fair? Can I explain the result? Will anyone actually be able to use this?</strong></p>
-<div class="path-strip">
-<div><strong>Start with the problem</strong><span>Understand the context before reaching for a model.</span></div>
-<div><strong>Make the data tell the truth</strong><span>Quality checks and honest evaluation matter more than a polished metric.</span></div>
-<div><strong>Build for a person</strong><span>Put the results somewhere understandable and usable.</span></div>
-</div>
+<p>Before training models, I worked with people and systems where reliability mattered every day. I managed enterprise devices and compliance reporting at South Indian Bank, then solved technical issues and coordinated teams at Execulink.</p>
+<p>That experience shapes how I work with machine learning: start with the problem, check the data, evaluate carefully, and make the result understandable.</p>
 </div>
 </div>
 </section>
-<section id="work" aria-labelledby="work-title">
-<div class="works-header reveal">
-<div class="section-kicker">02 / The work, behind the numbers</div>
-<h2 class="section-title" id="work-title">Every project starts with a question.</h2>
-<p class="section-intro">Three projects, from the original problem and technical decisions to evaluation, limitations and lessons learned.</p>
-</div>
-
-<article class="project" id="research" aria-labelledby="research-title">
-<div class="project-heading reveal">
-<div><span class="chapter-count">STORY 01 / GRADUATE RESEARCH</span>
-<h2 class="section-title" id="research-title">Can a few seconds of video reveal subtle signs of driver impairment?</h2>
-<p>My graduate research at Western University's AiX Lab explored whether synchronized RGB and infrared facial video could distinguish sober, low-impairment and severe-impairment sessions.</p></div>
-<div class="project-tags">Python / PyTorch / Computer vision<br/>TimeSformer / VideoMAE<br/>Participant-separated evaluation</div>
-</div>
-<div class="story-grid">
-<div class="chapter reveal"><div class="chapter-kicker">01 · The challenge</div><h3>Real video isn't a clean dataset</h3><p>Facial movement and appearance vary with lighting, camera angle and recording quality. Before modelling, the source sessions had to be checked for the face visibility and camera consistency the experiment needed. From the original 60 participants, the final publication cohort retained 57 after source-quality exclusions.</p></div>
-<div class="chapter reveal"><div class="chapter-kicker">02 · The exploration</div><h3>Try different ways to understand time</h3><p>TimeSformer, Video Swin and ViViT were part of the architecture exploration. The retained publication work then focused on a reference-free TimeSformer system and a separate personalized VideoMAE approach. Not every early exploratory run has preserved, directly comparable results, so I don't present a made-up leaderboard.</p></div>
-<div class="chapter featured reveal"><div><div class="chapter-kicker">03 · The turning point</div><h3>How I cropped the face mattered</h3><p>A controlled TimeSformer crop comparison was a reminder that representation choices can outweigh architectural novelty.</p></div><div>
-<div class="evidence-row"><div class="evidence-number"><strong>44.44%</strong><span>Crop A accuracy in matched replay</span></div><div class="evidence-number"><strong>76.02%</strong><span>Crop B accuracy in matched replay</span></div></div>
-<p style="margin-top:18px">The final reference-free pipeline used full-face/head-motion Crop B and synchronized RGB/IR inputs, sampling 16 frames from each preserved 125-frame clip.</p>
-</div></div>
-<div class="chapter reveal"><div class="chapter-kicker">04 · The evaluation</div><h3>Keep people separate across folds</h3><p>The reported TimeSformer result covers 57 participants and 171 sessions across five participant-disjoint outer folds and three training seeds. The preserved evaluation reports 76.02% accuracy and 76.05% macro-F1. It is a frozen downstream replay on the accepted feature lineage, not a claim of byte-identical end-to-end regeneration.</p></div>
-<div class="chapter reveal"><div class="chapter-kicker">05 · The parallel experiment</div><h3>What if you know someone's sober baseline?</h3><p>VideoMAE investigated a different condition, using same-participant sober calibration. Its frozen post-hoc result is 66.08% accuracy. Because the inference conditions and evaluation details differ, I do not rank it directly against the reference-free TimeSformer system.</p></div>
-</div>
-<div class="project-bottom"><p>Manuscript in preparation. Research code and participant data are private. The website reports the accepted evaluation, including its reproducibility boundaries.</p></div>
-<details class="disclosure"><summary>What this project taught me</summary><p>It reinforced that experimental design begins before training: with what is visible in the data, how it is cropped, who is allowed into a held-out fold and what a result actually supports. A more complex model isn't automatically a more defensible result.</p></details>
-</article>
-
-<article class="project" id="market" aria-labelledby="market-title">
-<div class="project-heading reveal">
-<div><span class="chapter-count">STORY 02 / END-TO-END ML APPLICATION</span>
-<h2 class="section-title" id="market-title">Buying a used car raises two very different questions.</h2>
-<p>How much is it asking for in the historical listing market? And what do owners say it is like to live with? Auto Market Assistant keeps these questions separate instead of forcing one model to answer both.</p></div>
-<div class="project-tags">CatBoost / scikit-learn<br/>MiniLM / FAISS / FastAPI<br/>Docker / AWS / Parquet</div>
-</div>
-<div class="story-grid">
-<div class="chapter reveal"><div class="chapter-kicker">01 · The pricing problem</div><h3>Estimate first, explain the context</h3><p>I trained CatBoost on 238,959 historical Craigslist listing records and used a chronological holdout instead of treating later listings as interchangeable with earlier ones. The result was a test MAE of $2,866 and R² of 0.883. These are <em>asking prices from 2021</em>, not today's market values or completed sales.</p></div>
-<div class="chapter reveal"><div class="chapter-kicker">02 · The owner experience</div><h3>Retrieve evidence rather than invent certainty</h3><p>A second system embeds matched Edmunds owner reviews using MiniLM, then searches them with FAISS. It indexes 70,665 matched reviews. The recorded vehicle-identity retrieval benchmark reports Hit@5 of 81.67%; evidence gates and citation validation prevent weak support from being presented as a confident answer.</p></div>
-<div class="chapter featured reveal"><div><div class="chapter-kicker">03 · From notebook to application</div><h3>Two models, one usable workflow</h3><p>I refactored the data cleaning into validated Parquet pipelines, built a FastAPI service and packaged the application with Docker. Qwen 2.5 generation was tested separately, while the deployed AWS service was configured to return deterministic retrieval-backed evidence.</p></div><div class="pipeline-diagram" aria-label="Two Auto Market Assistant workflows">
-  <div class="pipeline-track">
-    <div class="pipeline-label"><span class="pipeline-marker" aria-hidden="true"></span><strong>01 / Price estimation</strong><small>Structured data</small></div>
-    <ol class="pipeline-steps" aria-label="2021 listings to CatBoost to historical price estimate">
-      <li><span>Input</span><strong>2021 listings</strong></li>
-      <li><span>Model</span><strong>CatBoost</strong></li>
-      <li><span>Output</span><strong>Asking-price estimate</strong></li>
-    </ol>
-  </div>
-  <div class="pipeline-track">
-    <div class="pipeline-label"><span class="pipeline-marker" aria-hidden="true"></span><strong>02 / Owner-review retrieval</strong><small>Text evidence</small></div>
-    <ol class="pipeline-steps" aria-label="Owner reviews to MiniLM and FAISS to cited evidence">
-      <li><span>Input</span><strong>Owner reviews</strong></li>
-      <li><span>Retrieval</span><strong>MiniLM + FAISS</strong></li>
-      <li><span>Output</span><strong>Cited evidence</strong></li>
-    </ol>
-  </div>
-</div></div>
-<div class="chapter reveal"><div class="chapter-kicker">04 · A decision not to overpromise</div><h3>Not enough history to forecast responsibly</h3><p>The inspected source dates span roughly one month in 2021. That is not a sound basis for claiming reliable multi-month price forecasts. Instead, I built descriptive price and listing-volume trends by comparable make, model family and vehicle year, with sample-size gates and lineage checks.</p></div>
-<div class="chapter reveal"><div class="chapter-kicker">05 · The way you can try it</div><h3>Show genuine saved results without a cloud bill</h3><p>The portfolio's interactive case study runs entirely in the browser, replaying a verified saved CatBoost result and cited review IDs. It is not live inference. The actual AWS ECS service has been deployed, but compute is paused to limit cost. The canonical GitHub repository retains the technical implementation.</p></div>
-</div>
-<div class="project-bottom"><p><a href="/auto-market-assistant.html">Explore the saved-result demo</a> · <a href="https://github.com/gnambood/auto-market-assistant">View source and methodology</a></p></div>
-<details class="disclosure"><summary>What this project taught me</summary><p>A useful system needs more than a model: it needs a reproducible data definition, a trustworthy explanation of what its metrics measure and an interface that doesn't claim more than the evidence supports.</p></details>
-</article>
-
-<article class="project" id="security" aria-labelledby="security-title">
-<div class="project-heading reveal">
-<div><span class="chapter-count">STORY 03 / EXPLORATORY SECURITY ML</span>
-<h2 class="section-title" id="security-title">What if a risk signal is scattered across an ordinary working day?</h2>
-<p>Insider Threat Detection began as a question about patterns in employee activity logs: whether information spread across many event types could help distinguish suspicious behaviour from routine activity.</p></div>
-<div class="project-tags">Python / Feature engineering<br/>Random Forest / SVM<br/>Experimental evaluation</div>
-</div>
-<div class="story-grid">
-<div class="chapter reveal"><div class="chapter-kicker">01 · The challenge</div><h3>Events don't arrive as one neat story</h3><p>Simulated enterprise activity includes logs and device, file and communication records. The first challenge is turning scattered events into features a supervised classifier can interpret without forgetting the original activity context.</p></div>
-<div class="chapter reveal"><div class="chapter-kicker">02 · The experiment</div><h3>Compare simple and nonlinear models</h3><p>The notebook compares Logistic Regression, an RBF SVM and Random Forest. Its saved Random Forest output records 99.04% accuracy and approximately 0.97 macro-F1. These are historical notebook results, not independently reproduced production performance.</p></div>
-<div class="chapter featured reveal"><div><div class="chapter-kicker">03 · The lesson</div><h3>A high score is a question, not the end of the story</h3><p>Before treating these metrics as a deployment claim, the experimental unit, class balance, splitting policy and leakage controls still need a dedicated audit. I keep that limitation visible rather than dressing an exploratory notebook up as a security product.</p></div><div class="evidence-number"><strong>99.04%</strong><span>Random Forest accuracy recorded in the notebook, subject to evaluation audit</span></div></div>
-</div>
-<div class="project-bottom"><p>Exploratory classification project. Independent reproduction and leakage review remain outstanding.</p><p><a href="https://github.com/gnambood/Insider_Threat_Detection">Read the notebook and its limitations</a></p></div>
-</article>
-</section>
-
 <section id="about" aria-labelledby="about-title">
 <div class="section-kicker">03 / Beyond the screen</div>
 <h2 class="section-title" id="about-title">Beyond engineering.</h2>
@@ -153,7 +101,7 @@
 </section>
 
 <section id="experience" aria-labelledby="experience-title">
-<div class="section-kicker">04 / The path here</div>
+<div class="section-kicker">04 / Experience</div>
 <h2 class="section-title" id="experience-title">The experience behind the projects.</h2>
 <p class="section-intro">Different roles, one recurring theme: understand what isn't working, communicate clearly and make a system more dependable.</p>
 <div class="experience reveal">

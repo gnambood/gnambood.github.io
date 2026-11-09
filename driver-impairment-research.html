@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f5ebdd">
+<meta name="description" content="Gayathri Namboodiri's RGB and infrared driver impairment research: experimental choices, evaluations and limitations.">
+<title>Driver Impairment Research | Gayathri Namboodiri</title>
+<link rel="stylesheet" href="/styles/coffee.css">
+</head>
+<body>
+<div class="read-progress" aria-hidden="true" id="readProgress"></div>
+<div class="shell">
+<header class="nav">
+<a class="brand" href="/" aria-label="Return to portfolio"><span>GN.</span> Gayathri Namboodiri</a>
+<nav class="navlinks" aria-label="Main navigation"><a href="/#work">Projects</a><a href="/#story">My story</a><a href="/#experience">Experience</a><a href="/#contact">Say hello</a></nav>
+</header>
+<main id="top" class="research-page">
+<div class="case-intro">
+<div class="section-kicker">Graduate research / case study</div>
+<h1>Understanding driver impairment through RGB and infrared video.</h1>
+<p>The experimental question, the architectural choices and what the held-out evaluation actually supports.</p>
+<a class="cta text" href="/#work">← All projects</a>
+</div>
+<article class="project" id="research" aria-labelledby="research-title">
+<div class="project-heading reveal">
+<div><span class="chapter-count">STORY 01 / GRADUATE RESEARCH</span>
+<h2 class="section-title" id="research-title">Can a few seconds of video reveal subtle signs of driver impairment?</h2>
+<p>My graduate research at Western University's AiX Lab explored whether synchronized RGB and infrared facial video could distinguish sober, low-impairment and severe-impairment sessions.</p></div>
+<div class="project-tags">Python / PyTorch / Computer vision<br/>TimeSformer / VideoMAE<br/>Participant-separated evaluation</div>
+</div>
+<div class="story-grid">
+<div class="chapter reveal"><div class="chapter-kicker">01 · The challenge</div><h3>Real video isn't a clean dataset</h3><p>Facial movement and appearance vary with lighting, camera angle and recording quality. Before modelling, the source sessions had to be checked for the face visibility and camera consistency the experiment needed. From the original 60 participants, the final publication cohort retained 57 after source-quality exclusions.</p></div>
+<div class="chapter reveal"><div class="chapter-kicker">02 · The exploration</div><h3>Try different ways to understand time</h3><p>TimeSformer, Video Swin and ViViT were part of the architecture exploration. The retained publication work then focused on a reference-free TimeSformer system and a separate personalized VideoMAE approach. Not every early exploratory run has preserved, directly comparable results, so I don't present a made-up leaderboard.</p></div>
+<div class="chapter featured reveal"><div><div class="chapter-kicker">03 · The turning point</div><h3>How I cropped the face mattered</h3><p>A controlled TimeSformer crop comparison was a reminder that representation choices can outweigh architectural novelty.</p></div><div>
+<div class="evidence-row"><div class="evidence-number"><strong>44.44%</strong><span>Crop A accuracy in matched replay</span></div><div class="evidence-number"><strong>76.02%</strong><span>Crop B accuracy in matched replay</span></div></div>
+<p style="margin-top:18px">The final reference-free pipeline used full-face/head-motion Crop B and synchronized RGB/IR inputs, sampling 16 frames from each preserved 125-frame clip.</p>
+</div></div>
+<div class="chapter reveal"><div class="chapter-kicker">04 · The evaluation</div><h3>Keep people separate across folds</h3><p>The reported TimeSformer result covers 57 participants and 171 sessions across five participant-disjoint outer folds and three training seeds. The preserved evaluation reports 76.02% accuracy and 76.05% macro-F1. It is a frozen downstream replay on the accepted feature lineage, not a claim of byte-identical end-to-end regeneration.</p></div>
+<div class="chapter reveal"><div class="chapter-kicker">05 · The parallel experiment</div><h3>What if you know someone's sober baseline?</h3><p>VideoMAE investigated a different condition, using same-participant sober calibration. Its frozen post-hoc result is 66.08% accuracy. Because the inference conditions and evaluation details differ, I do not rank it directly against the reference-free TimeSformer system.</p></div>
+</div>
+<div class="project-bottom"><p>Manuscript in preparation. Research code and participant data are private. The website reports the accepted evaluation, including its reproducibility boundaries.</p></div>
+<details class="disclosure"><summary>What this project taught me</summary><p>It reinforced that experimental design begins before training: with what is visible in the data, how it is cropped, who is allowed into a held-out fold and what a result actually supports. A more complex model isn't automatically a more defensible result.</p></details>
+</article>
+<div class="case-next"><a class="cta primary" href="/#work">Explore other projects</a><a class="cta text" href="/#contact">Get in touch</a></div>
+</main>
+<footer class="footer"><span>© Gayathri Namboodiri</span><span>Research methodology and limitations, presented in context.</span></footer>
+</div>
+<script src="/scripts/coffee-motion.js" defer></script>
+</body></html>
