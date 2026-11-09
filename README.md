@@ -2,7 +2,8 @@
 
 This is the **GitHub Pages presentation layer**, not an ML application repository.
 
-- `index.html`: lightweight professional homepage.
+- `index.html`: concise recruiter-facing homepage with three project previews, a short background, experience and contact.
+- `driver-impairment-research.html`: dedicated research case study containing preserved experiment details, evaluation and limitations.
 - `auto-market-assistant.html`: interactive, browser-only case study showing *saved* price estimates and cited owner-review evidence. The site does not execute a model or contact AWS.
 - `data/auto-market-snapshots.v1.json`: small, published snapshot of prior verified inference and project-level evaluation. One 2004 Ford F-150 scenario is currently included; other vehicles must not be invented.
 - `scripts/auto-market-demo.js`: same-origin JSON loader and browser interactions (quartile/median comparisons, review-source inspection, and evaluation views).
@@ -37,22 +38,23 @@ Static output can be regenerated locally without ongoing AWS charges, but genera
 
 **Restored coffee-themed direction (November 6, 2026).** The original September portfolio used an espresso (#34241f), coffee (#6f4e37), rust (#b55435) and cream (#f5ebdd) palette, plus a personalized coffee-and-laptop portrait illustration. That exact original image is recovered from the earlier GitHub history and stored once as `assets/gayathri-coffee-portrait.png` (~2.17 MB), instead of embedding multiple base64 copies in the homepage.
 
-- `styles/coffee.css`: warm personal design with a responsive portrait-led hero, project story cards, and calm typography.
-- `scripts/coffee-motion.js`: staggered entrance, scroll reveals, decorative steam, floating note and restrained desktop pointer parallax. Motion is disabled through `prefers-reduced-motion`.
+- `styles/coffee.css`: warm personal design with a responsive portrait-led hero, concise featured-work cards, and shared long-form case-study styles.
+- `scripts/coffee-motion.js`: reading progress, scroll reveals and restrained pointer-driven hero depth, with `prefers-reduced-motion` support.
 - `index.html`: personal narrative, photography/design/coffee interests, and current evidence-backed project descriptions.
 - The Auto Market Assistant case study retains its separate, tested browser-only saved-result demo, with no AWS runtime requirement.
 
 We kept the engineering/evidence clarity from the [unslop](https://github.com/heydamir/unslop) design review (Damir Sokolovsky, CC BY 4.0) while restoring the user's own visual identity. This is not a recreation of outdated metrics or old cloud status; verified results and links supersede the September source.
 
-## Expanded story-led portfolio
+## Recruiter-first presentation (November 9, 2026)
 
-The coffee-themed homepage now has a personal introduction, the original illustrated Gayathri portrait, scroll/ticker/steam animations (disabled under `prefers-reduced-motion`), and three evidence-based case-study stories. The stories are written as problem → exploration → engineering choices → results → limitations/lessons:
+The homepage now provides an introduction, three featured project previews, a short career transition story, professional experience and contact. It is deliberately not a collection of full research chapters.
 
-- **Driver impairment:** RGB/IR source QC (60-source to 57-participant publication cohort), exploratory TimeSformer/Video Swin/ViViT work, matched Crop A vs B comparison, reference-free TimeSformer evaluation, and separate sober-calibrated VideoMAE condition.
-- **Auto Market Assistant:** the dual problem of historical asking-price estimation vs. owner-review evidence, CatBoost chronological holdout, MiniLM/FAISS, the decision not to forecast from one month of data, and the verified static demo.
-- **Insider threat:** feature construction from activity logs, saved notebook model comparisons and the unresolved independent reproduction/leakage audit.
+- **Driver impairment:** A concise measured result links to `driver-impairment-research.html`, which preserves source quality, model exploration, crop comparisons, participant-disjoint evaluation and the separate sober-calibrated experiment.
+- **Auto Market Assistant:** A price-model summary links to the existing browser-only saved-output demo and the canonical application repository. No live AWS prediction is implied.
+- **Insider threat:** An explicitly exploratory result links to the original notebook rather than implying production performance.
+- Existing `#research`, `#market` and `#security` homepage links still identify their corresponding previews.
 
-The site is deliberately narrative, not a claim that the manuscript is published or that the saved demo is a live AWS model. The original illustration is reused unchanged and described as an illustration rather than a photograph. Engineering code and canonical technical documentation remain in the project repositories.
+The original illustrated portrait and its coloured plots remain unchanged. Keep the prominent navigation and project previews scan-friendly; preserve reproducibility details, limitations and engineering narrative on their respective deeper destinations.
 
 ## Changes and deployment
 
