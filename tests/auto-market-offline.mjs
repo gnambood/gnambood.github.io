@@ -85,45 +85,51 @@ try {
   assert(width.content <= width.viewport + 4, JSON.stringify(width));
 
 
-  // The new coffee site should tell the full story and reuse the original portrait.
+  // The homepage is a recruiter-facing overview; long-form research lives separately.
   await page.goto(base + "/index.html");
   assert.match(await page.locator(".hero h1").innerText(), /Gayathri/);
-  assert.match(await page.locator(".hero h1").innerText(), /Curious by nature/);
-  assert.match(await page.locator(".coffee-stamp").innerText(), /Currently brewing/);
-  assert.equal(await page.locator(".project").count(), 3);
-  assert.equal(await page.locator("#research .chapter").count(), 5);
-  assert.equal(await page.locator("#market .chapter").count(), 5);
-  assert.equal(await page.locator("#security .chapter").count(), 3);
-  assert.match(await page.locator("#research").innerText(), /57 participants/);
-  assert.match(await page.locator("#market").innerText(), /chronological holdout/);
+  assert.equal(await page.locator(".feature-card").count(), 3);
+  assert.equal(await page.locator("#research .feature-proof strong").innerText(), "76.05%");
+  assert.equal(await page.locator("#market .feature-proof strong").innerText(), "0.883");
+  assert.equal(await page.locator("#security .feature-proof strong").innerText(), "99.04%");
+  assert.equal(await page.locator('a[href="/driver-impairment-research.html"]').count(), 1);
   assert.equal(await page.locator('a[href="/auto-market-assistant.html"]').count(), 1);
-  const coffee = await page.evaluate(() => {
-    const picture = document.querySelector(".portrait-stage img");
+  assert.equal(await page.locator("#research .chapter").count(), 0, "Homepage should not include full research chapters");
+
+  const portrait = await page.evaluate(() => {
+    const image = document.querySelector(".portrait-stage img");
     return {
-      loaded: picture.complete && picture.naturalWidth > 1000,
-      photoSrc: picture.getAttribute("src"),
+      loaded: image.complete && image.naturalWidth > 1000,
+      src: image.getAttribute("src"),
       background: getComputedStyle(document.body).backgroundColor,
-      steam: getComputedStyle(document.querySelector(".steam.s1")).animationName,
-      portrait: getComputedStyle(picture).animationName,
-      width: document.documentElement.clientWidth,
-      scrollWidth: document.documentElement.scrollWidth
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth
     };
   });
-  assert(coffee.loaded, "Original illustrated portrait should load");
-  assert.equal(coffee.photoSrc, "/assets/gayathri-coffee-portrait.png");
-  assert.equal(coffee.background, "rgb(245, 235, 221)");
-  assert.equal(coffee.steam, "steam");
-  assert.equal(coffee.portrait, "float-photo");
-  assert(coffee.scrollWidth <= coffee.width + 4, JSON.stringify(coffee));
+  assert(portrait.loaded, "Original coloured portrait illustration should load");
+  assert.equal(portrait.src, "/assets/gayathri-coffee-portrait.png");
+  assert.equal(portrait.background, "rgb(245, 235, 221)");
+  assert(portrait.scrollWidth <= portrait.clientWidth + 4, JSON.stringify(portrait));
 
-  // Motion is decorative and must respect reduced-motion preferences.
+  await page.goto(base + "/driver-impairment-research.html");
+  assert.equal(await page.locator("#research .chapter").count(), 5);
+  assert.match(await page.locator("#research").innerText(), /57 participants/);
+  assert.match(await page.locator("#research").innerText(), /76.02%/);
+
+  // Both overview and deep dive should remain usable at narrow widths.
+  for (const url of ["/index.html", "/driver-impairment-research.html"]) {
+    await page.goto(base + url);
+    const geometry = await page.evaluate(() => ({
+      width: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth
+    }));
+    assert(geometry.scrollWidth <= geometry.width + 4, url + " " + JSON.stringify(geometry));
+  }
+
+  // Reduced motion must disable decorative ticker animation.
   await page.emulateMedia({reducedMotion: "reduce"});
-  const reduced = await page.evaluate(() => ({
-    steam: getComputedStyle(document.querySelector(".steam.s1")).animationName,
-    portrait: getComputedStyle(document.querySelector(".portrait-stage img")).animationName,
-    ticker: getComputedStyle(document.querySelector(".ticker-inner")).animationName
-  }));
-  assert.deepEqual(reduced, {steam: "none", portrait: "none", ticker: "none"});
+  await page.goto(base + "/index.html");
+  assert.equal(await page.locator(".ticker-inner").evaluate(el => getComputedStyle(el).animationName), "none");
   await page.emulateMedia({reducedMotion: "no-preference"});
 
   assert.deepEqual(errors, [], "Client-side exceptions are not allowed");
