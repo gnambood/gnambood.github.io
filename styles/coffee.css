@@ -144,6 +144,8 @@ section{padding:92px 0;border-bottom:1px solid var(--line)}
 .feature-card .feature-stack{margin-top:20px;font:.78rem/1.6 Consolas,monospace;color:var(--coffee)}
 .feature-link{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;color:var(--coffee);font-size:.89rem;font-weight:650;text-decoration:none;border-bottom:1px solid #b9987e;padding:0 0 5px;margin-top:21px}
 .feature-link:hover{color:var(--rust);border-color:var(--rust)}
+.feature-actions{display:flex;gap:14px 24px;align-items:baseline;flex-wrap:wrap}
+.feature-actions .feature-link-secondary{font-size:.81rem;color:var(--muted);border-bottom-color:var(--line)}
 .feature-card-wide{grid-column:1/-1;min-height:0;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(230px,.6fr);gap:36px;align-items:center}
 .feature-card-wide h3{margin-top:14px}
 .feature-wide-right{display:flex;flex-direction:column;align-items:flex-start}
