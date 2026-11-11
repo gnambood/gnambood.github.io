@@ -102,20 +102,29 @@ section{padding:92px 0;border-bottom:1px solid var(--line)}
 .interests div{background:#fdf7ee;border:1px solid var(--line);padding:18px}
 .interests b{display:block;font-size:.96rem;margin-bottom:7px}
 .interests span{display:block;color:var(--muted);font-size:.83rem}
-.experience{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:36px}
-.experience div{border-top:1px solid #c6ad99;padding-top:20px}
-.experience small{font:600 .75rem Consolas,monospace;color:var(--rust)}
-.experience h3{font-size:1rem;font-weight:600;margin:12px 0 8px}
-.experience p{color:var(--muted);font-size:.87rem;margin:0}
-.experience-detail{margin-top:12px;color:var(--muted);font-size:.85rem}
-.experience-detail summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;color:var(--rust);font-weight:600;line-height:1.5;padding:10px 0;border-top:1px solid var(--line);list-style:none}
+/* Experience: editorial timeline, consistent with the site's restrained palette. */
+.experience-list{display:block;margin-top:42px;border-top:1px solid var(--line)}
+.experience-item{display:grid;grid-template-columns:180px minmax(0,1fr);gap:clamp(24px,5vw,76px);padding:31px 0 34px;border-bottom:1px solid var(--line)}
+.experience-date{display:flex;flex-direction:column;gap:7px;padding-top:5px}
+.experience-date>span:first-child{font:600 .82rem/1.4 Consolas,monospace;letter-spacing:.025em;color:var(--rust)}
+.experience-type{font-size:.8rem;line-height:1.5;color:var(--muted)}
+.experience-body{max-width:760px;min-width:0}
+.experience .experience-org{color:var(--rust);font-size:.78rem;font-weight:650;letter-spacing:.075em;text-transform:uppercase;line-height:1.45;margin:0 0 8px}
+.experience h3{font:400 clamp(1.4rem,2.4vw,1.9rem)/1.22 Georgia,serif;letter-spacing:-.025em;margin:0 0 11px}
+.experience h3 span{color:var(--muted);font-size:.8em}
+.experience .experience-overview{font-size:.94rem;line-height:1.72;color:#66534b;max-width:710px;margin:0}
+.experience-detail{margin-top:16px;color:var(--muted);font-size:.9rem}
+.experience-detail summary{display:inline-flex;align-items:center;gap:12px;cursor:pointer;color:var(--coffee);font-size:.85rem;font-weight:650;line-height:1.45;padding:5px 0;list-style:none}
 .experience-detail summary::-webkit-details-marker{display:none}
-.experience-detail summary::after{content:'+';display:inline-grid;place-items:center;flex:none;width:24px;height:24px;border:1px solid currentColor;border-radius:50%;font-size:1.1rem;line-height:1}
+.experience-detail summary::after{content:'+';display:inline-grid;place-items:center;flex:none;width:23px;height:23px;border:1px solid var(--line);border-radius:50%;font-size:1.05rem;line-height:1;color:var(--rust)}
 .experience-detail[open] summary::after{content:'−'}
+.experience-detail summary:hover{color:var(--rust)}
 .experience-detail summary:focus-visible{outline:2px solid var(--rust);outline-offset:4px}
-.experience-detail summary:hover{text-decoration:underline}
-.experience .experience-detail p{margin-top:10px;line-height:1.6}
-.experience-detail strong{color:var(--coffee)}
+.experience-expanded{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:20px;padding:20px 0 2px;border-top:1px solid var(--line)}
+.experience .experience-expanded p{margin:0;font-size:.84rem;line-height:1.65;color:var(--muted)}
+.experience-expanded strong{display:block;margin-bottom:7px;color:var(--espresso);font-size:.75rem;letter-spacing:.065em;text-transform:uppercase}
+.experience-expanded a{color:var(--rust);text-decoration-thickness:1px}
+@media(max-width:780px){.experience-item{grid-template-columns:1fr;gap:10px;padding:26px 0}.experience-date{flex-direction:row;gap:14px;align-items:center}.experience-expanded{grid-template-columns:1fr;gap:18px}.experience h3 span{display:block;margin-top:3px}}
 .contact{background:var(--espresso);color:var(--cream);margin:0;padding:100px 0;border-bottom:0}
 .contact .section-kicker{color:#d7ab84}
 .contact h2{font-size:clamp(3rem,5vw,5rem);letter-spacing:-.045em;line-height:1.13;margin:20px 0}
