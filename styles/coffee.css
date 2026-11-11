@@ -107,6 +107,11 @@ section{padding:92px 0;border-bottom:1px solid var(--line)}
 .experience small{font:600 .75rem Consolas,monospace;color:var(--rust)}
 .experience h3{font-size:1rem;font-weight:600;margin:12px 0 8px}
 .experience p{color:var(--muted);font-size:.87rem;margin:0}
+.experience-detail{margin-top:12px;color:var(--muted);font-size:.85rem}
+.experience-detail summary{cursor:pointer;color:var(--rust);font-weight:600;line-height:1.5}
+.experience-detail summary:hover{text-decoration:underline}
+.experience .experience-detail p{margin-top:10px;line-height:1.6}
+.experience-detail strong{color:var(--coffee)}
 .contact{background:var(--espresso);color:var(--cream);margin:0;padding:100px 0;border-bottom:0}
 .contact .section-kicker{color:#d7ab84}
 .contact h2{font-size:clamp(3rem,5vw,5rem);letter-spacing:-.045em;line-height:1.13;margin:20px 0}
