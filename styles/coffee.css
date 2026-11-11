@@ -108,7 +108,11 @@ section{padding:92px 0;border-bottom:1px solid var(--line)}
 .experience h3{font-size:1rem;font-weight:600;margin:12px 0 8px}
 .experience p{color:var(--muted);font-size:.87rem;margin:0}
 .experience-detail{margin-top:12px;color:var(--muted);font-size:.85rem}
-.experience-detail summary{cursor:pointer;color:var(--rust);font-weight:600;line-height:1.5}
+.experience-detail summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;color:var(--rust);font-weight:600;line-height:1.5;padding:10px 0;border-top:1px solid var(--line);list-style:none}
+.experience-detail summary::-webkit-details-marker{display:none}
+.experience-detail summary::after{content:'+';display:inline-grid;place-items:center;flex:none;width:24px;height:24px;border:1px solid currentColor;border-radius:50%;font-size:1.1rem;line-height:1}
+.experience-detail[open] summary::after{content:'−'}
+.experience-detail summary:focus-visible{outline:2px solid var(--rust);outline-offset:4px}
 .experience-detail summary:hover{text-decoration:underline}
 .experience .experience-detail p{margin-top:10px;line-height:1.6}
 .experience-detail strong{color:var(--coffee)}
